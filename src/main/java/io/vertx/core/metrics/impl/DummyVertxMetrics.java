@@ -20,12 +20,6 @@ public class DummyVertxMetrics implements VertxMetrics {
 
   public static final DummyVertxMetrics INSTANCE = new DummyVertxMetrics();
 
-  public static class DummyEventBusMetrics implements EventBusMetrics<Void> {
-
-    public static final DummyEventBusMetrics INSTANCE = new DummyEventBusMetrics();
-
-  }
-
   public static class DummyHttpServerMetrics implements HttpServerMetrics<Void, Void, Void> {
 
     public static final DummyHttpServerMetrics INSTANCE = new DummyHttpServerMetrics();

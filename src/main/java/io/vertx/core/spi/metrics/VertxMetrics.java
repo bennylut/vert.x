@@ -26,7 +26,7 @@ import io.vertx.core.net.*;
  * The main Vert.x metrics SPI which Vert.x will use internally. This interface serves two purposes, one
  * to be called by Vert.x itself for events like verticles deployed, timers created, etc. The other
  * to provide Vert.x with other metrics SPI's which will be used for specific components i.e.
- * {@link io.vertx.core.http.HttpServer}, {@link io.vertx.core.spi.metrics.EventBusMetrics}, etc.
+ * {@link io.vertx.core.http.HttpServer}, etc.
  *
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
  */
@@ -54,18 +54,6 @@ public interface VertxMetrics extends Metrics, Measured {
   default void verticleUndeployed(Verticle verticle) {
   }
 
-  /**
-   * Provides the event bus metrics SPI when the event bus is created.<p/>
-   * <p>
-   * No specific thread and context can be expected when this method is called.<p/>
-   * <p>
-   * This method should be called only once.
-   *
-   * @return the event bus metrics SPI or {@code null} when metrics are disabled
-   */
-  default EventBusMetrics createEventBusMetrics() {
-    return null;
-  }
 
   /**
    * Provides the http server metrics SPI when an http server is created.<p/>

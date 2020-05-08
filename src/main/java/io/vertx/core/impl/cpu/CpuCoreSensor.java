@@ -11,7 +11,7 @@
 
 package io.vertx.core.impl.cpu;
 
-import io.vertx.core.impl.launcher.commands.ExecUtils;
+import io.vertx.core.impl.ExecUtils;
 
 import java.io.*;
 import java.nio.charset.Charset;
