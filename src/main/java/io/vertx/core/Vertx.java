@@ -58,7 +58,7 @@ import java.util.function.Supplier;
  * Most functionality in Vert.x core is fairly low level.
  * <p>
  * To create an instance of this class you can use the static factory methods: {@link #vertx},
- * {@link #vertx(io.vertx.core.VertxOptions)} and {@link #clusteredVertx(io.vertx.core.VertxOptions, Handler)}.
+ * {@link #vertx(io.vertx.core.VertxOptions)} .
  * <p>
  * Please see the user manual for more detailed usage information.
  *
@@ -84,27 +84,6 @@ public interface Vertx extends Measured {
    */
   static Vertx vertx(VertxOptions options) {
     return new VertxFactory(options).vertx();
-  }
-
-  /**
-   * Creates a clustered instance using the specified options.
-   * <p>
-   * The instance is created asynchronously and the resultHandler is called with the result when it is ready.
-   *
-   * @param options  the options to use
-   * @param resultHandler  the result handler that will receive the result
-   */
-  static void clusteredVertx(VertxOptions options, Handler<AsyncResult<Vertx>> resultHandler) {
-    new VertxFactory(options).clusteredVertx(resultHandler);
-  }
-
-  /**
-   * Same as {@link #clusteredVertx(VertxOptions, Handler)} but with an {@code handler} called when the operation completes
-   */
-  static Future<Vertx> clusteredVertx(VertxOptions options) {
-    Promise<Vertx> promise = Promise.promise();
-    clusteredVertx(options, promise);
-    return promise.future();
   }
 
   /**
@@ -506,13 +485,6 @@ public interface Vertx extends Measured {
    */
   @GenIgnore(GenIgnore.PERMITTED_TYPE)
   Set<VerticleFactory> verticleFactories();
-
-  /**
-   * Is this Vert.x instance clustered?
-   *
-   * @return true if clustered
-   */
-  boolean isClustered();
 
   /**
    * Safely execute some blocking code.

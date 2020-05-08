@@ -1,2 +1,0 @@
-V	280523113651Z		01	unknown	/CN=localhost
-V	280523113652Z		02	unknown	/CN=client

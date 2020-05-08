@@ -86,14 +86,6 @@ public abstract class AbstractVerticle implements Verticle {
   }
 
   /**
-   * Get the arguments used when deploying the Vert.x process.
-   * @return the list of arguments
-   */
-  public List<String> processArgs() {
-    return context.processArgs();
-  }
-
-  /**
    * Start the verticle.<p>
    * This is called by Vert.x when the verticle instance is deployed. Don't call it yourself.<p>
    * If your verticle does things in its startup which take some time then you can override this method

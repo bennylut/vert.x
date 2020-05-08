@@ -13,7 +13,6 @@ package io.vertx.core.impl;
 import io.netty.util.concurrent.FastThreadLocal;
 import io.netty.util.concurrent.FastThreadLocalThread;
 import io.vertx.core.*;
-import io.vertx.core.impl.launcher.VertxCommandLauncher;
 
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
@@ -214,11 +213,6 @@ abstract class AbstractContext implements ContextInternal {
     } catch (RejectedExecutionException ignore) {
       // Pool is already shut down
     }
-  }
-
-  @Override
-  public final List<String> processArgs() {
-    return VertxCommandLauncher.getProcessArguments();
   }
 
   @Override

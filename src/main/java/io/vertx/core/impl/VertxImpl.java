@@ -749,10 +749,10 @@ public class VertxImpl implements VertxInternal, MetricsProvider {
     executeBlocking(blockingCodeHandler, true, asyncResultHandler);
   }
 
-  @Override
-  public boolean isClustered() {
-    return clusterManager != null;
-  }
+//  @Override
+//  public boolean isClustered() {
+//    return clusterManager != null;
+//  }
 
   @Override
   public EventLoopGroup nettyEventLoopGroup() {
