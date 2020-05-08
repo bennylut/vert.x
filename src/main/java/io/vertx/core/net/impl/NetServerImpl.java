@@ -319,7 +319,7 @@ public class NetServerImpl extends TCPServerBase implements Closeable, MetricsPr
         if (metrics != null) {
           conn.metric(metrics.connected(conn.remoteAddress(), conn.remoteName()));
         }
-        conn.registerEventBusHandler();
+//        conn.registerEventBusHandler();
         context.dispatch(conn, connectionHandler::handle);
       });
       nh.removeHandler(conn -> {

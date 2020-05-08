@@ -739,7 +739,7 @@ class Http1xClientConnection extends Http1xConnectionBase<WebSocketImpl> impleme
           close();
         } else {
           webSocket = (WebSocketImpl) wsRes.result();
-          webSocket.registerHandler(vertx.eventBus());
+//          webSocket.registerHandler(vertx.eventBus());
 
         }
         log.debug("WebSocket handshake complete");

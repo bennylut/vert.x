@@ -103,10 +103,10 @@ public class NetSocketImpl extends ConnectionBase implements NetSocketInternal {
     });
   }
 
-  synchronized void registerEventBusHandler() {
-    Handler<Message<Buffer>> writeHandler = msg -> write(msg.body());
-    registration = vertx.eventBus().<Buffer>localConsumer(writeHandlerID).handler(writeHandler);
-  }
+//  synchronized void registerEventBusHandler() {
+//    Handler<Message<Buffer>> writeHandler = msg -> write(msg.body());
+//    registration = vertx.eventBus().<Buffer>localConsumer(writeHandlerID).handler(writeHandler);
+//  }
 
   @Override
   public TCPMetrics metrics() {

@@ -20,7 +20,6 @@ import io.vertx.core.file.impl.FileResolver;
 import io.vertx.core.net.impl.transport.Transport;
 import io.vertx.core.spi.VertxMetricsFactory;
 import io.vertx.core.spi.VertxTracerFactory;
-import io.vertx.core.spi.cluster.ClusterManager;
 import io.vertx.core.spi.metrics.VertxMetrics;
 import io.vertx.core.spi.tracing.VertxTracer;
 
@@ -35,14 +34,12 @@ public class VertxFactory {
 
   private VertxOptions options;
   private Transport transport;
-  private ClusterManager clusterManager;
   private VertxTracer tracer;
   private VertxMetrics metrics;
   private FileResolver fileResolver;
 
   public VertxFactory(VertxOptions options) {
     this.options = options;
-    this.clusterManager = options.getClusterManager();
   }
 
   public VertxFactory() {
@@ -51,11 +48,6 @@ public class VertxFactory {
 
   public VertxFactory transport(Transport transport) {
     this.transport = transport;
-    return this;
-  }
-
-  public VertxFactory clusterManager(ClusterManager clusterManager) {
-    this.clusterManager = clusterManager;
     return this;
   }
 
@@ -70,36 +62,11 @@ public class VertxFactory {
   }
 
   public Vertx vertx() {
-    VertxImpl vertx = new VertxImpl(options, null, createMetrics(), createTracer(), createTransport(), createFileResolver());
+    VertxImpl vertx = new VertxImpl(options, createMetrics(), createTracer(), createTransport(), createFileResolver());
     vertx.init();
     return vertx;
   }
 
-  public void clusteredVertx(Handler<AsyncResult<Vertx>> handler) {
-    VertxImpl vertx = new VertxImpl(options, createClusterManager(), createMetrics(), createTracer(), createTransport(), createFileResolver());
-    vertx.joinCluster(options, handler);
-  }
-
-  private ClusterManager createClusterManager() {
-    if (clusterManager == null) {
-      String clusterManagerClassName = System.getProperty("vertx.cluster.managerClass");
-      if (clusterManagerClassName != null) {
-        // We allow specify a sys prop for the cluster manager factory which overrides ServiceLoader
-        try {
-          Class<?> clazz = Class.forName(clusterManagerClassName);
-          clusterManager = (ClusterManager) clazz.newInstance();
-        } catch (Exception e) {
-          throw new IllegalStateException("Failed to instantiate " + clusterManagerClassName, e);
-        }
-      } else {
-        clusterManager = ServiceHelper.loadFactoryOrNull(ClusterManager.class);
-        if (clusterManager == null) {
-          throw new IllegalStateException("No ClusterManagerFactory instances found on classpath");
-        }
-      }
-    }
-    return clusterManager;
-  }
 
   private Transport createTransport() {
     if (transport == null) {

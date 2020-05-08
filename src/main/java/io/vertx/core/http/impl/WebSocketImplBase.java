@@ -19,7 +19,6 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.http.WebSocketBase;
@@ -87,12 +86,12 @@ public abstract class WebSocketImplBase<S extends WebSocketBase> implements WebS
     pending.drainHandler(v -> conn.doResume());
   }
 
-  void registerHandler(EventBus eventBus) {
-    Handler<Message<Buffer>> binaryHandler = msg -> writeBinaryFrameInternal(msg.body());
-    Handler<Message<String>> textHandler = msg -> writeTextFrameInternal(msg.body());
-    binaryHandlerRegistration = eventBus.<Buffer>localConsumer(binaryHandlerID).handler(binaryHandler);
-    textHandlerRegistration = eventBus.<String>localConsumer(textHandlerID).handler(textHandler);
-  }
+//  void registerHandler(EventBus eventBus) {
+//    Handler<Message<Buffer>> binaryHandler = msg -> writeBinaryFrameInternal(msg.body());
+//    Handler<Message<String>> textHandler = msg -> writeTextFrameInternal(msg.body());
+//    binaryHandlerRegistration = eventBus.<Buffer>localConsumer(binaryHandlerID).handler(binaryHandler);
+//    textHandlerRegistration = eventBus.<String>localConsumer(textHandlerID).handler(textHandler);
+//  }
 
   public String binaryHandlerID() {
     return binaryHandlerID;

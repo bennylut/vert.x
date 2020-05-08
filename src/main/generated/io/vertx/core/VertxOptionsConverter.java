@@ -1,16 +1,12 @@
 package io.vertx.core;
 
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.json.JsonArray;
-import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 
 /**
  * Converter and mapper for {@link io.vertx.core.VertxOptions}.
  * NOTE: This class has been automatically generated from the {@link io.vertx.core.VertxOptions} original class using Vert.x codegen.
  */
 public class VertxOptionsConverter {
-
 
    static void fromJson(Iterable<java.util.Map.Entry<String, Object>> json, VertxOptions obj) {
     for (java.util.Map.Entry<String, Object> member : json) {
@@ -73,16 +69,6 @@ public class VertxOptionsConverter {
         case "fileSystemOptions":
           if (member.getValue() instanceof JsonObject) {
             obj.setFileSystemOptions(new io.vertx.core.file.FileSystemOptions((io.vertx.core.json.JsonObject)member.getValue()));
-          }
-          break;
-        case "haEnabled":
-          if (member.getValue() instanceof Boolean) {
-            obj.setHAEnabled((Boolean)member.getValue());
-          }
-          break;
-        case "haGroup":
-          if (member.getValue() instanceof String) {
-            obj.setHAGroup((String)member.getValue());
           }
           break;
         case "internalBlockingPoolSize":
@@ -177,10 +163,6 @@ public class VertxOptionsConverter {
     json.put("eventLoopPoolSize", obj.getEventLoopPoolSize());
     if (obj.getFileSystemOptions() != null) {
       json.put("fileSystemOptions", obj.getFileSystemOptions().toJson());
-    }
-    json.put("haEnabled", obj.isHAEnabled());
-    if (obj.getHAGroup() != null) {
-      json.put("haGroup", obj.getHAGroup());
     }
     json.put("internalBlockingPoolSize", obj.getInternalBlockingPoolSize());
     json.put("maxEventLoopExecuteTime", obj.getMaxEventLoopExecuteTime());

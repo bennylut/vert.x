@@ -21,7 +21,6 @@ import io.vertx.core.net.impl.NetServerImpl;
 import io.vertx.core.net.impl.ServerID;
 import io.vertx.core.net.impl.TCPServerBase;
 import io.vertx.core.net.impl.transport.Transport;
-import io.vertx.core.spi.cluster.ClusterManager;
 import io.vertx.core.spi.metrics.VertxMetrics;
 
 import java.io.File;
@@ -106,17 +105,8 @@ public interface VertxInternal extends Vertx {
   @Override
   WorkerExecutorInternal createSharedWorkerExecutor(String name, int poolSize, long maxExecuteTime, TimeUnit maxExecuteTimeUnit);
 
-  void simulateKill();
 
   Deployment getDeployment(String deploymentID);
-
-  void failoverCompleteHandler(FailoverCompleteHandler failoverCompleteHandler);
-
-  boolean isKilled();
-
-  void failDuringFailover(boolean fail);
-
-  String getNodeID();
 
   File resolveFile(String fileName);
 
@@ -125,9 +115,7 @@ public interface VertxInternal extends Vertx {
    */
   <T> void executeBlockingInternal(Handler<Promise<T>> blockingCodeHandler, Handler<AsyncResult<T>> resultHandler);
 
-  ClusterManager getClusterManager();
 
-  HAManager haManager();
 
   /**
    * Resolve an address (e.g. {@code vertx.io} into the first found A (IPv4) or AAAA (IPv6) record.

@@ -18,7 +18,6 @@ import io.vertx.core.file.FileSystemOptions;
 import io.vertx.core.impl.cpu.CpuCoreSensor;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.metrics.MetricsOptions;
-import io.vertx.core.spi.cluster.ClusterManager;
 import io.vertx.core.tracing.TracingOptions;
 
 import java.util.Objects;
@@ -132,15 +131,6 @@ public class VertxOptions {
    */
   public static final int DEFAULT_QUORUM_SIZE = 1;
 
-  /**
-   * The default value of Ha group is "__DEFAULT__"
-   */
-  public static final String DEFAULT_HA_GROUP = "__DEFAULT__";
-
-  /**
-   * The default value of HA enabled = false
-   */
-  public static final boolean DEFAULT_HA_ENABLED = false;
 
   /**
    * The default value for preferring native transport = false
@@ -165,10 +155,7 @@ public class VertxOptions {
   private long blockedThreadCheckInterval = DEFAULT_BLOCKED_THREAD_CHECK_INTERVAL;
   private long maxEventLoopExecuteTime = DEFAULT_MAX_EVENT_LOOP_EXECUTE_TIME;
   private long maxWorkerExecuteTime = DEFAULT_MAX_WORKER_EXECUTE_TIME;
-  private ClusterManager clusterManager;
-  private boolean haEnabled = DEFAULT_HA_ENABLED;
   private int quorumSize = DEFAULT_QUORUM_SIZE;
-  private String haGroup = DEFAULT_HA_GROUP;
   private MetricsOptions metricsOptions = new MetricsOptions();
   private TracingOptions tracingOptions = new TracingOptions();
   private FileSystemOptions fileSystemOptions = new FileSystemOptions();
@@ -199,10 +186,7 @@ public class VertxOptions {
     this.maxEventLoopExecuteTime = other.getMaxEventLoopExecuteTime();
     this.maxWorkerExecuteTime = other.getMaxWorkerExecuteTime();
     this.internalBlockingPoolSize = other.getInternalBlockingPoolSize();
-    this.clusterManager = other.getClusterManager();
-    this.haEnabled = other.isHAEnabled();
     this.quorumSize = other.getQuorumSize();
-    this.haGroup = other.getHAGroup();
     this.metricsOptions = other.getMetricsOptions() != null ? new MetricsOptions(other.getMetricsOptions()) : null;
     this.fileSystemOptions = other.getFileSystemOptions() != null ? new FileSystemOptions(other.getFileSystemOptions()) : null;
     this.warningExceptionTime = other.warningExceptionTime;
@@ -530,35 +514,6 @@ public class VertxOptions {
   }
 
   /**
-   * Get the cluster manager to be used when clustering.
-   * <p>
-   * If the cluster manager has been programmatically set here, then that will be used when clustering.
-   * <p>
-   * Otherwise Vert.x attempts to locate a cluster manager on the classpath.
-   *
-   * @return the cluster manager.
-   */
-  public ClusterManager getClusterManager() {
-    return clusterManager;
-  }
-
-  /**
-   * Programmatically set the cluster manager to be used when clustering.
-   * <p>
-   * Only valid if clustered = true.
-   * <p>
-   * Normally Vert.x will look on the classpath for a cluster manager, but if you want to set one
-   * programmatically you can use this method.
-   *
-   * @param clusterManager the cluster manager
-   * @return a reference to this, so the API can be used fluently
-   */
-  public VertxOptions setClusterManager(ClusterManager clusterManager) {
-    this.clusterManager = clusterManager;
-    return this;
-  }
-
-  /**
    * Get the value of internal blocking pool size.
    * <p>
    * Vert.x maintains a pool for internal blocking operations
@@ -580,26 +535,6 @@ public class VertxOptions {
       throw new IllegalArgumentException("internalBlockingPoolSize must be > 0");
     }
     this.internalBlockingPoolSize = internalBlockingPoolSize;
-    return this;
-  }
-
-  /**
-   * Will HA be enabled on the Vert.x instance?
-   *
-   * @return true if HA enabled, false otherwise
-   */
-  public boolean isHAEnabled() {
-    return haEnabled;
-  }
-
-  /**
-   * Set whether HA will be enabled on the Vert.x instance.
-   *
-   * @param haEnabled true if enabled, false if not.
-   * @return a reference to this, so the API can be used fluently
-   */
-  public VertxOptions setHAEnabled(boolean haEnabled) {
-    this.haEnabled = haEnabled;
     return this;
   }
 
@@ -626,26 +561,6 @@ public class VertxOptions {
     return this;
   }
 
-  /**
-   * Get the HA group to be used when HA is enabled.
-   *
-   * @return the HA group
-   */
-  public String getHAGroup() {
-    return haGroup;
-  }
-
-  /**
-   * Set the HA group to be used when HA is enabled.
-   *
-   * @param haGroup the HA group to use
-   * @return a reference to this, so the API can be used fluently
-   */
-  public VertxOptions setHAGroup(String haGroup) {
-    Objects.requireNonNull(haGroup, "ha group cannot be null");
-    this.haGroup = haGroup;
-    return this;
-  }
 
   /**
    * @return the metrics options
@@ -863,11 +778,8 @@ public class VertxOptions {
         ", maxEventLoopExecuteTime=" + maxEventLoopExecuteTime +
         ", maxWorkerExecuteTimeUnit=" + maxWorkerExecuteTimeUnit +
         ", maxWorkerExecuteTime=" + maxWorkerExecuteTime +
-        ", clusterManager=" + clusterManager +
-        ", haEnabled=" + haEnabled +
         ", preferNativeTransport=" + preferNativeTransport +
         ", quorumSize=" + quorumSize +
-        ", haGroup='" + haGroup + '\'' +
         ", metrics=" + metricsOptions +
         ", fileSystemOptions=" + fileSystemOptions +
         ", addressResolver=" + addressResolverOptions.toJson() +

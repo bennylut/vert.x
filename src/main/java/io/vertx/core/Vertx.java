@@ -17,7 +17,6 @@ import io.vertx.core.datagram.DatagramSocket;
 import io.vertx.core.datagram.DatagramSocketOptions;
 import io.vertx.core.dns.DnsClient;
 import io.vertx.core.dns.DnsClientOptions;
-import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.file.FileSystem;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
@@ -31,7 +30,6 @@ import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
-import io.vertx.core.shareddata.SharedData;
 import io.vertx.core.spi.VerticleFactory;
 import io.vertx.core.streams.ReadStream;
 
@@ -186,14 +184,6 @@ public interface Vertx extends Measured {
   FileSystem fileSystem();
 
   /**
-   * Get the event bus object. There is a single instance of EventBus per Vertx instance.
-   *
-   * @return the event bus object
-   */
-  @CacheReturn
-  EventBus eventBus();
-
-  /**
    * Create a DNS client to connect to a DNS server at the specified host and port, with the default query timeout (5 seconds)
    * <p/>
    *
@@ -219,14 +209,6 @@ public interface Vertx extends Measured {
    * @return the DNS client
    */
   DnsClient createDnsClient(DnsClientOptions options);
-
-  /**
-   * Get the shared data object. There is a single instance of SharedData per Vertx instance.
-   *
-   * @return the shared data object
-   */
-  @CacheReturn
-  SharedData sharedData();
 
   /**
    * Set a one-shot timer to fire after {@code delay} milliseconds, at which point {@code handler} will be called with

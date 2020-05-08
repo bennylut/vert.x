@@ -198,7 +198,7 @@ public class ServerWebSocketImpl extends WebSocketImplBase<ServerWebSocketImpl> 
     if (handler != null) {
       pipeline.remove(handler);
     }
-    registerHandler(conn.getContext().owner().eventBus());
+//    registerHandler(conn.getContext().owner().eventBus());
   }
 
   Boolean tryHandshake(int sc) {
