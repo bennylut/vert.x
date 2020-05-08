@@ -1,35 +1,31 @@
 /*
- *  Copyright (c) 2011-2015 The original author or authors
- *  ------------------------------------------------------
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *       The Eclipse Public License is available at
- *       http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *       The Apache License v2.0 is available at
- *       http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
+
 package io.vertx.core.impl.launcher.commands;
 
 import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 import io.vertx.core.cli.CLIException;
 import io.vertx.core.cli.CommandLine;
 import io.vertx.core.cli.annotations.*;
+import io.vertx.core.impl.VertxInternal;
 import io.vertx.core.impl.launcher.VertxLifecycleHooks;
-import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.spi.launcher.ExecutionContext;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -205,14 +201,14 @@ public class RunCommand extends BareCommand {
   public void setUp(ExecutionContext context) throws CLIException {
     super.setUp(context);
 
-    // If cluster-host and / or port is set, cluster need to have been explicitly set
-    io.vertx.core.cli.Option clusterHostOption = executionContext.cli().getOption("cluster-host");
-    io.vertx.core.cli.Option clusterPortOption = executionContext.cli().getOption("cluster-port");
     CommandLine commandLine = executionContext.commandLine();
-    if ((!isClustered()) &&
-        (commandLine.isOptionAssigned(clusterHostOption)
-            || commandLine.isOptionAssigned(clusterPortOption))) {
-      throw new CLIException("The option -cluster-host and -cluster-port requires -cluster to be enabled");
+    if (!isClustered() && (
+      commandLine.isOptionAssigned(executionContext.cli().getOption("cluster-host"))
+        || commandLine.isOptionAssigned(executionContext.cli().getOption("cluster-port"))
+        || commandLine.isOptionAssigned(executionContext.cli().getOption("cluster-public-host"))
+        || commandLine.isOptionAssigned(executionContext.cli().getOption("cluster-public-port"))
+    )) {
+      throw new CLIException("The -cluster-xxx options require -cluster to be enabled");
     }
 
     // If quorum and / or ha-group, ha need to have been explicitly set
@@ -230,7 +226,7 @@ public class RunCommand extends BareCommand {
    */
   @Override
   public boolean isClustered() {
-    return cluster || ha || (options != null  && options.isClustered());
+    return cluster || ha;
   }
 
   @Override
@@ -250,11 +246,23 @@ public class RunCommand extends BareCommand {
       }
       afterConfigParsed(conf);
 
-      super.run();
+      super.run(this::afterStoppingVertx);
       if (vertx == null) {
         // Already logged.
         ExecUtils.exitBecauseOfVertxInitializationIssue();
       }
+
+      if (vertx instanceof VertxInternal) {
+        ((VertxInternal) vertx).addCloseHook(completionHandler -> {
+          try {
+            beforeStoppingVertx(vertx);
+            completionHandler.handle(Future.succeededFuture());
+          } catch (Exception e) {
+            completionHandler.handle(Future.failedFuture(e));
+          }
+        });
+      }
+
       deploymentOptions = new DeploymentOptions();
       configureFromSystemProperties(deploymentOptions, DEPLOYMENT_OPTIONS_PROP_PREFIX);
       deploymentOptions.setConfig(conf).setWorker(worker).setHa(ha).setInstances(instances);
@@ -349,6 +357,12 @@ public class RunCommand extends BareCommand {
     if (clusterPort != 0) {
       args.add("--cluster-port=" + clusterPort);
     }
+    if (clusterPublicHost != null) {
+      args.add("--cluster-public-host=" + clusterPublicHost);
+    }
+    if (clusterPublicPort != -1) {
+      args.add("--cluster-public-port=" + clusterPublicPort);
+    }
     if (ha) {
       args.add("--ha");
     }
@@ -388,7 +402,6 @@ public class RunCommand extends BareCommand {
   protected void deploy() {
     deploy(mainVerticle, vertx, deploymentOptions, res -> {
       if (res.failed()) {
-        res.cause().printStackTrace();
         handleDeployFailed(res.cause());
       }
     });
@@ -403,30 +416,7 @@ public class RunCommand extends BareCommand {
   }
 
   protected JsonObject getConfiguration() {
-    JsonObject conf;
-    if (config != null) {
-      try (Scanner scanner = new Scanner(new File(config)).useDelimiter("\\A")) {
-        String sconf = scanner.next();
-        try {
-          conf = new JsonObject(sconf);
-        } catch (DecodeException e) {
-          log.error("Configuration file " + sconf + " does not contain a valid JSON object");
-          return null;
-        }
-      } catch (FileNotFoundException e) {
-        try {
-          conf = new JsonObject(config);
-        } catch (DecodeException e2) {
-          // The configuration is not printed for security purpose, it can contain sensitive data.
-          log.error("The -conf option does not point to an existing file or is not a valid JSON object");
-          e2.printStackTrace();
-          return null;
-        }
-      }
-    } else {
-      conf = null;
-    }
-    return conf;
+    return getJsonFromFileOrString(config, "conf");
   }
 
   protected void beforeDeployingVerticle(DeploymentOptions deploymentOptions) {
@@ -440,6 +430,20 @@ public class RunCommand extends BareCommand {
     final Object main = executionContext.main();
     if (main instanceof VertxLifecycleHooks) {
       ((VertxLifecycleHooks) main).afterConfigParsed(config);
+    }
+  }
+
+  protected void beforeStoppingVertx(Vertx vertx) {
+    final Object main = executionContext.main();
+    if (main instanceof VertxLifecycleHooks) {
+      ((VertxLifecycleHooks) main).beforeStoppingVertx(vertx);
+    }
+  }
+
+  protected void afterStoppingVertx() {
+    final Object main = executionContext.main();
+    if (main instanceof VertxLifecycleHooks) {
+      ((VertxLifecycleHooks) main).afterStoppingVertx();
     }
   }
 }

@@ -1,23 +1,18 @@
 /*
- * Copyright (c) 2011-2014 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.spi;
 
-import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.metrics.MetricsOptions;
 import io.vertx.core.spi.metrics.VertxMetrics;
 
@@ -33,16 +28,15 @@ public interface VertxMetricsFactory {
    *
    * No specific thread and context can be expected when this method is called.
    *
-   * @param vertx the vertx instance
    * @param options the metrics configuration option
    * @return the metrics implementation
    */
-  VertxMetrics metrics(Vertx vertx, VertxOptions options);
+  VertxMetrics metrics(VertxOptions options);
 
   /**
-   * Create an empty metrics options. Providers can override this method to provide a custom metrics options subclass
-   * that exposes custom configuration. It is used by the {@link io.vertx.core.Starter} class when
-   * creating new options when building a CLI vert.x
+   * Create an empty metrics options.
+   * Providers can override this method to provide a custom metrics options subclass that exposes custom configuration.
+   * It is used by the {@link io.vertx.core.Launcher} class when creating new options when building a CLI Vert.x.
    *
    * @return new metrics options
    */
@@ -50,4 +44,15 @@ public interface VertxMetricsFactory {
     return new MetricsOptions();
   }
 
+  /**
+   * Create metrics options from the provided {@code jsonObject}.
+   * Providers can override this method to provide a custom metrics options subclass that exposes custom configuration.
+   * It is used by the {@link io.vertx.core.Launcher} class when creating new options when building a CLI Vert.x.
+   *
+   * @param jsonObject json provided by the user
+   * @return new metrics options
+   */
+  default MetricsOptions newOptions(JsonObject jsonObject) {
+    return new MetricsOptions(jsonObject);
+  }
 }

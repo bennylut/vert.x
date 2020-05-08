@@ -1,336 +1,428 @@
 /*
- * Copyright (c) 2011-2014 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
+
 package io.vertx.core.http;
 
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
+import io.netty.util.AsciiString;
+import io.vertx.codegen.annotations.GenIgnore;
+import io.vertx.codegen.annotations.VertxGen;
+import io.vertx.core.MultiMap;
+import io.vertx.core.http.impl.headers.CaseInsensitiveHeaders;
+
 /**
- * Contains often used Header names.
- * <p>
- * It also contains a utility method to create optimized {@link CharSequence} which can be used as header name and value.
+ * Contains a bunch of useful HTTP headers stuff:
+ *
+ * <ul>
+ *   <li>methods for creating {@link MultiMap} instances</li>
+ *   <li>often used Header names</li>
+ *   <li>method to create optimized {@link CharSequence} which can be used as header name and value</li>
+ * </ul>
  *
  * @author <a href="mailto:nmaurer@redhat.com">Norman Maurer</a>
  */
-public final class HttpHeaders {
+@VertxGen
+public interface HttpHeaders {
 
+  /** JVM system property that disables HTTP headers validation, don't use this in production. */
+  String DISABLE_HTTP_HEADERS_VALIDATION_PROP_NAME = "vertx.disableHttpHeadersValidation";
+
+  /** Constant that disables HTTP headers validation, this is a constant so the JIT can eliminate validation code. */
+  boolean DISABLE_HTTP_HEADERS_VALIDATION = Boolean.getBoolean(DISABLE_HTTP_HEADERS_VALIDATION_PROP_NAME);
 
   /**
    * Accept header name
    */
-  public static final CharSequence ACCEPT = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.ACCEPT);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence ACCEPT = HttpHeaderNames.ACCEPT;
 
   /**
    * Accept-Charset header name
    */
-  public static final CharSequence ACCEPT_CHARSET = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.ACCEPT_CHARSET);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence ACCEPT_CHARSET = HttpHeaderNames.ACCEPT_CHARSET;
 
   /**
    * Accept-Encoding header name
    */
-  public static final CharSequence ACCEPT_ENCODING = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.ACCEPT_ENCODING);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence ACCEPT_ENCODING = HttpHeaderNames.ACCEPT_ENCODING;
 
   /**
    * Accept-Language header name
    */
-  public static final CharSequence ACCEPT_LANGUAGE = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.ACCEPT_LANGUAGE);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence ACCEPT_LANGUAGE = HttpHeaderNames.ACCEPT_LANGUAGE;
 
   /**
    * Accept-Ranges header name
    */
-  public static final CharSequence ACCEPT_RANGES = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.ACCEPT_RANGES);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence ACCEPT_RANGES = HttpHeaderNames.ACCEPT_RANGES;
 
   /**
    * Accept-Patch header name
    */
-  public static final CharSequence ACCEPT_PATCH = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.ACCEPT_PATCH);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence ACCEPT_PATCH = HttpHeaderNames.ACCEPT_PATCH;
 
   /**
    * Access-Control-Allow-Credentials header name
    */
-  public static final CharSequence ACCESS_CONTROL_ALLOW_CREDENTIALS = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.ACCESS_CONTROL_ALLOW_CREDENTIALS);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence ACCESS_CONTROL_ALLOW_CREDENTIALS = HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS;
 
   /**
    * Access-Control-Allow-Headers header name
    */
-  public static final CharSequence ACCESS_CONTROL_ALLOW_HEADERS = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.ACCESS_CONTROL_ALLOW_HEADERS);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence ACCESS_CONTROL_ALLOW_HEADERS = HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS;
 
   /**
    * Access-Control-Allow-Methods header name
    */
-  public static final CharSequence ACCESS_CONTROL_ALLOW_METHODS = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.ACCESS_CONTROL_ALLOW_METHODS);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence ACCESS_CONTROL_ALLOW_METHODS = HttpHeaderNames.ACCESS_CONTROL_ALLOW_METHODS;
 
   /**
    * Access-Control-Allow-Origin header name
    */
-  public static final CharSequence ACCESS_CONTROL_ALLOW_ORIGIN = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.ACCESS_CONTROL_ALLOW_ORIGIN);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence ACCESS_CONTROL_ALLOW_ORIGIN = HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN;
 
   /**
    * Access-Control-Expose-Headers header name
    */
-  public static final CharSequence ACCESS_CONTROL_EXPOSE_HEADERS = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.ACCESS_CONTROL_EXPOSE_HEADERS);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence ACCESS_CONTROL_EXPOSE_HEADERS = HttpHeaderNames.ACCESS_CONTROL_EXPOSE_HEADERS;
 
   /**
    * Access-Control-Max-Age header name
    */
-  public static final CharSequence ACCESS_CONTROL_MAX_AGE = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.ACCESS_CONTROL_MAX_AGE);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence ACCESS_CONTROL_MAX_AGE = HttpHeaderNames.ACCESS_CONTROL_MAX_AGE;
 
   /**
    * Access-Control-Request-Headers header name
    */
-  public static final CharSequence ACCESS_CONTROL_REQUEST_HEADERS = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.ACCESS_CONTROL_REQUEST_HEADERS);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence ACCESS_CONTROL_REQUEST_HEADERS = HttpHeaderNames.ACCESS_CONTROL_REQUEST_HEADERS;
 
   /**
    * Access-Control-Request-Method header name
    */
-  public static final CharSequence ACCESS_CONTROL_REQUEST_METHOD = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.ACCESS_CONTROL_REQUEST_METHOD);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence ACCESS_CONTROL_REQUEST_METHOD = HttpHeaderNames.ACCESS_CONTROL_REQUEST_METHOD;
 
   /**
    *  Age header name
    */
-  public static final CharSequence AGE = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.AGE);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence AGE = HttpHeaderNames.AGE;
 
   /**
    * Allow header name
    */
-  public static final CharSequence ALLOW = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.ALLOW);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence ALLOW = HttpHeaderNames.ALLOW;
 
   /**
    * Authorization header name
    */
-  public static final CharSequence AUTHORIZATION = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.AUTHORIZATION);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence AUTHORIZATION = HttpHeaderNames.AUTHORIZATION;
 
   /**
    * Cache-Control header name
    */
-  public static final CharSequence CACHE_CONTROL = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.CACHE_CONTROL);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence CACHE_CONTROL = HttpHeaderNames.CACHE_CONTROL;
 
   /**
    * Connection header name
    */
-  public static final CharSequence CONNECTION = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.CONNECTION);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence CONNECTION = HttpHeaderNames.CONNECTION;
 
   /**
    * Content-Base header name
    */
-  public static final CharSequence CONTENT_BASE = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_BASE);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence CONTENT_BASE = HttpHeaderNames.CONTENT_BASE;
+
+  /**
+   * Content-Disposition header name
+   */
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence CONTENT_DISPOSITION = HttpHeaderNames.CONTENT_DISPOSITION;
 
   /**
    * Content-Encoding header name
    */
-  public static final CharSequence CONTENT_ENCODING = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_ENCODING);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence CONTENT_ENCODING = HttpHeaderNames.CONTENT_ENCODING;
 
   /**
    * Content-Language header name
    */
-  public static final CharSequence CONTENT_LANGUAGE = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LANGUAGE);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence CONTENT_LANGUAGE = HttpHeaderNames.CONTENT_LANGUAGE;
 
   /**
    * Content-Length header name
    */
-  public static final CharSequence CONTENT_LENGTH = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence CONTENT_LENGTH = HttpHeaderNames.CONTENT_LENGTH;
 
   /**
    * Content-Location header name
    */
-  public static final CharSequence CONTENT_LOCATION = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LOCATION);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence CONTENT_LOCATION = HttpHeaderNames.CONTENT_LOCATION;
 
   /**
    * Content-Transfer-Encoding header name
    */
-  public static final CharSequence CONTENT_TRANSFER_ENCODING = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TRANSFER_ENCODING);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence CONTENT_TRANSFER_ENCODING = HttpHeaderNames.CONTENT_TRANSFER_ENCODING;
 
   /**
    * Content-MD5 header name
    */
-  public static final CharSequence CONTENT_MD5 = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_MD5);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence CONTENT_MD5 = HttpHeaderNames.CONTENT_MD5;
 
   /**
    * Content-Rage header name
    */
-  public static final CharSequence CONTENT_RANGE = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_RANGE);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence CONTENT_RANGE = HttpHeaderNames.CONTENT_RANGE;
 
   /**
    * Content-Type header name
    */
-  public static final CharSequence CONTENT_TYPE = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence CONTENT_TYPE = HttpHeaderNames.CONTENT_TYPE;
 
   /**
    * Content-Cookie header name
    */
-  public static final CharSequence COOKIE = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.COOKIE);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence COOKIE = HttpHeaderNames.COOKIE;
 
   /**
    * Date header name
    */
-  public static final CharSequence DATE = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.DATE);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence DATE = HttpHeaderNames.DATE;
 
   /**
    * Etag header name
    */
-  public static final CharSequence ETAG = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.ETAG);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence ETAG = HttpHeaderNames.ETAG;
 
   /**
    * Expect header name
    */
-  public static final CharSequence EXPECT = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.EXPECT);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence EXPECT = HttpHeaderNames.EXPECT;
 
   /**
    * Expires header name
    */
-  public static final CharSequence EXPIRES = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.EXPIRES);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence EXPIRES = HttpHeaderNames.EXPIRES;
 
   /**
    * From header name
    */
-  public static final CharSequence FROM = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.FROM);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence FROM = HttpHeaderNames.FROM;
 
   /**
    * Host header name
    */
-  public static final CharSequence HOST = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.HOST);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence HOST = HttpHeaderNames.HOST;
 
   /**
    * If-Match header name
    */
-  public static final CharSequence IF_MATCH = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.IF_MATCH);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence IF_MATCH = HttpHeaderNames.IF_MATCH;
 
   /**
    * If-Modified-Since header name
    */
-  public static final CharSequence IF_MODIFIED_SINCE = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.IF_MODIFIED_SINCE);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence IF_MODIFIED_SINCE = HttpHeaderNames.IF_MODIFIED_SINCE;
 
   /**
    * If-None-Match header name
    */
-  public static final CharSequence IF_NONE_MATCH = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.IF_NONE_MATCH);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence IF_NONE_MATCH = HttpHeaderNames.IF_NONE_MATCH;
 
   /**
    * Last-Modified header name
    */
-  public static final CharSequence LAST_MODIFIED = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.LAST_MODIFIED);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence LAST_MODIFIED = HttpHeaderNames.LAST_MODIFIED;
 
   /**
    * Location header name
    */
-  public static final CharSequence LOCATION = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.LOCATION);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence LOCATION = HttpHeaderNames.LOCATION;
 
   /**
    * Origin header name
    */
-  public static final CharSequence ORIGIN = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.ORIGIN);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence ORIGIN = HttpHeaderNames.ORIGIN;
 
   /**
    * Proxy-Authenticate header name
    */
-  public static final CharSequence PROXY_AUTHENTICATE = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.PROXY_AUTHENTICATE);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence PROXY_AUTHENTICATE = HttpHeaderNames.PROXY_AUTHENTICATE;
 
   /**
    * Proxy-Authorization header name
    */
-  public static final CharSequence PROXY_AUTHORIZATION = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.PROXY_AUTHORIZATION);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence PROXY_AUTHORIZATION = HttpHeaderNames.PROXY_AUTHORIZATION;
 
   /**
    * Referer header name
    */
-  public static final CharSequence REFERER = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.REFERER);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence REFERER = HttpHeaderNames.REFERER;
 
   /**
    * Retry-After header name
    */
-  public static final CharSequence RETRY_AFTER = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.RETRY_AFTER);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence RETRY_AFTER = HttpHeaderNames.RETRY_AFTER;
 
   /**
    * Server header name
    */
-  public static final CharSequence SERVER = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.SERVER);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence SERVER = HttpHeaderNames.SERVER;
 
   /**
    * Transfer-Encoding header name
    */
-  public static final CharSequence TRANSFER_ENCODING = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.TRANSFER_ENCODING);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence TRANSFER_ENCODING = HttpHeaderNames.TRANSFER_ENCODING;
 
   /**
    * User-Agent header name
    */
-  public static final CharSequence USER_AGENT = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.USER_AGENT);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence USER_AGENT = HttpHeaderNames.USER_AGENT;
 
   /**
    * Set-Cookie header name
    */
-  public static final CharSequence SET_COOKIE = createOptimized(io.netty.handler.codec.http.HttpHeaders.Names.SET_COOKIE);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence SET_COOKIE = HttpHeaderNames.SET_COOKIE;
 
   /**
    * application/x-www-form-urlencoded header value
    */
-  public static final CharSequence APPLICATION_X_WWW_FORM_URLENCODED = createOptimized(io.netty.handler.codec.http.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence APPLICATION_X_WWW_FORM_URLENCODED = HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED;
 
   /**
    * chunked header value
    */
-  public static final CharSequence CHUNKED =  createOptimized(io.netty.handler.codec.http.HttpHeaders.Values.CHUNKED);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence CHUNKED = HttpHeaderValues.CHUNKED;
   /**
    * close header value
    */
-  public static final CharSequence CLOSE =  createOptimized(io.netty.handler.codec.http.HttpHeaders.Values.CLOSE);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence CLOSE = HttpHeaderValues.CLOSE;
 
   /**
    * 100-continue header value
    */
-  public static final CharSequence CONTINUE =  createOptimized(io.netty.handler.codec.http.HttpHeaders.Values.CONTINUE);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence CONTINUE = HttpHeaderValues.CONTINUE;
 
   /**
    * identity header value
    */
-  public static final CharSequence IDENTITY =  createOptimized(io.netty.handler.codec.http.HttpHeaders.Values.IDENTITY);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence IDENTITY = HttpHeaderValues.IDENTITY;
   /**
    * keep-alive header value
    */
-  public static final CharSequence KEEP_ALIVE = createOptimized(io.netty.handler.codec.http.HttpHeaders.Values.KEEP_ALIVE);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence KEEP_ALIVE = HttpHeaderValues.KEEP_ALIVE;
 
   /**
    * Upgrade header value
    */
-  public static final CharSequence UPGRADE = createOptimized(io.netty.handler.codec.http.HttpHeaders.Values.UPGRADE);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence UPGRADE = HttpHeaderValues.UPGRADE;
+
   /**
    * WebSocket header value
    */
-  public static final CharSequence WEBSOCKET = createOptimized(io.netty.handler.codec.http.HttpHeaders.Values.WEBSOCKET);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence WEBSOCKET = HttpHeaderValues.WEBSOCKET;
 
   /**
    * deflate,gzip header value
    */
-  public static final CharSequence DEFLATE_GZIP = createOptimized("deflate, gzip");
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence DEFLATE_GZIP = createOptimized("deflate, gzip");
 
   /**
    * text/html header value
    */
-  public static final CharSequence TEXT_HTML = createOptimized("text/html");
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence TEXT_HTML = createOptimized("text/html");
 
   /**
    * GET header value
    */
-  public static final CharSequence GET = createOptimized("GET");
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  CharSequence GET = createOptimized("GET");
 
   /**
    * Create an optimized {@link CharSequence} which can be used as header name or value.
    * This should be used if you expect to use it multiple times liked for example adding the same header name or value
    * for multiple responses or requests.
    */
-  public static CharSequence createOptimized(String value) {
-    return io.netty.handler.codec.http.HttpHeaders.newEntity(value);
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  static CharSequence createOptimized(String value) {
+    return new AsciiString(value);
   }
 
-  private HttpHeaders() {
+  static MultiMap headers() {
+    return new CaseInsensitiveHeaders();
+  }
+
+  static MultiMap set(String name, String value) {
+    return new CaseInsensitiveHeaders().set(name, value);
+  }
+
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  static MultiMap set(CharSequence name, CharSequence value) {
+    return new CaseInsensitiveHeaders().set(name, value);
   }
 }

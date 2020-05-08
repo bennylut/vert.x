@@ -1,33 +1,26 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.impl;
 
 
+import io.netty.channel.EventLoop;
 import io.netty.channel.EventLoopGroup;
 import io.netty.resolver.AddressResolverGroup;
-import io.vertx.codegen.annotations.GenIgnore;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Closeable;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 import io.vertx.core.http.impl.HttpServerImpl;
-import io.vertx.core.json.JsonObject;
-import io.vertx.core.net.impl.NetServerBase;
+import io.vertx.core.net.impl.NetServerImpl;
 import io.vertx.core.net.impl.ServerID;
+import io.vertx.core.net.impl.TCPServerBase;
+import io.vertx.core.net.impl.transport.Transport;
 import io.vertx.core.spi.cluster.ClusterManager;
 import io.vertx.core.spi.metrics.VertxMetrics;
 
@@ -36,6 +29,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This interface provides services for vert.x core internal use only
@@ -46,8 +40,23 @@ import java.util.concurrent.ExecutorService;
  */
 public interface VertxInternal extends Vertx {
 
+  /**
+   * @return a promise associated with the context returned by {@link #getOrCreateContext()}.
+   */
+  <T> PromiseInternal<T> promise();
+
+  /**
+   * @return a promise associated with the context returned by {@link #getOrCreateContext()} or the {@code handler}
+   *         if that handler is already an instance of {@code PromiseInternal}
+   */
+  <T> PromiseInternal<T> promise(Handler<AsyncResult<T>> handler);
+
+  long maxEventLoopExecTime();
+
+  TimeUnit maxEventLoopExecTimeUnit();
+
   @Override
-  ContextImpl getOrCreateContext();
+  ContextInternal getOrCreateContext();
 
   EventLoopGroup getEventLoopGroup();
 
@@ -57,34 +66,45 @@ public interface VertxInternal extends Vertx {
 
   Map<ServerID, HttpServerImpl> sharedHttpServers();
 
-  Map<ServerID, NetServerBase> sharedNetServers();
+  Map<ServerID, NetServerImpl> sharedNetServers();
+
+  <S extends TCPServerBase> Map<ServerID, S> sharedTCPServers(Class<S> type);
 
   VertxMetrics metricsSPI();
+
+  Transport transport();
 
   /**
    * Get the current context
    * @return the context
    */
-  ContextImpl getContext();
+  ContextInternal getContext();
 
   /**
    * @return event loop context
    */
-  EventLoopContext createEventLoopContext(String deploymentID, WorkerPool workerPool, JsonObject config, ClassLoader tccl);
+  ContextInternal createEventLoopContext(Deployment deployment, WorkerPool workerPool, ClassLoader tccl);
+
+  ContextInternal createEventLoopContext(EventLoop eventLoop, WorkerPool workerPool, ClassLoader tccl);
 
   /**
    * @return worker loop context
    */
-  ContextImpl createWorkerContext(boolean multiThreaded, String deploymentID, WorkerPool pool, JsonObject config, ClassLoader tccl);
+  ContextInternal createWorkerContext(Deployment deployment, WorkerPool pool, ClassLoader tccl);
+
+  ContextInternal createWorkerContext();
 
   @Override
-  WorkerExecutorImpl createSharedWorkerExecutor(String name);
+  WorkerExecutorInternal createSharedWorkerExecutor(String name);
 
   @Override
-  WorkerExecutorImpl createSharedWorkerExecutor(String name, int poolSize);
+  WorkerExecutorInternal createSharedWorkerExecutor(String name, int poolSize);
 
   @Override
-  WorkerExecutorImpl createSharedWorkerExecutor(String name, int poolSize, long maxExecuteTime);
+  WorkerExecutorInternal createSharedWorkerExecutor(String name, int poolSize, long maxExecuteTime);
+
+  @Override
+  WorkerExecutorInternal createSharedWorkerExecutor(String name, int poolSize, long maxExecuteTime, TimeUnit maxExecuteTimeUnit);
 
   void simulateKill();
 
@@ -100,9 +120,14 @@ public interface VertxInternal extends Vertx {
 
   File resolveFile(String fileName);
 
-  <T> void executeBlockingInternal(Action<T> action, Handler<AsyncResult<T>> resultHandler);
+  /**
+   * Like {@link #executeBlocking(Handler, Handler)} but using the internal worker thread pool.
+   */
+  <T> void executeBlockingInternal(Handler<Promise<T>> blockingCodeHandler, Handler<AsyncResult<T>> resultHandler);
 
   ClusterManager getClusterManager();
+
+  HAManager haManager();
 
   /**
    * Resolve an address (e.g. {@code vertx.io} into the first found A (IPv4) or AAAA (IPv6) record.
@@ -122,9 +147,10 @@ public interface VertxInternal extends Vertx {
    */
   AddressResolverGroup<InetSocketAddress> nettyAddressResolverGroup();
 
-  @GenIgnore
+  BlockedThreadChecker blockedThreadChecker();
+
   void addCloseHook(Closeable hook);
 
-  @GenIgnore
   void removeCloseHook(Closeable hook);
+
 }

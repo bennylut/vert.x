@@ -1,17 +1,12 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- *  ------------------------------------------------------
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *      The Eclipse Public License is available at
- *      http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *      The Apache License v2.0 is available at
- *      http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.eventbus;
@@ -19,7 +14,9 @@ package io.vertx.core.eventbus;
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.http.RequestOptions;
 import io.vertx.core.streams.WriteStream;
 
 /**
@@ -29,31 +26,7 @@ import io.vertx.core.streams.WriteStream;
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */
 @VertxGen
-public interface MessageProducer<T> extends WriteStream<T> {
-
-  int DEFAULT_WRITE_QUEUE_MAX_SIZE = 1000;
-
-  /**
-   * Synonym for {@link #write(Object)}.
-   *
-   * @param message  the message to send
-   * @return  reference to this for fluency
-   */
-  MessageProducer<T> send(T message);
-
-  <R> MessageProducer<T> send(T message, Handler<AsyncResult<Message<R>>> replyHandler);
-
-  @Override
-  MessageProducer<T> exceptionHandler(Handler<Throwable> handler);
-
-  @Override
-  MessageProducer<T> write(T data);
-
-  @Override
-  MessageProducer<T> setWriteQueueMaxSize(int maxSize);
-
-  @Override
-  MessageProducer<T> drainHandler(Handler<Void> handler);
+public interface MessageProducer<T> {
 
   /**
    * Update the delivery options of this producer.
@@ -70,13 +43,28 @@ public interface MessageProducer<T> extends WriteStream<T> {
   String address();
 
   /**
-   * Closes the producer, calls {@link #close()}
+   * Write a message to the event-bus, either sending or publishing.
+   *
+   * @param body the message body
+   * @param handler the handler called when the message has been successfully or failed to be written, this is not a delivery
+   *                guarantee
    */
-  @Override
-  void end();
+  void write(T body, Handler<AsyncResult<Void>> handler);
+
+  /**
+   * Like {@link #write(Object, Handler)} but returns a {@code Future} of the asynchronous result
+   */
+  Future<Void> write(T body);
 
   /**
    * Closes the producer, this method should be called when the message producer is not used anymore.
+   *
+   * @return a future completed with the result
    */
-  void close();
+  Future<Void> close();
+
+  /**
+   * Same as {@link #close()} but with an {@code handler} called when the operation completes
+   */
+  void close(Handler<AsyncResult<Void>> handler);
 }

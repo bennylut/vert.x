@@ -1,17 +1,12 @@
 /*
- *  Copyright (c) 2011-2015 The original author or authors
- *  ------------------------------------------------------
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *       The Eclipse Public License is available at
- *       http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *       The Apache License v2.0 is available at
- *       http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.impl.launcher.commands;
@@ -77,13 +72,13 @@ public class WatcherTest extends CommandTestBase {
     watcher.watch();
 
     // Initial deployment
-    waitUntil(() -> deploy.get() == 1);
+    assertWaitUntil(() -> deploy.get() == 1);
 
     File file = new File(root, "foo.txt");
     file.createNewFile();
 
     // undeployment followed by redeployment
-    waitUntil(() -> undeploy.get() == 1 && deploy.get() == 2);
+    assertWaitUntil(() -> undeploy.get() == 1 && deploy.get() == 2);
   }
 
   @Test
@@ -91,7 +86,7 @@ public class WatcherTest extends CommandTestBase {
     watcher.watch();
 
     // Initial deployment
-    waitUntil(() -> deploy.get() == 1);
+    assertWaitUntil(() -> deploy.get() == 1);
 
     File file = new File(root, "foo.nope");
     file.createNewFile();
@@ -107,11 +102,11 @@ public class WatcherTest extends CommandTestBase {
     watcher.watch();
 
     // Initial deployment
-    waitUntil(() -> deploy.get() == 1);
+    assertWaitUntil(() -> deploy.get() == 1);
 
     file.createNewFile();
 
-    waitUntil(() -> deploy.get() == 2);
+    assertWaitUntil(() -> deploy.get() == 2);
 
     // Simulate a 'touch', we wait more than a second to avoid being in the same second as the creation. This is because
     // some FS return the last modified date with a second of precision.
@@ -119,7 +114,7 @@ public class WatcherTest extends CommandTestBase {
     file.setLastModified(System.currentTimeMillis());
 
     // undeployment followed by redeployment
-    waitUntil(() -> undeploy.get() == 2 && deploy.get() == 3);
+    assertWaitUntil(() -> undeploy.get() == 2 && deploy.get() == 3);
   }
 
   @Test
@@ -130,14 +125,14 @@ public class WatcherTest extends CommandTestBase {
     watcher.watch();
 
     // Initial deployment
-    waitUntil(() -> deploy.get() == 1);
+    assertWaitUntil(() -> deploy.get() == 1);
 
     // Wait until the file monitoring is set up (ugly, but I don't know any way to detect this).
     Thread.sleep(500);
     file.delete();
 
     // undeployment followed by redeployment
-    waitUntil(() -> undeploy.get() == 1 && deploy.get() == 2);
+    assertWaitUntil(() -> undeploy.get() == 1 && deploy.get() == 2);
   }
 
   @Test
@@ -147,7 +142,7 @@ public class WatcherTest extends CommandTestBase {
     Thread.sleep(500);
 
     // Initial deployment
-    waitUntil(() -> deploy.get() == 1);
+    assertWaitUntil(() -> deploy.get() == 1);
 
     File newDir = new File(root, "directory");
     newDir.mkdir();
@@ -156,7 +151,7 @@ public class WatcherTest extends CommandTestBase {
     file.createNewFile();
 
     // undeployment followed by redeployment
-    waitUntil(() -> undeploy.get() == 1 && deploy.get() == 2);
+    assertWaitUntil(() -> undeploy.get() == 1 && deploy.get() == 2);
 
     Thread.sleep(1000);
 
@@ -165,14 +160,14 @@ public class WatcherTest extends CommandTestBase {
     file.setLastModified(System.currentTimeMillis());
 
     // undeployment followed by redeployment
-    waitUntil(() -> undeploy.get() == 2 && deploy.get() == 3);
+    assertWaitUntil(() -> undeploy.get() == 2 && deploy.get() == 3);
 
     Thread.sleep(1000);
 
     // delete directory
     deleteRecursive(newDir);
 
-    waitUntil(() -> undeploy.get() == 3 && deploy.get() == 4);
+    assertWaitUntil(() -> undeploy.get() == 3 && deploy.get() == 4);
   }
 
   @Test
@@ -180,7 +175,7 @@ public class WatcherTest extends CommandTestBase {
     watcher.watch();
 
     // Initial deployment
-    waitUntil(() -> deploy.get() == 1);
+    assertWaitUntil(() -> deploy.get() == 1);
 
     // create a file to be matched using windows style include pattern
     File winDir = new File(root, "windows");
@@ -190,7 +185,7 @@ public class WatcherTest extends CommandTestBase {
     winFile.createNewFile();
 
     // undeployment followed by redeployment
-    waitUntil(() -> undeploy.get() == 1 && deploy.get() == 2);
+    assertWaitUntil(() -> undeploy.get() == 1 && deploy.get() == 2);
     Thread.sleep(1000);
 
     // create a file to be matched using *nix style include pattern
@@ -201,7 +196,7 @@ public class WatcherTest extends CommandTestBase {
     nixFile.createNewFile();
 
     // undeployment followed by redeployment
-    waitUntil(() -> undeploy.get() == 2 && deploy.get() == 3);
+    assertWaitUntil(() -> undeploy.get() == 2 && deploy.get() == 3);
   }
 
   @Test
@@ -209,7 +204,7 @@ public class WatcherTest extends CommandTestBase {
     watcher.watch();
 
     // Initial deployment
-    waitUntil(() -> deploy.get() == 1);
+    assertWaitUntil(() -> deploy.get() == 1);
 
     // create a file to be matched against "FOO.bar" pattern
     File file = new File(root, "fOo.BAr");
@@ -217,7 +212,7 @@ public class WatcherTest extends CommandTestBase {
 
     if (ExecUtils.isWindows()) {
       // undeployment followed by redeployment. Windows is not case sensitive
-      waitUntil(() -> undeploy.get() == 1 && deploy.get() == 2);
+      assertWaitUntil(() -> undeploy.get() == 1 && deploy.get() == 2, "expected undeploy " + undeploy.get() + " == 1 and deploy " + deploy.get() + " == 2");
     } else {
       // It depends on the file system, we can't really test anything in a reliable way.
     }
@@ -265,21 +260,21 @@ public class WatcherTest extends CommandTestBase {
 
     System.out.println("Environment setup");
     watcher.watch();
-    waitUntil(() -> deploy.get() == 1);
+    assertWaitUntil(() -> deploy.get() == 1);
 
     long begin = System.currentTimeMillis();
     Path path = files.get(0).toPath();
     Thread.sleep(1000); // Need to wait to be sure we are not in the same second as the previous write
     Files.write(path, "booooo".getBytes());
-    waitUntil(() -> undeploy.get() == 1);
-    waitUntil(() -> deploy.get() == 2);
+    assertWaitUntil(() -> undeploy.get() == 1);
+    assertWaitUntil(() -> deploy.get() == 2);
     long end = System.currentTimeMillis();
     System.out.println("Update change applied in " + (end - begin) + " ms");
 
     begin = System.currentTimeMillis();
     files.get(1).delete();
-    waitUntil(() -> undeploy.get() == 2);
-    waitUntil(() -> deploy.get() == 3);
+    assertWaitUntil(() -> undeploy.get() == 2);
+    assertWaitUntil(() -> deploy.get() == 3);
     end = System.currentTimeMillis();
     System.out.println("Deletion change applied in " + (end - begin) + " ms");
 
@@ -287,8 +282,8 @@ public class WatcherTest extends CommandTestBase {
     files.get(1).delete();
     File newFile = new File(root, "test.txt");
     Files.write(newFile.toPath(), "I'm a new file".getBytes());
-    waitUntil(() -> undeploy.get() == 3);
-    waitUntil(() -> deploy.get() == 4);
+    assertWaitUntil(() -> undeploy.get() == 3);
+    assertWaitUntil(() -> deploy.get() == 4);
     end = System.currentTimeMillis();
     System.out.println("Creation change applied in " + (end - begin) + " ms");
   }

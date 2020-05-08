@@ -1,17 +1,12 @@
 /*
- * Copyright 2014 Red Hat, Inc.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *  The Eclipse Public License is available at
- *  http://www.eclipse.org/legal/epl-v10.html
- *
- *  The Apache License v2.0 is available at
- *  http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package examples;
@@ -20,17 +15,16 @@ import io.vertx.core.*;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.dns.AddressResolverOptions;
 import io.vertx.core.file.FileSystem;
-import io.vertx.core.http.HttpServer;
-import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.http.*;
+import io.vertx.core.impl.logging.Logger;
+import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
+import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetServer;
+import io.vertx.core.net.SocketAddress;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by tim on 08/01/15.
@@ -46,7 +40,7 @@ public class CoreExamples {
   }
 
   public void example3(HttpServerRequest request) {
-    request.response().putHeader("Content-Type", "text/plain").write("some text").end();
+    request.response().putHeader("Content-Type", "text/plain").end("some text");
   }
 
   public void example4(HttpServerRequest request) {
@@ -72,10 +66,10 @@ public class CoreExamples {
   }
 
   public void example7(Vertx vertx) {
-    vertx.executeBlocking(future -> {
+    vertx.executeBlocking(promise -> {
       // Call some blocking API that takes a significant amount of time to return
       String result = someAPI.blockingMethod("hello");
-      future.complete(result);
+      promise.complete(result);
     }, res -> {
       System.out.println("The result is: " + res.result());
     });
@@ -83,10 +77,10 @@ public class CoreExamples {
 
   public void workerExecutor1(Vertx vertx) {
     WorkerExecutor executor = vertx.createSharedWorkerExecutor("my-worker-pool");
-    executor.executeBlocking(future -> {
+    executor.executeBlocking(promise -> {
       // Call some blocking API that takes a significant amount of time to return
       String result = someAPI.blockingMethod("hello");
-      future.complete(result);
+      promise.complete(result);
     }, res -> {
       System.out.println("The result is: " + res.result());
     });
@@ -102,9 +96,10 @@ public class CoreExamples {
     int poolSize = 10;
 
     // 2 minutes
-    long maxExecuteTime = 120000;
+    long maxExecuteTime = 2;
+    TimeUnit maxExecuteTimeUnit = TimeUnit.MINUTES;
 
-    WorkerExecutor executor = vertx.createSharedWorkerExecutor("my-worker-pool", poolSize, maxExecuteTime);
+    WorkerExecutor executor = vertx.createSharedWorkerExecutor("my-worker-pool", poolSize, maxExecuteTime, maxExecuteTimeUnit);
   }
 
   BlockingAPI someAPI = new BlockingAPI();
@@ -116,13 +111,11 @@ public class CoreExamples {
   }
 
   public void exampleFutureAll1(HttpServer httpServer, NetServer netServer) {
-    Future<HttpServer> httpServerFuture = Future.future();
-    httpServer.listen(httpServerFuture.completer());
+    Future<HttpServer> httpServerFuture = Future.future(promise -> httpServer.listen(promise));
 
-    Future<NetServer> netServerFuture = Future.future();
-    netServer.listen(netServerFuture.completer());
+    Future<NetServer> netServerFuture = Future.future(promise -> netServer.listen(promise));
 
-    CompositeFuture.all(httpServerFuture, netServerFuture).setHandler(ar -> {
+    CompositeFuture.all(httpServerFuture, netServerFuture).onComplete(ar -> {
       if (ar.succeeded()) {
         // All servers started
       } else {
@@ -136,7 +129,7 @@ public class CoreExamples {
   }
 
   public void exampleFutureAny1(Future<String> future1, Future<String> future2) {
-    CompositeFuture.any(future1, future2).setHandler(ar -> {
+    CompositeFuture.any(future1, future2).onComplete(ar -> {
       if (ar.succeeded()) {
         // At least one is succeeded
       } else {
@@ -150,7 +143,7 @@ public class CoreExamples {
   }
 
   public void exampleFutureJoin1(Future future1, Future future2, Future future3) {
-    CompositeFuture.join(future1, future2, future3).setHandler(ar -> {
+    CompositeFuture.join(future1, future2, future3).onComplete(ar -> {
       if (ar.succeeded()) {
         // All succeeded
       } else {
@@ -166,22 +159,18 @@ public class CoreExamples {
   public void exampleFuture6(Vertx vertx) {
 
     FileSystem fs = vertx.fileSystem();
-    Future<Void> startFuture = Future.future();
 
-    Future<Void> fut1 = Future.future();
-    fs.createFile("/foo", fut1.completer());
+    Future<Void> fut1 = Future.future(promise -> fs.createFile("/foo", promise));
 
-    fut1.compose(v -> {
+    Future<Void> startFuture = fut1
+      .compose(v -> {
       // When the file is created (fut1), execute this:
-      Future<Void> fut2 = Future.future();
-      fs.writeFile("/foo", Buffer.buffer(), fut2.completer());
-      return fut2;
-    }).compose(v -> {
-              // When the file is written (fut2), execute this:
-              fs.move("/foo", "/bar", startFuture.completer());
-            },
-            // mark startFuture it as failed if any step fails.
-            startFuture);
+      return Future.<Void>future(promise -> fs.writeFile("/foo", Buffer.buffer(), promise));
+    })
+      .compose(v -> {
+      // When the file is written (fut2), execute this:
+      return Future.future(promise -> fs.move("/foo", "/bar", promise));
+    });
   }
 
   public void example7_1(Vertx vertx) {
@@ -248,13 +237,6 @@ public class CoreExamples {
     vertx.deployVerticle("com.mycompany.MyOrderProcessorVerticle", options);
   }
 
-  public void example14(Vertx vertx) {
-    DeploymentOptions options = new DeploymentOptions().setIsolationGroup("mygroup");
-    options.setIsolatedClasses(Arrays.asList("com.mycompany.myverticle.*",
-                       "com.mycompany.somepkg.SomeClass", "org.somelibrary.*"));
-    vertx.deployVerticle("com.mycompany.myverticle.VerticleClass", options);
-  }
-
   public void example15(Vertx vertx) {
     long timerID = vertx.setTimer(1000, id -> {
       System.out.println("And one second later this is printed");
@@ -297,8 +279,6 @@ public class CoreExamples {
       System.out.println("Context attached to Event Loop");
     } else if (context.isWorkerContext()) {
       System.out.println("Context attached to Worker Thread");
-    } else if (context.isMultiThreadedWorkerContext()) {
-      System.out.println("Context attached to Worker Thread - multi threaded worker");
     } else if (! Context.isOnVertxThread()) {
       System.out.println("Context not attached to a thread managed by vert.x");
     }
@@ -351,4 +331,76 @@ public class CoreExamples {
     vertx.deployVerticle("the-verticle", new DeploymentOptions().setWorkerPoolName("the-specific-pool"));
   }
 
+  public void configureNative() {
+    Vertx vertx = Vertx.vertx(new VertxOptions().
+      setPreferNativeTransport(true)
+    );
+
+    // True when native is available
+    boolean usingNative = vertx.isNativeTransportEnabled();
+    System.out.println("Running with native: " + usingNative);
+  }
+
+  public void configureLinuxOptions(Vertx vertx, boolean fastOpen, boolean cork, boolean quickAck, boolean reusePort) {
+    // Available on Linux
+    vertx.createHttpServer(new HttpServerOptions()
+      .setTcpFastOpen(fastOpen)
+      .setTcpCork(cork)
+      .setTcpQuickAck(quickAck)
+      .setReusePort(reusePort)
+    );
+  }
+
+  public void configureBSDOptions(Vertx vertx, boolean reusePort) {
+    // Available on BSD
+    vertx.createHttpServer(new HttpServerOptions().setReusePort(reusePort));
+  }
+
+  public void tcpServerWithDomainSockets(Vertx vertx) {
+    // Only available on BSD and Linux
+    vertx.createNetServer().connectHandler(so -> {
+      // Handle application
+    }).listen(SocketAddress.domainSocketAddress("/var/tmp/myservice.sock"));
+  }
+
+  public void httpServerWithDomainSockets(Vertx vertx) {
+    vertx.createHttpServer().requestHandler(req -> {
+      // Handle application
+    }).listen(SocketAddress.domainSocketAddress("/var/tmp/myservice.sock"), ar -> {
+      if (ar.succeeded()) {
+        // Bound to socket
+      } else {
+        ar.cause().printStackTrace();
+      }
+    });
+  }
+
+  public void tcpClientWithDomainSockets(Vertx vertx) {
+    NetClient netClient = vertx.createNetClient();
+
+    // Only available on BSD and Linux
+    SocketAddress addr = SocketAddress.domainSocketAddress("/var/tmp/myservice.sock");
+
+    // Connect to the server
+    netClient.connect(addr, ar -> {
+      if (ar.succeeded()) {
+        // Connected
+      } else {
+        ar.cause().printStackTrace();
+      }
+    });
+  }
+
+  public void httpClientWithDomainSockets(Vertx vertx) {
+    HttpClient httpClient = vertx.createHttpClient();
+
+    // Only available on BSD and Linux
+    SocketAddress addr = SocketAddress.domainSocketAddress("/var/tmp/myservice.sock");
+
+    // Send request to the server
+    httpClient.request(HttpMethod.GET, addr, 8080, "localhost", "/")
+      .onComplete(resp -> {
+        // Process response
+      }).end();
+  }
 }

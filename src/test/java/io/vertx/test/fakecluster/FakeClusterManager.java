@@ -1,23 +1,17 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.test.fakecluster;
 
 import io.vertx.core.AsyncResult;
-import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
@@ -28,7 +22,8 @@ import io.vertx.core.shareddata.AsyncMap;
 import io.vertx.core.shareddata.Counter;
 import io.vertx.core.shareddata.Lock;
 import io.vertx.core.shareddata.impl.AsynchronousCounter;
-import io.vertx.core.shareddata.impl.AsynchronousLock;
+import io.vertx.core.shareddata.impl.LocalAsyncLocks;
+import io.vertx.core.shareddata.impl.LocalAsyncMapImpl;
 import io.vertx.core.spi.cluster.AsyncMultiMap;
 import io.vertx.core.spi.cluster.ChoosableIterable;
 import io.vertx.core.spi.cluster.ClusterManager;
@@ -40,6 +35,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -50,10 +46,10 @@ public class FakeClusterManager implements ClusterManager {
 
   private static Map<String, FakeClusterManager> nodes = Collections.synchronizedMap(new LinkedHashMap<>());
 
-  private static ConcurrentMap<String, ConcurrentMap> asyncMaps = new ConcurrentHashMap<>();
+  private static ConcurrentMap<String, LocalAsyncMapImpl> asyncMaps = new ConcurrentHashMap<>();
   private static ConcurrentMap<String, ConcurrentMap> asyncMultiMaps = new ConcurrentHashMap<>();
   private static ConcurrentMap<String, Map> syncMaps = new ConcurrentHashMap<>();
-  private static ConcurrentMap<String, AsynchronousLock> locks = new ConcurrentHashMap<>();
+  private static LocalAsyncLocks localAsyncLocks = new LocalAsyncLocks();
   private static ConcurrentMap<String, AtomicLong> counters = new ConcurrentHashMap<>();
 
   private String nodeID;
@@ -70,7 +66,7 @@ public class FakeClusterManager implements ClusterManager {
     }
     nodes.put(nodeID, node);
     synchronized (nodes) {
-      for (Map.Entry<String, FakeClusterManager> entry : nodes.entrySet()) {
+      for (Entry<String, FakeClusterManager> entry : nodes.entrySet()) {
         if (!entry.getKey().equals(nodeID)) {
           new Thread(() -> entry.getValue().memberAdded(nodeID)).start();
         }
@@ -93,7 +89,7 @@ public class FakeClusterManager implements ClusterManager {
   private static void doLeave(String nodeID) {
     nodes.remove(nodeID);
     synchronized (nodes) {
-      for (Map.Entry<String, FakeClusterManager> entry : nodes.entrySet()) {
+      for (Entry<String, FakeClusterManager> entry : nodes.entrySet()) {
         if (!entry.getKey().equals(nodeID)) {
           new Thread(() -> entry.getValue().memberRemoved(nodeID)).start();
         }
@@ -128,19 +124,12 @@ public class FakeClusterManager implements ClusterManager {
     vertx.runOnContext(v -> resultHandler.handle(Future.succeededFuture(new FakeAsyncMultiMap<>(theMap))));
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public <K, V> void getAsyncMap(String name, Handler<AsyncResult<AsyncMap<K, V>>> resultHandler) {
-    ConcurrentMap map = asyncMaps.get(name);
-    if (map == null) {
-      map = new ConcurrentHashMap<>();
-      ConcurrentMap prevMap = asyncMaps.putIfAbsent(name, map);
-      if (prevMap != null) {
-        map = prevMap;
-      }
-    }
-    @SuppressWarnings("unchecked")
-    ConcurrentMap<K, V> theMap = map;
-    vertx.runOnContext(v -> resultHandler.handle(Future.succeededFuture(new FakeAsyncMap<>(theMap))));
+  public <K, V> Future<AsyncMap<K, V>> getAsyncMap(String name) {
+    LocalAsyncMapImpl<K, V> asyncMap = asyncMaps.computeIfAbsent(name, n -> new LocalAsyncMapImpl(vertx));
+    ContextInternal context = vertx.getOrCreateContext();
+    return context.succeededFuture(asyncMap);
   }
 
   @Override
@@ -159,26 +148,20 @@ public class FakeClusterManager implements ClusterManager {
   }
 
   @Override
-  public void getLockWithTimeout(String name, long timeout, Handler<AsyncResult<Lock>> resultHandler) {
-    AsynchronousLock lock = new AsynchronousLock(vertx);
-    AsynchronousLock prev = locks.putIfAbsent(name, lock);
-    if (prev != null) {
-      lock = prev;
-    }
-    FakeLock flock = new FakeLock(lock);
-    flock.acquire(timeout, resultHandler);
+  public Future<Lock> getLockWithTimeout(String name, long timeout) {
+    return localAsyncLocks.acquire(vertx.getOrCreateContext(), name, timeout);
   }
 
   @Override
-  public void getCounter(String name, Handler<AsyncResult<Counter>> resultHandler) {
+  public Future<Counter> getCounter(String name) {
     AtomicLong counter = new AtomicLong();
     AtomicLong prev = counters.putIfAbsent(name, counter);
     if (prev != null) {
       counter = prev;
     }
     AtomicLong theCounter = counter;
-    Context context = vertx.getOrCreateContext();
-    context.runOnContext(v -> resultHandler.handle(Future.succeededFuture(new AsynchronousCounter(vertx, theCounter))));
+    ContextInternal context = vertx.getOrCreateContext();
+    return context.succeededFuture(new AsynchronousCounter(vertx, theCounter));
   }
 
   @Override
@@ -236,105 +219,9 @@ public class FakeClusterManager implements ClusterManager {
     nodes.clear();
     asyncMaps.clear();
     asyncMultiMaps.clear();
-    locks.clear();
+    localAsyncLocks = new LocalAsyncLocks();
     counters.clear();
     syncMaps.clear();
-  }
-
-  private class FakeLock implements Lock {
-
-    private final AsynchronousLock delegate;
-
-    public FakeLock(AsynchronousLock delegate) {
-      this.delegate = delegate;
-    }
-
-    public void acquire(long timeout, Handler<AsyncResult<Lock>> resultHandler) {
-      Context context = vertx.getOrCreateContext();
-      delegate.doAcquire(context, timeout, resultHandler);
-    }
-
-    @Override
-    public void release() {
-      delegate.release();
-    }
-  }
-
-  private class FakeAsyncMap<K, V> implements AsyncMap<K, V> {
-
-    private final Map<K, V> map;
-
-    public FakeAsyncMap(Map<K, V> map) {
-      this.map = map;
-    }
-
-    @Override
-    public void get(final K k, Handler<AsyncResult<V>> resultHandler) {
-      vertx.executeBlocking(fut -> fut.complete(map.get(k)), resultHandler);
-    }
-
-    @Override
-    public void put(final K k, final V v, Handler<AsyncResult<Void>> resultHandler) {
-      vertx.executeBlocking(fut -> {
-        map.put(k, v);
-        fut.complete();
-      }, resultHandler);
-    }
-
-    @Override
-    public void putIfAbsent(K k, V v, Handler<AsyncResult<V>> resultHandler) {
-      vertx.executeBlocking(fut -> fut.complete(map.putIfAbsent(k, v)), resultHandler);
-    }
-
-    @Override
-    public void put(K k, V v, long timeout, Handler<AsyncResult<Void>> completionHandler) {
-      put(k, v, completionHandler);
-      vertx.setTimer(timeout, tid -> map.remove(k));
-    }
-
-    @Override
-    public void putIfAbsent(K k, V v, long timeout, Handler<AsyncResult<V>> completionHandler) {
-      Future<V> future = Future.future();
-      putIfAbsent(k, v, future);
-      future.map(vv -> {
-        if (vv == null) vertx.setTimer(timeout, tid -> map.remove(k));
-        return vv;
-      }).setHandler(completionHandler);
-    }
-
-    @Override
-    public void removeIfPresent(K k, V v, Handler<AsyncResult<Boolean>> resultHandler) {
-      vertx.executeBlocking(fut -> fut.complete(map.remove(k, v)), resultHandler);
-    }
-
-    @Override
-    public void replace(K k, V v, Handler<AsyncResult<V>> resultHandler) {
-      vertx.executeBlocking(fut -> fut.complete(map.replace(k, v)), resultHandler);
-    }
-
-    @Override
-    public void replaceIfPresent(K k, V oldValue, V newValue, Handler<AsyncResult<Boolean>> resultHandler) {
-      vertx.executeBlocking(fut -> fut.complete(map.replace(k, oldValue, newValue)), resultHandler);
-    }
-
-    @Override
-    public void clear(Handler<AsyncResult<Void>> resultHandler) {
-      vertx.executeBlocking(fut -> {
-        map.clear();
-        fut.complete();
-      }, resultHandler);
-    }
-
-    @Override
-    public void size(Handler<AsyncResult<Integer>> resultHandler) {
-      vertx.executeBlocking(fut -> fut.complete(map.size()), resultHandler);
-    }
-
-    @Override
-    public void remove(final K k, Handler<AsyncResult<V>> resultHandler) {
-      vertx.executeBlocking(fut -> fut.complete(map.remove(k)), resultHandler);
-    }
-
   }
 
   private class FakeAsyncMultiMap<K, V> implements AsyncMultiMap<K, V> {
@@ -404,9 +291,9 @@ public class FakeClusterManager implements ClusterManager {
     public void removeAllMatching(Predicate<V> p, Handler<AsyncResult<Void>> completionHandler) {
       ContextInternal ctx = vertx.getOrCreateContext();
       ctx.executeBlocking(fut -> {
-        Iterator<Map.Entry<K, ChoosableSet<V>>> mapIter = map.entrySet().iterator();
+        Iterator<Entry<K, ChoosableSet<V>>> mapIter = map.entrySet().iterator();
         while (mapIter.hasNext()) {
-          Map.Entry<K, ChoosableSet<V>> entry = mapIter.next();
+          Entry<K, ChoosableSet<V>> entry = mapIter.next();
           ChoosableSet<V> vals = entry.getValue();
           Iterator<V> iter = vals.iterator();
           while (iter.hasNext()) {

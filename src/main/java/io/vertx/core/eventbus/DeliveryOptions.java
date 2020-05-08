@@ -1,17 +1,12 @@
 /*
- * Copyright (c) 2011-2014 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.eventbus;
@@ -19,7 +14,6 @@ package io.vertx.core.eventbus;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.core.MultiMap;
-import io.vertx.core.http.CaseInsensitiveHeaders;
 import io.vertx.core.impl.Arguments;
 import io.vertx.core.json.JsonObject;
 
@@ -42,9 +36,15 @@ public class DeliveryOptions {
    */
   public static final long DEFAULT_TIMEOUT = 30 * 1000;
 
+  /**
+   * Whether the message should be delivered to local consumers only by default = false.
+   */
+  public static final boolean DEFAULT_LOCAL_ONLY = false;
+
   private long timeout = DEFAULT_TIMEOUT;
   private String codecName;
   private MultiMap headers;
+  private boolean localOnly = DEFAULT_LOCAL_ONLY;
 
   /**
    * Default constructor
@@ -61,6 +61,7 @@ public class DeliveryOptions {
     this.timeout = other.getSendTimeout();
     this.codecName = other.getCodecName();
     this.headers = other.getHeaders();
+    this.localOnly = other.localOnly;
   }
 
   /**
@@ -73,7 +74,7 @@ public class DeliveryOptions {
     this.codecName = json.getString("codecName", null);
     JsonObject hdrs = json.getJsonObject("headers", null);
     if (hdrs != null) {
-      headers = new CaseInsensitiveHeaders();
+      headers = MultiMap.caseInsensitiveMultiMap();
       for (Map.Entry<String, Object> entry: hdrs) {
         if (!(entry.getValue() instanceof String)) {
           throw new IllegalStateException("Invalid type for message header value " + entry.getValue().getClass());
@@ -81,7 +82,27 @@ public class DeliveryOptions {
         headers.set(entry.getKey(), (String)entry.getValue());
       }
     }
+    this.localOnly = json.getBoolean("localOnly", DEFAULT_LOCAL_ONLY);
   }
+
+  /**
+   * Convert to JSON.
+   *
+   * @return the JSON
+   */
+  public JsonObject toJson() {
+    JsonObject json = new JsonObject();
+    json.put("timeout", timeout);
+    if (codecName != null) json.put("codecName", codecName);
+    if (headers != null) {
+      JsonObject hJson = new JsonObject();
+      headers.entries().forEach(entry -> hJson.put(entry.getKey(), entry.getValue()));
+      json.put("headers", hJson);
+    }
+    json.put("localOnly", localOnly);
+    return json;
+  }
+
 
   /**
    * Get the send timeout.
@@ -172,7 +193,28 @@ public class DeliveryOptions {
 
   private void checkHeaders() {
     if (headers == null) {
-      headers = new CaseInsensitiveHeaders();
+      headers = MultiMap.caseInsensitiveMultiMap();
     }
+  }
+
+  /**
+   * @return whether the message should be delivered to local consumers only
+   */
+  public boolean isLocalOnly() {
+    return localOnly;
+  }
+
+  /**
+   * Whether a message should be delivered to local consumers only. Defaults to {@code false}.
+   *
+   * <p>
+   * <strong>This option is effective in clustered mode only and does not apply to reply messages</strong>.
+   *
+   * @param localOnly {@code true} to deliver to local consumers only, {@code false} otherwise
+   * @return a reference to this, so the API can be used fluently
+   */
+  public DeliveryOptions setLocalOnly(boolean localOnly) {
+    this.localOnly = localOnly;
+    return this;
   }
 }

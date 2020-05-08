@@ -1,24 +1,24 @@
 /*
- * Copyright (c) 2011-2014 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.test.core;
 
 import org.junit.ComparisonFailure;
 import org.junit.Test;
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
+import org.junit.runners.BlockJUnit4ClassRunner;
+import org.junit.runners.model.InitializationError;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -38,7 +38,8 @@ public class AsyncTestBaseTest extends AsyncTestBase {
   }
 
   protected void tearDown() throws Exception {
-    executor.shutdownNow();
+    executor.shutdown();
+    executor.awaitTermination(10, TimeUnit.SECONDS);
     super.tearDown();
   }
 
@@ -269,4 +270,38 @@ public class AsyncTestBaseTest extends AsyncTestBase {
     assertEquals(toWaitFor, cnt.get());
   }
 
+  public static class LateFailureReport extends AsyncTestBase {
+
+    CountDownLatch latch = new CountDownLatch(1);
+
+    @Override
+    protected void tearDown() throws Exception {
+      latch.await(30, TimeUnit.SECONDS);
+      super.tearDown();
+    }
+
+    @Test
+    public void test() {
+      new Thread(() -> {
+        testComplete();
+        try {
+          fail();
+        } catch (Throwable ignore) {
+        }
+        latch.countDown();
+      }).run();
+    }
+  }
+
+  @Test
+  public void testReportLateFailures() {
+    Result result;
+    try {
+      result = new JUnitCore().run(new BlockJUnit4ClassRunner(LateFailureReport.class));
+    } catch (InitializationError initializationError) {
+      throw new AssertionError(initializationError);
+    }
+    assertEquals(1, result.getFailureCount());
+    assertEquals(IllegalStateException.class, result.getFailures().get(0).getException().getClass());
+  }
 }

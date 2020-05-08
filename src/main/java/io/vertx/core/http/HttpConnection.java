@@ -1,29 +1,26 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- *  ------------------------------------------------------
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *      The Eclipse Public License is available at
- *      http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *      The Apache License v2.0 is available at
- *      http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.http;
 
-import io.vertx.codegen.annotations.CacheReturn;
-import io.vertx.codegen.annotations.Fluent;
-import io.vertx.codegen.annotations.Nullable;
-import io.vertx.codegen.annotations.VertxGen;
+import io.vertx.codegen.annotations.*;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.SocketAddress;
+
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
+import javax.security.cert.X509Certificate;
 
 /**
  * Represents an HTTP connection.
@@ -63,11 +60,11 @@ public interface HttpConnection {
   }
 
   /**
-   * Like {@link #goAway(long, int)} with a last stream id {@code 2^31-1}.
+   * Like {@link #goAway(long, int)} with a last stream id {@code -1} which means to disallow any new stream creation.
    */
   @Fluent
   default HttpConnection goAway(long errorCode) {
-    return goAway(errorCode, Integer.MAX_VALUE);
+    return goAway(errorCode, -1);
   }
 
   /**
@@ -120,27 +117,38 @@ public interface HttpConnection {
   HttpConnection shutdownHandler(@Nullable  Handler<Void> handler);
 
   /**
-   * Initiate a connection shutdown, a go away frame is sent and the connection is closed when all current active streams
-   * are closed or after a time out of 30 seconds.
-   * <p/>
-   * This is not implemented for HTTP/1.x.
+   * Initiate a graceful connection shutdown, the connection is taken out of service and closed when all current requests
+   * are processed, otherwise after 30 seconds the connection will be closed. Client connection are immediately removed
+   * from the pool.
    *
-   * @return a reference to this, so the API can be used fluently
+   * <ul>
+   *   <li>HTTP/2 connections will send a go away frame immediately to signal the other side the connection will close</li>
+   *   <li>HTTP/1.x client connection supports this feature</li>
+   *   <li>HTTP/1.x server connections do not support this feature</li>
+   * </ul>
+   *
+   * @param handler the handler called when shutdown has completed
    */
-  @Fluent
-  HttpConnection shutdown();
+  default void shutdown(Handler<AsyncResult<Void>> handler) {
+    shutdown(30000, handler);
+  }
 
   /**
-   * Initiate a connection shutdown, a go away frame is sent and the connection is closed when all current streams
-   * will be closed or the {@code timeout} is fired.
-   * <p/>
-   * This is not implemented for HTTP/1.x.
-   *
-   * @param timeoutMs the timeout in milliseconds
-   * @return a reference to this, so the API can be used fluently
+   * Like {@link #shutdown(Handler)} but returns a {@code Future} of the asynchronous result
    */
-  @Fluent
-  HttpConnection shutdown(long timeoutMs);
+  default Future<Void> shutdown() {
+    return shutdown(30000L);
+  }
+
+  /**
+   * Like {@link #shutdown(Handler)} but with a specific {@code timeout} in milliseconds.
+   */
+  void shutdown(long timeout, Handler<AsyncResult<Void>> handler);
+
+  /**
+   * Like {@link #shutdown(long, Handler)} but returns a {@code Future} of the asynchronous result
+   */
+  Future<Void> shutdown(long timeoutMs);
 
   /**
    * Set a close handler. The handler will get notified when the connection is closed.
@@ -155,8 +163,10 @@ public interface HttpConnection {
    * Close the connection and all the currently active streams.
    * <p/>
    * An HTTP/2 connection will send a {@literal GOAWAY} frame before.
+   *
+   * @return a future completed with the result
    */
-  void close();
+  Future<Void> close();
 
   /**
    * @return the latest server settings acknowledged by the remote endpoint - this is not implemented for HTTP/1.x
@@ -169,10 +179,9 @@ public interface HttpConnection {
    * This is not implemented for HTTP/1.x.
    *
    * @param settings the new settings
-   * @return a reference to this, so the API can be used fluently
+   * @return a future completed with the result
    */
-  @Fluent
-  HttpConnection updateSettings(Http2Settings settings);
+  Future<Void> updateSettings(Http2Settings settings);
 
   /**
    * Send to the remote endpoint an update of this endpoint settings
@@ -217,6 +226,11 @@ public interface HttpConnection {
   HttpConnection ping(Buffer data, Handler<AsyncResult<Buffer>> pongHandler);
 
   /**
+   * Same as {@link #ping(Buffer, Handler)} but returns a {@code Future} of the asynchronous result
+   */
+  Future<Buffer> ping(Buffer data);
+
+  /**
    * Set an handler notified when a {@literal PING} frame is received from the remote endpoint.
    * <p/>
    * This is not implemented for HTTP/1.x.
@@ -237,15 +251,50 @@ public interface HttpConnection {
   HttpConnection exceptionHandler(Handler<Throwable> handler);
 
   /**
-   * @return the remote address for this connection
+   * @return the remote address for this connection, possibly {@code null} (e.g a server bound on a domain socket).
+   * If {@code useProxyProtocol} is set to {@code true}, the address returned will be of the actual connecting client.
    */
   @CacheReturn
   SocketAddress remoteAddress();
 
   /**
-   * @return the remote address for this connection
+   * @return the local address for this connection, possibly {@code null} (e.g a server bound on a domain socket)
+   * If {@code useProxyProtocol} is set to {@code true}, the address returned will be of the proxy.
    */
   @CacheReturn
   SocketAddress localAddress();
 
+  /**
+   * @return true if this {@link io.vertx.core.http.HttpConnection} is encrypted via SSL/TLS.
+   */
+  boolean isSsl();
+
+  /**
+   * @return SSLSession associated with the underlying socket. Returns null if connection is
+   *         not SSL.
+   * @see javax.net.ssl.SSLSession
+   */
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  SSLSession sslSession();
+
+  /**
+   * Note: Java SE 5+ recommends to use javax.net.ssl.SSLSession#getPeerCertificates() instead of
+   * of javax.net.ssl.SSLSession#getPeerCertificateChain() which this method is based on. Use {@link #sslSession()} to
+   * access that method.
+   *
+   * @return an ordered array of the peer certificates. Returns null if connection is
+   *         not SSL.
+   * @throws javax.net.ssl.SSLPeerUnverifiedException SSL peer's identity has not been verified.
+   * @see javax.net.ssl.SSLSession#getPeerCertificateChain()
+   * @see #sslSession()
+   */
+  @GenIgnore
+  X509Certificate[] peerCertificateChain() throws SSLPeerUnverifiedException;
+
+  /**
+   * Returns the SNI server name presented during the SSL handshake by the client.
+   *
+   * @return the indicated server name
+   */
+  String indicatedServerName();
 }

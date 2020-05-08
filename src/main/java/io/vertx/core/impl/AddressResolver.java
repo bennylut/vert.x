@@ -1,21 +1,17 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- *  ------------------------------------------------------
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *      The Eclipse Public License is available at
- *      http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *      The Apache License v2.0 is available at
- *      http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.impl;
 
+import io.netty.channel.EventLoop;
 import io.netty.resolver.AddressResolverGroup;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -23,10 +19,11 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.dns.AddressResolverOptions;
 import io.vertx.core.impl.launcher.commands.ExecUtils;
+import io.vertx.core.impl.logging.Logger;
+import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.spi.resolver.ResolverProvider;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
@@ -37,6 +34,8 @@ import java.util.regex.Pattern;
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */
 public class AddressResolver {
+
+  private static final Logger log = LoggerFactory.getLogger(AddressResolver.class);
 
   private static Pattern resolvOption(String regex) {
     return Pattern.compile("^[ \\t\\f]*options[^\n]+" + regex + "(?=$|\\s)", Pattern.MULTILINE);
@@ -52,16 +51,17 @@ public class AddressResolver {
     boolean rotate = false;
     if (ExecUtils.isLinux()) {
       File f = new File("/etc/resolv.conf");
-      if (f.exists() && f.isFile()) {
-        try {
+      try {
+        if (f.exists() && f.isFile()) {
           String conf = new String(Files.readAllBytes(f.toPath()));
           int ndotsOption = parseNdotsOptionFromResolvConf(conf);
           if (ndotsOption != -1) {
             ndots = ndotsOption;
           }
           rotate = parseRotateOptionFromResolvConf(conf);
-        } catch (Throwable ignore) {
         }
+      } catch (Throwable t) {
+        log.debug("Failed to load options from /etc/resolv/.conf", t);
       }
     }
     DEFAULT_NDOTS_RESOLV_OPTION = ndots;
@@ -79,19 +79,16 @@ public class AddressResolver {
   }
 
   public void resolveHostname(String hostname, Handler<AsyncResult<InetAddress>> resultHandler) {
-    ContextInternal callback = (ContextInternal) vertx.getOrCreateContext();
-    io.netty.resolver.AddressResolver<InetSocketAddress> resolver = resolverGroup.getResolver(callback.nettyEventLoop());
-    io.netty.util.concurrent.Future<InetSocketAddress> fut = resolver.resolve(InetSocketAddress.createUnresolved(hostname, 0));
-    fut.addListener(a -> {
-      callback.runOnContext(v -> {
-        if (a.isSuccess()) {
-          InetSocketAddress address = fut.getNow();
-          resultHandler.handle(Future.succeededFuture(address.getAddress()));
-        } else {
-          resultHandler.handle(Future.failedFuture(a.cause()));
-        }
-      });
-    });
+    ContextInternal context = (ContextInternal) vertx.getOrCreateContext();
+    io.netty.util.concurrent.Future<InetSocketAddress> fut = resolveHostname(context.nettyEventLoop(), hostname);
+    PromiseInternal<InetSocketAddress> promise = context.promise();
+    fut.addListener(promise);
+    promise.future().map(InetSocketAddress::getAddress).onComplete(resultHandler);
+  }
+
+  public io.netty.util.concurrent.Future<InetSocketAddress> resolveHostname(EventLoop eventLoop, String hostname) {
+    io.netty.resolver.AddressResolver<InetSocketAddress> resolver = resolverGroup.getResolver(eventLoop);
+    return resolver.resolve(InetSocketAddress.createUnresolved(hostname, 0));
   }
 
   AddressResolverGroup<InetSocketAddress> nettyAddressResolverGroup() {

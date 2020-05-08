@@ -1,17 +1,12 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.impl;
@@ -20,7 +15,12 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
-class FutureImpl<T> implements Future<T>, Handler<AsyncResult<T>> {
+import java.util.ArrayList;
+import java.util.Objects;
+
+class FutureImpl<T> implements PromiseInternal<T>, Future<T> {
+
+  private final ContextInternal context;
   private boolean failed;
   private boolean succeeded;
   private Handler<AsyncResult<T>> handler;
@@ -31,19 +31,32 @@ class FutureImpl<T> implements Future<T>, Handler<AsyncResult<T>> {
    * Create a future that hasn't completed yet
    */
   FutureImpl() {
+    this(null);
+  }
+
+
+  /**
+   * Create a future that hasn't completed yet
+   */
+  FutureImpl(ContextInternal context) {
+    this.context = context;
+  }
+
+  public ContextInternal context() {
+    return context;
   }
 
   /**
    * The result of the operation. This will be null if the operation failed.
    */
-  public T result() {
+  public synchronized T result() {
     return result;
   }
 
   /**
    * An exception describing failure. This will be null if the operation succeeded.
    */
-  public Throwable cause() {
+  public synchronized Throwable cause() {
     return throwable;
   }
 
@@ -68,46 +81,50 @@ class FutureImpl<T> implements Future<T>, Handler<AsyncResult<T>> {
     return failed || succeeded;
   }
 
-  /**
-   * Set a handler for the result. It will get called when it's complete
-   */
-  public Future<T> setHandler(Handler<AsyncResult<T>> handler) {
-    boolean callHandler;
+  @Override
+  public Future<T> onComplete(Handler<AsyncResult<T>> h) {
+    Objects.requireNonNull(h, "No null handler accepted");
     synchronized (this) {
-      this.handler = handler;
-      callHandler = isComplete();
+      if (!isComplete()) {
+        if (handler == null) {
+          handler = h;
+        } else {
+          addHandler(h);
+        }
+        return this;
+      }
     }
-    if (callHandler) {
-      handler.handle(this);
-    }
+    dispatch(h);
     return this;
   }
 
-  @Override
-  public void complete(T result) {
-    if (!tryComplete(result)) {
-      throw new IllegalStateException("Result is already complete: " + (succeeded ? "succeeded" : "failed"));
+  private void addHandler(Handler<AsyncResult<T>> h) {
+    Handlers<T> handlers;
+    if (handler instanceof Handlers) {
+      handlers = (Handlers<T>) handler;
+    } else {
+      handlers = new Handlers<>();
+      handlers.add(handler);
+      handler = handlers;
+    }
+    handlers.add(h);
+  }
+
+  protected void dispatch(Handler<AsyncResult<T>> handler) {
+    if (handler instanceof Handlers) {
+      for (Handler<AsyncResult<T>> h : (Handlers<T>)handler) {
+        doDispatch(h);
+      }
+    } else {
+      doDispatch(handler);
     }
   }
 
-  @Override
-  public void complete() {
-    if (!tryComplete()) {
-      throw new IllegalStateException("Result is already complete: " + (succeeded ? "succeeded" : "failed"));
-    }
-  }
-
-  @Override
-  public void fail(Throwable cause) {
-    if (!tryFail(cause)) {
-      throw new IllegalStateException("Result is already complete: " + (succeeded ? "succeeded" : "failed"));
-    }
-  }
-
-  @Override
-  public void fail(String failureMessage) {
-    if (!tryFail(failureMessage)) {
-      throw new IllegalStateException("Result is already complete: " + (succeeded ? "succeeded" : "failed"));
+  private void doDispatch(Handler<AsyncResult<T>> handler) {
+    if (context != null) {
+      context.dispatch(this, handler);
+    } else {
+      handler.handle(this);
     }
   }
 
@@ -121,16 +138,12 @@ class FutureImpl<T> implements Future<T>, Handler<AsyncResult<T>> {
       this.result = result;
       succeeded = true;
       h = handler;
+      handler = null;
     }
     if (h != null) {
-      h.handle(this);
+      dispatch(h);
     }
     return true;
-  }
-
-  @Override
-  public boolean tryComplete() {
-    return tryComplete(null);
   }
 
   public void handle(Future<T> ar) {
@@ -138,20 +151,6 @@ class FutureImpl<T> implements Future<T>, Handler<AsyncResult<T>> {
       complete(ar.result());
     } else {
       fail(ar.cause());
-    }
-  }
-
-  @Override
-  public Handler<AsyncResult<T>> completer() {
-    return this;
-  }
-
-  @Override
-  public void handle(AsyncResult<T> asyncResult) {
-    if (asyncResult.succeeded()) {
-      complete(asyncResult.result());
-    } else {
-      fail(asyncResult.cause());
     }
   }
 
@@ -165,16 +164,26 @@ class FutureImpl<T> implements Future<T>, Handler<AsyncResult<T>> {
       this.throwable = cause != null ? cause : new NoStackTraceThrowable(null);
       failed = true;
       h = handler;
+      handler = null;
     }
     if (h != null) {
-      h.handle(this);
+      dispatch(h);
     }
     return true;
   }
 
   @Override
-  public boolean tryFail(String failureMessage) {
-    return tryFail(new NoStackTraceThrowable(failureMessage));
+  public Future<T> future() {
+    return this;
+  }
+
+  @Override
+  public void operationComplete(io.netty.util.concurrent.Future<T> future) {
+    if (future.isSuccess()) {
+      complete(future.getNow());
+    } else {
+      fail(future.cause());
+    }
   }
 
   @Override
@@ -187,6 +196,16 @@ class FutureImpl<T> implements Future<T>, Handler<AsyncResult<T>> {
         return "Future{cause=" + throwable.getMessage() + "}";
       }
       return "Future{unresolved}";
+    }
+  }
+
+
+  private class Handlers<T> extends ArrayList<Handler<AsyncResult<T>>> implements Handler<AsyncResult<T>> {
+    @Override
+    public void handle(AsyncResult<T> res) {
+      for (Handler<AsyncResult<T>> handler : this) {
+        handler.handle(res);
+      }
     }
   }
 }

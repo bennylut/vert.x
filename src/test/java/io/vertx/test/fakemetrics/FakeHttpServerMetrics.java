@@ -1,23 +1,17 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- *  ------------------------------------------------------
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *      The Eclipse Public License is available at
- *      http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *      The Apache License v2.0 is available at
- *      http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.test.fakemetrics;
 
 import io.vertx.core.http.HttpMethod;
-import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.http.ServerWebSocket;
@@ -36,12 +30,6 @@ public class FakeHttpServerMetrics extends FakeMetricsBase implements HttpServer
 
   private final ConcurrentMap<WebSocketBase, WebSocketMetric> webSockets = new ConcurrentHashMap<>();
   private final ConcurrentHashSet<HttpServerMetric> requests = new ConcurrentHashSet<>();
-  public final HttpServer server;
-
-  public FakeHttpServerMetrics(HttpServer server) {
-    super(server);
-    this.server = server;
-  }
 
   public WebSocketMetric getMetric(ServerWebSocket ws) {
     return webSockets.get(ws);
@@ -77,22 +65,24 @@ public class FakeHttpServerMetrics extends FakeMetricsBase implements HttpServer
   }
 
   @Override
+  public void responseBegin(HttpServerMetric requestMetric, HttpServerResponse response) {
+    requestMetric.response.set(response);
+  }
+
+  @Override
   public void responseEnd(HttpServerMetric requestMetric, HttpServerResponse response) {
     requests.remove(requestMetric);
   }
 
   @Override
-  public WebSocketMetric upgrade(HttpServerMetric requestMetric, ServerWebSocket serverWebSocket) {
-    requests.remove(requestMetric);
-    WebSocketMetric metric = new WebSocketMetric(requestMetric.socket, serverWebSocket);
-    webSockets.put(serverWebSocket, metric);
-    return metric;
-  }
-
-  @Override
-  public WebSocketMetric connected(SocketMetric socketMetric, ServerWebSocket serverWebSocket) {
+  public WebSocketMetric connected(SocketMetric socketMetric, HttpServerMetric requestMetric, ServerWebSocket serverWebSocket) {
+    if (!requests.remove(requestMetric)) {
+      throw new IllegalStateException();
+    }
     WebSocketMetric metric = new WebSocketMetric(socketMetric, serverWebSocket);
-    webSockets.put(serverWebSocket, metric);
+    if (webSockets.put(serverWebSocket, metric) != null) {
+      throw new AssertionError();
+    }
     return metric;
   }
 
@@ -125,12 +115,4 @@ public class FakeHttpServerMetrics extends FakeMetricsBase implements HttpServer
   public void exceptionOccurred(SocketMetric socketMetric, SocketAddress remoteAddress, Throwable t) {
   }
 
-  @Override
-  public boolean isEnabled() {
-    return true;
-  }
-
-  @Override
-  public void close() {
-  }
 }

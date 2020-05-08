@@ -1,17 +1,12 @@
 /*
- * Copyright (c) 2009 Red Hat, Inc.
- * -------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.logging;
@@ -23,6 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
+ * @deprecated see https://github.com/eclipse-vertx/vert.x/issues/2774
+ *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
 public class LoggerFactory {
@@ -38,33 +35,44 @@ public class LoggerFactory {
   }
 
   public static synchronized void initialise() {
-    LogDelegateFactory delegateFactory;
-
-    // If a system property is specified then this overrides any delegate factory which is set
-    // programmatically - this is primarily of use so we can configure the logger delegate on the client side.
-    // call to System.getProperty is wrapped in a try block as it will fail if the client runs in a secured
-    // environment
-    String className = JULLogDelegateFactory.class.getName();
+    ClassLoader loader = Thread.currentThread().getContextClassLoader();
+    String className;
     try {
       className = System.getProperty(LOGGER_DELEGATE_FACTORY_CLASS_NAME);
-    } catch (Exception e) {
+    } catch (Exception ignore) {
+      className = null;
     }
-
-    if (className != null) {
-      ClassLoader loader = Thread.currentThread().getContextClassLoader();
-      try {
-        Class<?> clz = loader.loadClass(className);
-        delegateFactory = (LogDelegateFactory) clz.newInstance();
-      } catch (Exception e) {
-        throw new IllegalArgumentException("Error instantiating transformer class \"" + className + "\"", e);
+    if (className != null && configureWith(className, false, loader)) {
+      return;
+    }
+    if (loader.getResource("vertx-default-jul-logging.properties") == null) {
+      if (configureWith("SLF4J", true, loader)
+        || configureWith("Log4j", true, loader)
+        || configureWith("Log4j2", true, loader)) {
+        return;
       }
-    } else {
-      delegateFactory = new JULLogDelegateFactory();
     }
-
-    LoggerFactory.delegateFactory = delegateFactory;
+    // Do not use dynamic classloading here to ensure the class is visible by AOT compilers
+    delegateFactory = new JULLogDelegateFactory();
   }
 
+  private static boolean configureWith(String name, boolean shortName, ClassLoader loader) {
+    String loggerName = LoggerFactory.class.getName();
+    try {
+      Class<?> clazz = Class.forName(shortName ? "io.vertx.core.logging." + name + "LogDelegateFactory" : name, true, loader);
+      LogDelegateFactory factory = (LogDelegateFactory) clazz.newInstance();
+      factory.createDelegate(loggerName).debug("Using " + factory.getClass().getName());
+      delegateFactory = factory;
+      return true;
+    } catch (Throwable ignore) {
+      return false;
+    }
+  }
+
+  /**
+   * @deprecated see https://github.com/eclipse-vertx/vert.x/issues/2774
+   */
+  @Deprecated
   public static Logger getLogger(final Class<?> clazz) {
     String name = clazz.isAnonymousClass() ?
       clazz.getEnclosingClass().getCanonicalName() :
@@ -72,6 +80,10 @@ public class LoggerFactory {
     return getLogger(name);
   }
 
+  /**
+   * @deprecated see https://github.com/eclipse-vertx/vert.x/issues/2774
+   */
+  @Deprecated
   public static Logger getLogger(final String name) {
     Logger logger = loggers.get(name);
 
@@ -90,6 +102,10 @@ public class LoggerFactory {
     return logger;
   }
 
+  /**
+   * @deprecated see https://github.com/eclipse-vertx/vert.x/issues/2774
+   */
+  @Deprecated
   public static void removeLogger(String name) {
     loggers.remove(name);
   }

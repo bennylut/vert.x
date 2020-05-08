@@ -1,22 +1,16 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- *  ------------------------------------------------------
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *      The Eclipse Public License is available at
- *      http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *      The Apache License v2.0 is available at
- *      http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.test.fakemetrics;
 
-import io.vertx.core.metrics.Measured;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.core.spi.metrics.DatagramSocketMetrics;
 
@@ -33,10 +27,6 @@ public class FakeDatagramSocketMetrics extends FakeMetricsBase implements Datagr
   private volatile SocketAddress localAddress;
   private final List<PacketMetric> reads = Collections.synchronizedList(new ArrayList<>());
   private final List<PacketMetric> writes = Collections.synchronizedList(new ArrayList<>());
-
-  public FakeDatagramSocketMetrics(Measured measured) {
-    super(measured);
-  }
 
   public String getLocalName() {
     return localName;
@@ -68,19 +58,5 @@ public class FakeDatagramSocketMetrics extends FakeMetricsBase implements Datagr
   @Override
   public void bytesWritten(Void socketMetric, SocketAddress remoteAddress,long numberOfBytes) {
     writes.add(new PacketMetric(remoteAddress, numberOfBytes));
-  }
-
-  @Override
-  public void exceptionOccurred(Void socketMetric, SocketAddress remoteAddress, Throwable t) {
-
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return true;
-  }
-
-  @Override
-  public void close() {
   }
 }

@@ -1,26 +1,20 @@
 /*
- * Copyright (c) 2010 The Netty Project
- * ------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.http;
 
 import io.vertx.codegen.annotations.CacheReturn;
 import io.vertx.codegen.annotations.VertxGen;
-import io.vertx.core.ServiceHelper;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.spi.WebSocketFrameFactory;
+import io.vertx.core.http.impl.ws.WebSocketFrameImpl;
 
 /**
  * A WebSocket frame that represents either text or binary data.
@@ -48,7 +42,7 @@ public interface WebSocketFrame {
    * @return the frame
    */
   static WebSocketFrame binaryFrame(Buffer data, boolean isFinal) {
-    return factory.binaryFrame(data, isFinal);
+    return WebSocketFrameImpl.binaryFrame(data, isFinal);
   }
 
   /**
@@ -59,7 +53,27 @@ public interface WebSocketFrame {
    * @return the frame
    */
   static WebSocketFrame textFrame(String str, boolean isFinal) {
-    return factory.textFrame(str, isFinal);
+    return WebSocketFrameImpl.textFrame(str, isFinal);
+  }
+
+  /**
+   * Create a ping WebSocket frame.  Will be a final frame. There is no option for non final ping frames.
+   *
+   * @param data the bytes for the frame, may be at most 125 bytes
+   * @return the frame
+   */
+  static WebSocketFrame pingFrame(Buffer data) {
+    return WebSocketFrameImpl.pingFrame(data);
+  }
+
+  /**
+   * Create a pong WebSocket frame.  Will be a final frame. There is no option for non final pong frames.
+   *
+   * @param data the bytes for the frame, may be at most 125 bytes
+   * @return the frame
+   */
+  static WebSocketFrame pongFrame(Buffer data) {
+    return WebSocketFrameImpl.pongFrame(data);
   }
 
   /**
@@ -70,7 +84,7 @@ public interface WebSocketFrame {
    * @return the frame
    */
   static WebSocketFrame continuationFrame(Buffer data, boolean isFinal) {
-    return factory.continuationFrame(data, isFinal);
+    return WebSocketFrameImpl.continuationFrame(data, isFinal);
   }
 
   /**
@@ -87,6 +101,11 @@ public interface WebSocketFrame {
    * @return true if it's a continuation frame
    */
   boolean isContinuation();
+
+  /**
+   * @return true if it's close frame
+   */
+  boolean isClose();
 
   /**
    * @return the content of this frame as a UTF-8 string and returns the
@@ -106,5 +125,14 @@ public interface WebSocketFrame {
    */
   boolean isFinal();
 
-  WebSocketFrameFactory factory = ServiceHelper.loadFactory(WebSocketFrameFactory.class);
+  /**
+   * @return status code of close frame. Only use this for close frames
+   */
+  short closeStatusCode();
+
+  /**
+   * @return string explaining close reason. Only use this for close frames
+   */
+  String closeReason();
+
 }

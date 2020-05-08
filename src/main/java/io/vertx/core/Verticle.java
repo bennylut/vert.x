@@ -1,17 +1,12 @@
 /*
- * Copyright (c) 2011-2014 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core;
@@ -31,6 +26,7 @@ package io.vertx.core;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
+@SuppressWarnings( "deprecation" )
 public interface Verticle {
 
   /**
@@ -55,22 +51,22 @@ public interface Verticle {
    * <p>
    * Vert.x calls this method when deploying the instance. You do not call it yourself.
    * <p>
-   * A future is passed into the method, and when deployment is complete the verticle should either call
-   * {@link io.vertx.core.Future#complete} or {@link io.vertx.core.Future#fail} the future.
+   * A promise is passed into the method, and when deployment is complete the verticle should either call
+   * {@link io.vertx.core.Promise#complete} or {@link io.vertx.core.Promise#fail} the future.
    *
-   * @param startFuture  the future
+   * @param startPromise  the future
    */
-  void start(Future<Void> startFuture) throws Exception;
+  void start(Promise<Void> startPromise) throws Exception;
 
   /**
    * Stop the verticle instance.
    * <p>
    * Vert.x calls this method when un-deploying the instance. You do not call it yourself.
    * <p>
-   * A future is passed into the method, and when un-deployment is complete the verticle should either call
-   * {@link io.vertx.core.Future#complete} or {@link io.vertx.core.Future#fail} the future.
+   * A promise is passed into the method, and when un-deployment is complete the verticle should either call
+   * {@link io.vertx.core.Promise#complete} or {@link io.vertx.core.Promise#fail} the future.
    *
-   * @param stopFuture  the future
+   * @param stopPromise  the future
    */
-  void stop(Future<Void> stopFuture) throws Exception;
+  void stop(Promise<Void> stopPromise) throws Exception;
 }

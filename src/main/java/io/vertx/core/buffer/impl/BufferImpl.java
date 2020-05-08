@@ -1,18 +1,14 @@
 /*
- * Copyright 2014 Red Hat, Inc.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- * The Eclipse Public License is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * The Apache License v2.0 is available at
- * http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
+
 package io.vertx.core.buffer.impl;
 
 
@@ -23,6 +19,7 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.impl.Arguments;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.net.impl.PartialPooledByteBufAllocator;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -34,9 +31,43 @@ import java.util.Objects;
  */
 public class BufferImpl implements Buffer {
 
+  public static Buffer buffer(int initialSizeHint) {
+    return new BufferImpl(initialSizeHint);
+  }
+
+  public static Buffer buffer() {
+    return new BufferImpl();
+  }
+
+  public static Buffer buffer(String str) {
+    return new BufferImpl(str);
+  }
+
+  public static Buffer buffer(String str, String enc) {
+    return new BufferImpl(str, enc);
+  }
+
+  public static Buffer buffer(byte[] bytes) {
+    return new BufferImpl(bytes);
+  }
+
+  public static Buffer buffer(ByteBuf byteBuffer) {
+    return new BufferImpl(byteBuffer);
+  }
+
+  public static Buffer directBuffer(String str, String enc) {
+    return directBuffer(str.getBytes(Charset.forName(Objects.requireNonNull(enc))));
+  }
+
+  public static Buffer directBuffer(byte[] bytes) {
+    ByteBuf buff = PartialPooledByteBufAllocator.UNPOOLED.directBuffer(bytes.length);
+    buff.writeBytes(bytes);
+    return new BufferImpl(buff);
+  }
+
   private ByteBuf buffer;
 
-  BufferImpl() {
+  public BufferImpl() {
     this(0);
   }
 
@@ -79,12 +110,12 @@ public class BufferImpl implements Buffer {
 
   @Override
   public JsonObject toJsonObject() {
-    return new JsonObject(toString());
+    return new JsonObject(this);
   }
 
   @Override
   public JsonArray toJsonArray() {
-    return new JsonArray(toString());
+    return new JsonArray(this);
   }
 
   public byte getByte(int pos) {
@@ -210,14 +241,14 @@ public class BufferImpl implements Buffer {
   }
 
   public Buffer appendBuffer(Buffer buff) {
-    ByteBuf cb = buff.getByteBuf();
     buffer.writeBytes(buff.getByteBuf());
-    cb.readerIndex(0); // Need to reset readerindex since Netty write modifies readerIndex of source!
     return this;
   }
 
   public Buffer appendBuffer(Buffer buff, int offset, int len) {
-    buffer.writeBytes(buff.getByteBuf(), offset, len);
+    ByteBuf byteBuf = buff.getByteBuf();
+    int from = byteBuf.readerIndex() + offset;
+    buffer.writeBytes(byteBuf, from, len);
     return this;
   }
 
@@ -423,7 +454,8 @@ public class BufferImpl implements Buffer {
 
   public Buffer setBuffer(int pos, Buffer b, int offset, int len) {
     ensureWritable(pos, len);
-    buffer.setBytes(pos, b.getByteBuf(), offset, len);
+    ByteBuf byteBuf = b.getByteBuf();
+    buffer.setBytes(pos, byteBuf, byteBuf.readerIndex() + offset, len);
     return this;
   }
 

@@ -1,21 +1,17 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- *  ------------------------------------------------------
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *      The Eclipse Public License is available at
- *      http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *      The Apache License v2.0 is available at
- *      http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core;
 
+import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.metrics.Measured;
 
@@ -39,7 +35,7 @@ public interface WorkerExecutor extends Measured {
    * (i.e. on the original event loop of the caller).
    * <p>
    * A {@code Future} instance is passed into {@code blockingCodeHandler}. When the blocking code successfully completes,
-   * the handler should call the {@link Future#complete} or {@link Future#complete(Object)} method, or the {@link Future#fail}
+   * the handler should call the {@link Promise#complete} or {@link Promise#complete(Object)} method, or the {@link Promise#fail}
    * method if it failed.
    * <p>
    * In the {@code blockingCodeHandler} the current context remains the original context and therefore any task
@@ -52,19 +48,30 @@ public interface WorkerExecutor extends Measured {
    *                 guarantees
    * @param <T> the type of the result
    */
-  <T> void executeBlocking(Handler<Future<T>> blockingCodeHandler, boolean ordered, Handler<AsyncResult<T>> resultHandler);
+  <T> void executeBlocking(Handler<Promise<T>> blockingCodeHandler, boolean ordered, Handler<AsyncResult<@Nullable T>> resultHandler);
 
   /**
    * Like {@link #executeBlocking(Handler, boolean, Handler)} called with ordered = true.
    */
-  default <T> void executeBlocking(Handler<Future<T>> blockingCodeHandler, Handler<AsyncResult<T>> resultHandler) {
+  default <T> void executeBlocking(Handler<Promise<T>> blockingCodeHandler, Handler<AsyncResult<@Nullable T>> resultHandler) {
     executeBlocking(blockingCodeHandler, true, resultHandler);
+  }
+
+  /**
+   * Same as {@link #executeBlocking(Handler, boolean, Handler)} but with an {@code handler} called when the operation completes
+   */
+  <T> Future<@Nullable T> executeBlocking(Handler<Promise<T>> blockingCodeHandler, boolean ordered);
+
+  /**
+   * Like {@link #executeBlocking(Handler, boolean, Handler)} called with ordered = true.
+   */
+  default <T> Future<T> executeBlocking(Handler<Promise<T>> blockingCodeHandler) {
+    return executeBlocking(blockingCodeHandler, true);
   }
 
   /**
    * Close the executor.
    */
-  default void close() {
-  }
+  Future<Void> close();
 
 }

@@ -1,26 +1,18 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- *  ------------------------------------------------------
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *      The Eclipse Public License is available at
- *      http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *      The Apache License v2.0 is available at
- *      http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.impl;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Closeable;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
+import io.vertx.codegen.annotations.Nullable;
+import io.vertx.core.*;
 import io.vertx.core.spi.metrics.Metrics;
 import io.vertx.core.spi.metrics.MetricsProvider;
 import io.vertx.core.spi.metrics.PoolMetrics;
@@ -28,17 +20,15 @@ import io.vertx.core.spi.metrics.PoolMetrics;
 /**
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */
-class WorkerExecutorImpl implements Closeable, MetricsProvider, WorkerExecutorInternal {
+class WorkerExecutorImpl implements MetricsProvider, WorkerExecutorInternal {
 
-  private final Vertx vertx;
-  private final WorkerPool pool;
+  private final ContextInternal ctx;
+  private final VertxImpl.SharedWorkerPool pool;
   private boolean closed;
-  private final boolean releaseOnClose;
 
-  public WorkerExecutorImpl(Vertx vertx, WorkerPool pool, boolean releaseOnClose) {
-    this.vertx = vertx;
+  public WorkerExecutorImpl(ContextInternal ctx, VertxImpl.SharedWorkerPool pool) {
+    this.ctx = ctx;
     this.pool = pool;
-    this.releaseOnClose = releaseOnClose;
   }
 
   @Override
@@ -49,44 +39,52 @@ class WorkerExecutorImpl implements Closeable, MetricsProvider, WorkerExecutorIn
   @Override
   public boolean isMetricsEnabled() {
     PoolMetrics metrics = pool.metrics();
-    return metrics != null && metrics.isEnabled();
+    return metrics != null;
   }
 
   @Override
   public Vertx vertx() {
-    return vertx;
+    return ctx.owner();
   }
 
+  @Override
   public WorkerPool getPool() {
     return pool;
   }
 
-  public synchronized <T> void executeBlocking(Handler<Future<T>> blockingCodeHandler, boolean ordered, Handler<AsyncResult<T>> asyncResultHandler) {
+  @Override
+  public <T> Future<@Nullable T> executeBlocking(Handler<Promise<T>> blockingCodeHandler, boolean ordered) {
     if (closed) {
       throw new IllegalStateException("Worker executor closed");
     }
-    ContextImpl context = (ContextImpl) vertx.getOrCreateContext();
-    context.executeBlocking(null, blockingCodeHandler, asyncResultHandler, pool.executor(), ordered ? context.orderedTasks : null, pool.metrics());
+    ContextInternal context = (ContextInternal) ctx.owner().getOrCreateContext();
+    ContextImpl impl = context instanceof ContextImpl.Duplicated ? ((ContextImpl.Duplicated)context).delegate : (ContextImpl) context;
+    return ContextImpl.executeBlocking(context, blockingCodeHandler, pool, ordered ? impl.orderedTasks : null);
+  }
+
+  public synchronized <T> void executeBlocking(Handler<Promise<T>> blockingCodeHandler, boolean ordered, Handler<AsyncResult<T>> asyncResultHandler) {
+    Future<T> fut = executeBlocking(blockingCodeHandler, ordered);
+    if (asyncResultHandler != null) {
+      fut.onComplete(asyncResultHandler);
+    }
   }
 
   @Override
-  public void close() {
+  public Future<Void> close() {
+    PromiseInternal<Void> promise = ctx.promise();
+    close(promise);
+    return promise.future();
+  }
+
+  @Override
+  public void close(Promise<Void> completion) {
     synchronized (this) {
       if (!closed) {
         closed = true;
-      } else {
-        return;
+        ctx.removeCloseHook(this);
+        pool.release();
       }
     }
-    if (releaseOnClose && pool instanceof VertxImpl.SharedWorkerPool) {
-      ((VertxImpl.SharedWorkerPool)pool).release();
-    }
+    completion.complete();
   }
-
-  @Override
-  public void close(Handler<AsyncResult<Void>> completionHandler) {
-    close();
-    completionHandler.handle(Future.succeededFuture());
-  }
-
 }

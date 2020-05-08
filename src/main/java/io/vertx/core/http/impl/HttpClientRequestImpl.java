@@ -1,17 +1,12 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.http.impl;
@@ -19,21 +14,24 @@ package io.vertx.core.http.impl;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.CompositeByteBuf;
 import io.netty.buffer.Unpooled;
-import io.vertx.codegen.annotations.Nullable;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.MultiMap;
+import io.vertx.core.*;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.http.CaseInsensitiveHeaders;
 import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.http.HttpConnection;
-import io.vertx.core.http.HttpFrame;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpVersion;
-import io.vertx.core.impl.VertxInternal;
+import io.vertx.core.http.StreamPriority;
+import io.vertx.core.http.impl.headers.VertxHttpHeaders;
+import io.vertx.core.impl.Arguments;
+import io.vertx.core.impl.ContextInternal;
+import io.vertx.core.impl.PromiseInternal;
+import io.vertx.core.impl.logging.Logger;
+import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetSocket;
+import io.vertx.core.net.SocketAddress;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -46,858 +44,615 @@ import static io.vertx.core.http.HttpHeaders.*;
  * The internal state is protected using the synchronized keyword. If always used on the same event loop, then
  * we benefit from biased locking which makes the overhead of synchronized near zero.
  *
+ * This class uses {@code this} for synchronization purpose. The {@link #client}  or{@link #stream} instead are
+ * called must not be called under this lock to avoid deadlocks.
+ *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
 public class HttpClientRequestImpl extends HttpClientRequestBase implements HttpClientRequest {
 
-  private final VertxInternal vertx;
-  private final int port;
-  private Handler<HttpClientResponse> respHandler;
-  private Handler<Void> endHandler;
+  static final Logger log = LoggerFactory.getLogger(HttpClientRequestImpl.class);
+
+  private final Promise<Void> endPromise;
+  private final Future<Void> endFuture;
   private boolean chunked;
-  private String hostHeader;
-  private String rawMethod;
+  private String authority;
   private Handler<Void> continueHandler;
-  private HttpClientStream stream;
-  private volatile Object lock;
   private Handler<Void> drainHandler;
   private Handler<HttpClientRequest> pushHandler;
-  private Handler<HttpConnection> connectionHandler;
-  private boolean headWritten;
-  private boolean completed;
-  private Handler<Void> completionHandler;
-  private Long reset;
-  private HttpClientResponseImpl response;
+  private Handler<Throwable> exceptionHandler;
+  private boolean ended;
+  private Throwable reset;
   private ByteBuf pendingChunks;
-  private CompositeByteBuf cachedChunks;
+  private List<Handler<AsyncResult<Void>>> pendingHandlers;
   private int pendingMaxSize = -1;
   private int followRedirects;
+  private VertxHttpHeaders headers;
+  private StreamPriority priority;
+  private HttpClientStream stream;
   private boolean connecting;
-  private boolean writeHead;
-  private long written;
-  private CaseInsensitiveHeaders headers;
+  private Promise<NetSocket> netSocketPromise;
 
-  HttpClientRequestImpl(HttpClientImpl client, boolean ssl, HttpMethod method, String host, int port,
-                        String relativeURI, VertxInternal vertx) {
-    super(client, ssl, method, host, port, relativeURI);
+  HttpClientRequestImpl(HttpClientImpl client, PromiseInternal<HttpClientResponse> responsePromise, boolean ssl, HttpMethod method,
+                        SocketAddress server, String host, int port, String requestURI) {
+    super(client, responsePromise, ssl, method, server, host, port, requestURI);
     this.chunked = false;
-    this.vertx = vertx;
-    this.port = port;
+    this.endPromise = context.promise();
+    this.endFuture = endPromise.future();
+    this.priority = HttpUtils.DEFAULT_STREAM_PRIORITY;
   }
 
   @Override
-  public int streamId() {
-    synchronized (getLock()) {
-      return stream != null ? stream.id() : -1;
-    }
-  }
-
-  @Override
-  public  HttpClientRequest handler(Handler<HttpClientResponse> handler) {
-    synchronized (getLock()) {
-      if (handler != null) {
-        checkComplete();
-        respHandler = checkConnect(method, handler);
-      } else {
-        respHandler = null;
+  void handleException(Throwable t) {
+    super.handleException(t);
+    Handler<Throwable> handler;
+    synchronized (this) {
+      handler = exceptionHandler;
+      if (handler == null || endFuture.isComplete()) {
+        log.error(t);
+        return;
       }
-      return this;
     }
+    // Might be called from non vertx thread
+    context.dispatch(t, handler);
+    endPromise.tryFail(t);
   }
 
   @Override
-  public HttpClientRequest pause() {
-    return this;
+  public synchronized int streamId() {
+    return stream == null ? -1 : stream.id();
   }
 
   @Override
-  public HttpClientRequest resume() {
-    return this;
-  }
-
-  @Override
-  public HttpClientRequest setFollowRedirects(boolean followRedirects) {
-    synchronized (getLock()) {
-      checkComplete();
-      if (followRedirects) {
-        this.followRedirects = client.getOptions().getMaxRedirects() - 1;
-      } else {
-        this.followRedirects = 0;
-      }
-      return this;
+  public synchronized Future<NetSocket> netSocket() {
+    if (client.getOptions().isPipelining()) {
+      return Future.failedFuture("Cannot upgrade a pipe-lined request");
     }
-  }
-
-  @Override
-  public HttpClientRequest endHandler(Handler<Void> endHandler) {
-    synchronized (getLock()) {
-      if (endHandler != null) {
-        checkComplete();
-      }
-      this.endHandler = endHandler;
-      return this;
+    if (netSocketPromise == null) {
+      netSocketPromise = context.promise();
     }
+    return netSocketPromise.future();
   }
 
   @Override
-  public HttpClientRequestImpl setChunked(boolean chunked) {
-    synchronized (getLock()) {
-      checkComplete();
-      if (written > 0) {
-        throw new IllegalStateException("Cannot set chunked after data has been written on request");
-      }
-      // HTTP 1.0 does not support chunking so we ignore this if HTTP 1.0
-      if (client.getOptions().getProtocolVersion() != io.vertx.core.http.HttpVersion.HTTP_1_0) {
-        this.chunked = chunked;
-      }
-      return this;
-    }
-  }
-
-  @Override
-  public boolean isChunked() {
-    synchronized (getLock()) {
-      return chunked;
-    }
-  }
-
-  @Override
-  public String getRawMethod() {
-    synchronized (getLock()) {
-      return rawMethod;
-    }
-  }
-
-  @Override
-  public HttpClientRequest setRawMethod(String method) {
-    synchronized (getLock()) {
-      this.rawMethod = method;
-      return this;
-    }
-  }
-
-  @Override
-  public HttpClientRequest setHost(String host) {
-    synchronized (getLock()) {
-      this.hostHeader = host;
-      return this;
-    }
-  }
-
-  @Override
-  public String getHost() {
-    synchronized (getLock()) {
-      return hostHeader;
-    }
-  }
-
-  @Override
-  public MultiMap headers() {
-    synchronized (getLock()) {
-      if (headers == null) {
-        headers = new CaseInsensitiveHeaders();
-      }
-      return headers;
-    }
-  }
-
-  @Override
-  public HttpClientRequest putHeader(String name, String value) {
-    synchronized (getLock()) {
-      checkComplete();
-      headers().set(name, value);
-      return this;
-    }
-  }
-
-  @Override
-  public HttpClientRequest putHeader(String name, Iterable<String> values) {
-    synchronized (getLock()) {
-      checkComplete();
-      headers().set(name, values);
-      return this;
-    }
-  }
-
-  @Override
-  public HttpClientRequestImpl write(Buffer chunk) {
-    synchronized (getLock()) {
-      checkComplete();
-      checkResponseHandler();
-      ByteBuf buf = chunk.getByteBuf();
-      write(buf, false);
-      return this;
-    }
-  }
-
-  @Override
-  public HttpClientRequestImpl write(String chunk) {
-    synchronized (getLock()) {
-      checkComplete();
-      checkResponseHandler();
-      return write(Buffer.buffer(chunk));
-    }
-  }
-
-  @Override
-  public HttpClientRequestImpl write(String chunk, String enc) {
-    synchronized (getLock()) {
-      Objects.requireNonNull(enc, "no null encoding accepted");
-      checkComplete();
-      checkResponseHandler();
-      return write(Buffer.buffer(chunk, enc));
-    }
-  }
-
-  @Override
-  public HttpClientRequest setWriteQueueMaxSize(int maxSize) {
-    synchronized (getLock()) {
-      checkComplete();
-      if (stream != null) {
-        stream.doSetWriteQueueMaxSize(maxSize);
-      } else {
-        pendingMaxSize = maxSize;
-      }
-      return this;
-    }
-  }
-
-  @Override
-  public boolean writeQueueFull() {
-    synchronized (getLock()) {
-      checkComplete();
-      return stream != null && stream.isNotWritable();
-    }
-  }
-
-  @Override
-  public HttpClientRequest drainHandler(Handler<Void> handler) {
-    synchronized (getLock()) {
-      checkComplete();
-      this.drainHandler = handler;
-      if (stream != null) {
-        stream.getContext().runOnContext(v -> {
-          synchronized (getLock()) {
-            if (stream != null) {
-              stream.checkDrained();
-            }
-          }
-        });
-      }
-      return this;
-    }
-  }
-
-  @Override
-  public HttpClientRequest continueHandler(Handler<Void> handler) {
-    synchronized (getLock()) {
-      checkComplete();
-      this.continueHandler = handler;
-      return this;
-    }
-  }
-
-  @Override
-  public HttpClientRequest sendHead() {
-    return sendHead(null);
-  }
-
-  @Override
-  public HttpClientRequest sendHead(Handler<HttpVersion> completionHandler) {
-    synchronized (getLock()) {
-      checkComplete();
-      checkResponseHandler();
-      if (stream != null) {
-        if (!headWritten) {
-          writeHead();
-          if (completionHandler != null) {
-            completionHandler.handle(stream.version());
-          }
-        }
-      } else {
-        connect(completionHandler);
-        writeHead = true;
-      }
-      return this;
-    }
-  }
-
-  @Override
-  public void end(String chunk) {
-    synchronized (getLock()) {
-      end(Buffer.buffer(chunk));
-    }
-  }
-
-  @Override
-  public void end(String chunk, String enc) {
-    synchronized (getLock()) {
-      Objects.requireNonNull(enc, "no null encoding accepted");
-      end(Buffer.buffer(chunk, enc));
-    }
-  }
-
-  @Override
-  public void end(Buffer chunk) {
-    synchronized (getLock()) {
-      checkComplete();
-      checkResponseHandler();
-      write(chunk.getByteBuf(), true);
-    }
-  }
-
-  @Override
-  public void end() {
-    synchronized (getLock()) {
-      checkComplete();
-      checkResponseHandler();
-      write(null, true);
-    }
-  }
-
-  @Override
-  public HttpClientRequest putHeader(CharSequence name, CharSequence value) {
-    synchronized (getLock()) {
-      checkComplete();
-      headers().set(name, value);
-      return this;
-    }
-  }
-
-  @Override
-  public HttpClientRequest putHeader(CharSequence name, Iterable<CharSequence> values) {
-    synchronized (getLock()) {
-      checkComplete();
-      headers().set(name, values);
-      return this;
-    }
-  }
-
-  @Override
-  public HttpClientRequest pushHandler(Handler<HttpClientRequest> handler) {
-    synchronized (getLock()) {
-      pushHandler = handler;
+  public synchronized HttpClientRequest setFollowRedirects(boolean followRedirects) {
+    checkEnded();
+    if (followRedirects) {
+      this.followRedirects = client.getOptions().getMaxRedirects() - 1;
+    } else {
+      this.followRedirects = 0;
     }
     return this;
   }
 
   @Override
-  public boolean reset(long code) {
-    synchronized (getLock()) {
-      if (reset == null) {
-        reset = code;
-        if (!completed) {
-          completed = true;
-          if (stream != null) {
-            stream.resetRequest(code);
-          }
-          if (completionHandler != null) {
-            completionHandler.handle(null);
-          }
-        } else {
-          if (response != null) {
-            stream.resetResponse(code);
-          }
-        }
-        return true;
+  public synchronized HttpClientRequest setMaxRedirects(int maxRedirects) {
+    Arguments.require(maxRedirects >= 0, "Max redirects must be >= 0");
+    checkEnded();
+    followRedirects = maxRedirects;
+    return this;
+  }
+
+  @Override
+  public synchronized HttpClientRequestImpl setChunked(boolean chunked) {
+    checkEnded();
+    if (stream != null) {
+      throw new IllegalStateException("Cannot set chunked after data has been written on request");
+    }
+    // HTTP 1.0 does not support chunking so we ignore this if HTTP 1.0
+    if (client.getOptions().getProtocolVersion() != io.vertx.core.http.HttpVersion.HTTP_1_0) {
+      this.chunked = chunked;
+    }
+    return this;
+  }
+
+  @Override
+  public synchronized boolean isChunked() {
+    return chunked;
+  }
+
+  @Override
+  public synchronized HttpClientRequest setAuthority(String authority) {
+    this.authority = authority;
+    return this;
+  }
+
+  @Override
+  public synchronized String getAuthority() {
+    return authority;
+  }
+
+  @Override
+  public synchronized MultiMap headers() {
+    if (headers == null) {
+      headers = new VertxHttpHeaders();
+    }
+    return headers;
+  }
+
+  @Override
+  public synchronized HttpClientRequest putHeader(String name, String value) {
+    checkEnded();
+    headers().set(name, value);
+    return this;
+  }
+
+  @Override
+  public synchronized HttpClientRequest putHeader(String name, Iterable<String> values) {
+    checkEnded();
+    headers().set(name, values);
+    return this;
+  }
+
+  @Override
+  public synchronized HttpClientRequest setWriteQueueMaxSize(int maxSize) {
+    checkEnded();
+    if (stream == null) {
+      pendingMaxSize = maxSize;
+    } else {
+      stream.doSetWriteQueueMaxSize(maxSize);
+    }
+    return this;
+  }
+
+  @Override
+  public synchronized boolean writeQueueFull() {
+    checkEnded();
+    synchronized (this) {
+      checkEnded();
+      if (stream == null) {
+        // Should actually check with max queue size and not always blindly return false
+        return false;
       }
-      return false;
     }
+    return stream.isNotWritable();
+  }
+
+  private synchronized Handler<Throwable> exceptionHandler() {
+    return exceptionHandler;
+  }
+
+  public synchronized HttpClientRequest exceptionHandler(Handler<Throwable> handler) {
+    if (handler != null) {
+      checkEnded();
+      this.exceptionHandler = handler;
+    } else {
+      this.exceptionHandler = null;
+    }
+    return this;
   }
 
   @Override
-  public HttpConnection connection() {
-    synchronized (getLock()) {
-      return stream != null ? stream.connection() : null;
+  public synchronized HttpClientRequest drainHandler(Handler<Void> handler) {
+    if (handler != null) {
+      checkEnded();
     }
+    checkEnded();
+    drainHandler = handler;
+    return this;
   }
 
   @Override
-  public HttpClientRequest connectionHandler(@Nullable Handler<HttpConnection> handler) {
-    synchronized (getLock()) {
-      connectionHandler = handler;
-      return this;
+  public synchronized HttpClientRequest continueHandler(Handler<Void> handler) {
+    if (handler != null) {
+      checkEnded();
     }
+    this.continueHandler = handler;
+    return this;
+  }
+
+  @Override
+  public Future<HttpVersion> sendHead() {
+    Promise<HttpVersion> promise = context.promise();
+    sendHead(promise);
+    return promise.future();
+  }
+
+  @Override
+  public synchronized HttpClientRequest sendHead(Handler<AsyncResult<HttpVersion>> headersHandler) {
+    checkEnded();
+    checkResponseHandler();
+    if (stream != null) {
+      throw new IllegalStateException("Head already written");
+    } else {
+      connect(headersHandler);
+    }
+    return this;
+  }
+
+  @Override
+  public synchronized HttpClientRequest putHeader(CharSequence name, CharSequence value) {
+    checkEnded();
+    headers().set(name, value);
+    return this;
+  }
+
+  @Override
+  public synchronized HttpClientRequest putHeader(CharSequence name, Iterable<CharSequence> values) {
+    checkEnded();
+    headers().set(name, values);
+    return this;
+  }
+
+  @Override
+  public synchronized HttpClientRequest pushHandler(Handler<HttpClientRequest> handler) {
+    pushHandler = handler;
+    return this;
+  }
+
+  @Override
+  boolean reset(Throwable cause) {
+    HttpClientStream s;
+    synchronized (this) {
+      if (reset != null) {
+        return false;
+      }
+      reset = cause;
+      s = stream;
+    }
+    if (s != null) {
+      s.reset(cause);
+    } else {
+      handleException(cause);
+    }
+    return true;
+  }
+
+  private void tryComplete() {
+    endPromise.tryComplete();
+  }
+
+  @Override
+  public synchronized HttpConnection connection() {
+    return stream == null ? null : stream.connection();
   }
 
   @Override
   public HttpClientRequest writeCustomFrame(int type, int flags, Buffer payload) {
-    synchronized (getLock()) {
-      if (stream == null) {
+    HttpClientStream s;
+    synchronized (this) {
+      checkEnded();
+      if ((s = stream) == null) {
         throw new IllegalStateException("Not yet connected");
       }
-      stream.writeFrame(type, flags, payload.getByteBuf());
     }
+    s.writeFrame(type, flags, payload.getByteBuf());
     return this;
   }
 
   void handleDrained() {
-    synchronized (getLock()) {
-      if (!completed && drainHandler != null) {
-        try {
-          drainHandler.handle(null);
-        } catch (Throwable t) {
-          handleException(t);
-        }
+    Handler<Void> handler;
+    synchronized (this) {
+      handler =  drainHandler;
+      if (handler == null || endFuture.isComplete()) {
+        return;
       }
     }
+    context.emit(handler);
   }
 
-  private void handleNextRequest(HttpClientResponse resp, HttpClientRequestImpl next, long timeoutMs) {
-    next.handler(respHandler);
+  private void handleNextRequest(HttpClientRequest next, Handler<AsyncResult<HttpClientResponse>> handler, long timeoutMs) {
+    next.onComplete(handler);
     next.exceptionHandler(exceptionHandler());
     exceptionHandler(null);
-    next.endHandler(endHandler);
-    next.pushHandler = pushHandler;
-    next.followRedirects = followRedirects - 1;
-    next.written = written;
-    if (next.hostHeader == null) {
-      next.hostHeader = hostHeader;
+    next.pushHandler(pushHandler);
+    next.setMaxRedirects(followRedirects - 1);
+    if (next.getAuthority() == null) {
+      next.setAuthority(authority);
     }
-    if (headers != null && next.headers == null) {
+    if (headers != null) {
       next.headers().addAll(headers);
     }
-    ByteBuf body;
-    switch (next.method) {
-      case GET:
-        body = null;
-        break;
-      case OTHER:
-        next.rawMethod = rawMethod;
-        body = null;
-        break;
-      default:
-        if (cachedChunks != null) {
-          body = cachedChunks;
-        } else {
-          body = null;
-        }
-        break;
-    }
-    cachedChunks = null;
-    Future<Void> fut = Future.future();
-    fut.setHandler(ar -> {
+    endFuture.onComplete(ar -> {
       if (ar.succeeded()) {
         if (timeoutMs > 0) {
           next.setTimeout(timeoutMs);
         }
-        next.write(body, true);
+        next.end();
       } else {
-        next.handleException(ar.cause());
+        next.reset(0);
       }
     });
-    if (exceptionOccurred != null) {
-      fut.fail(exceptionOccurred);
+  }
+
+  void handleContinue() {
+    Handler<Void> handler;
+    synchronized (this) {
+      handler = continueHandler;
     }
-    else if (completed) {
-      fut.complete();
-    } else {
-      exceptionHandler(err -> {
-        if (!fut.isComplete()) {
-          fut.fail(err);
-        }
-      });
-      completionHandler = v -> {
-        if (!fut.isComplete()) {
-          fut.complete();
-        }
-      };
+    if (handler != null) {
+      handler.handle(null);
     }
   }
 
-  protected void doHandleResponse(HttpClientResponseImpl resp, long timeoutMs) {
+  void handleResponse(Promise<HttpClientResponse> promise, HttpClientResponse resp, long timeoutMs) {
     if (reset != null) {
-      stream.resetResponse(reset);
-    } else {
-      response = resp;
-      int statusCode = resp.statusCode();
-      if (followRedirects > 0 && statusCode >= 300 && statusCode < 400) {
-        Future<HttpClientRequest> next = client.redirectHandler().apply(resp);
-        if (next != null) {
-          next.setHandler(ar -> {
-            if (ar.succeeded()) {
-              handleNextRequest(resp, (HttpClientRequestImpl) ar.result(), timeoutMs);
-            } else {
-              handleException(ar.cause());
-            }
-          });
-          return;
-        }
+      return;
+    }
+    int statusCode = resp.statusCode();
+    if (followRedirects > 0 && statusCode >= 300 && statusCode < 400) {
+      ContextInternal prev = context.emitBegin();
+      Future<HttpClientRequest> next;
+      try {
+        next = client.redirectHandler().apply(resp);
+      } finally {
+        context.emitEnd(prev);
       }
-      if (statusCode == 100) {
-        if (continueHandler != null) {
-          continueHandler.handle(null);
-        }
-      } else {
-        if (respHandler != null) {
-          respHandler.handle(resp);
-        }
-        if (endHandler != null) {
-          endHandler.handle(null);
-        }
+      if (next != null) {
+        next.onComplete(ar -> {
+          if (ar.succeeded()) {
+            handleNextRequest(ar.result(), promise, timeoutMs);
+          } else {
+            fail(ar.cause());
+          }
+        });
+        return;
       }
     }
+    promise.complete(resp);
   }
 
   @Override
-  protected String hostHeader() {
-    return hostHeader != null ? hostHeader : super.hostHeader();
+  protected String authority() {
+    return authority != null ? authority : super.authority();
   }
 
-  // After connecting we should synchronize on the client connection instance to prevent deadlock conditions
-  // but there is a catch - the client connection is null before connecting so we synchronized on this before that
-  // point
-  protected Object getLock() {
-    // We do the initial check outside the synchronized block to prevent the hit of synchronized once the conn has
-    // been set
-    if (lock != null) {
-      return lock;
-    } else {
-      synchronized (this) {
-        if (lock != null) {
-          return lock;
-        } else {
-          return this;
-        }
-      }
-    }
-  }
-
-  private Handler<HttpClientResponse> checkConnect(io.vertx.core.http.HttpMethod method, Handler<HttpClientResponse> handler) {
-    if (method == io.vertx.core.http.HttpMethod.CONNECT) {
-      // special handling for CONNECT
-      handler = connectHandler(handler);
-    }
-    return handler;
-  }
-
-  private Handler<HttpClientResponse> connectHandler(Handler<HttpClientResponse> responseHandler) {
-    Objects.requireNonNull(responseHandler, "no null responseHandler accepted");
-    return resp -> {
-      HttpClientResponse response;
-      if (resp.statusCode() == 200) {
-        // connect successful force the modification of the ChannelPipeline
-        // beside this also pause the socket for now so the user has a chance to register its dataHandler
-        // after received the NetSocket
-        NetSocket socket = resp.netSocket();
-        socket.pause();
-
-        response = new HttpClientResponse() {
-          private boolean resumed;
-
-          @Override
-          public HttpClientRequest request() {
-            return resp.request();
-          }
-
-          @Override
-          public int statusCode() {
-            return resp.statusCode();
-          }
-
-          @Override
-          public String statusMessage() {
-            return resp.statusMessage();
-          }
-
-          @Override
-          public MultiMap headers() {
-            return resp.headers();
-          }
-
-          @Override
-          public String getHeader(String headerName) {
-            return resp.getHeader(headerName);
-          }
-
-          @Override
-          public String getHeader(CharSequence headerName) {
-            return resp.getHeader(headerName);
-          }
-
-          @Override
-          public String getTrailer(String trailerName) {
-            return resp.getTrailer(trailerName);
-          }
-
-          @Override
-          public MultiMap trailers() {
-            return resp.trailers();
-          }
-
-          @Override
-          public List<String> cookies() {
-            return resp.cookies();
-          }
-
-          @Override
-          public HttpVersion version() {
-            return resp.version();
-          }
-
-          @Override
-          public HttpClientResponse bodyHandler(Handler<Buffer> bodyHandler) {
-            resp.bodyHandler(bodyHandler);
-            return this;
-          }
-
-          @Override
-          public HttpClientResponse customFrameHandler(Handler<HttpFrame> handler) {
-            resp.customFrameHandler(handler);
-            return this;
-          }
-
-          @Override
-          public synchronized NetSocket netSocket() {
-            if (!resumed) {
-              resumed = true;
-              vertx.getContext().runOnContext((v) -> socket.resume()); // resume the socket now as the user had the chance to register a dataHandler
-            }
-            return socket;
-          }
-
-          @Override
-          public HttpClientResponse endHandler(Handler<Void> endHandler) {
-            resp.endHandler(endHandler);
-            return this;
-          }
-
-          @Override
-          public HttpClientResponse handler(Handler<Buffer> handler) {
-            resp.handler(handler);
-            return this;
-          }
-
-          @Override
-          public HttpClientResponse pause() {
-            resp.pause();
-            return this;
-          }
-
-          @Override
-          public HttpClientResponse resume() {
-            resp.resume();
-            return this;
-          }
-
-          @Override
-          public HttpClientResponse exceptionHandler(Handler<Throwable> handler) {
-            resp.exceptionHandler(handler);
-            return this;
-          }
-        };
-      } else {
-        response = resp;
-      }
-      responseHandler.handle(response);
-    };
-  }
-
-  private synchronized void connect(Handler<HttpVersion> headersCompletionHandler) {
+  private synchronized void connect(Handler<AsyncResult<HttpVersion>> headersHandler) {
     if (!connecting) {
-
-      if (method == HttpMethod.OTHER && rawMethod == null) {
-        throw new IllegalStateException("You must provide a rawMethod when using an HttpMethod.OTHER method");
+      SocketAddress peerAddress;
+      if (authority != null) {
+        int idx = authority.lastIndexOf(':');
+        if (idx != -1) {
+          peerAddress = SocketAddress.inetSocketAddress(Integer.parseInt(authority.substring(idx + 1)), authority.substring(0, idx));
+        } else {
+          peerAddress = SocketAddress.inetSocketAddress(80, authority);
+        }
+      } else {
+        String peerHost = host;
+        if (peerHost.endsWith(".")) {
+          peerHost = peerHost.substring(0, peerHost.length() -  1);
+        }
+        peerAddress = SocketAddress.inetSocketAddress(port, peerHost);
       }
-
-      Waiter waiter = new Waiter(this, vertx.getContext()) {
-
-        @Override
-        void handleFailure(Throwable failure) {
-          handleException(failure);
-        }
-
-        @Override
-        void handleConnection(HttpClientConnection conn) {
-          synchronized (HttpClientRequestImpl.this) {
-            if (connectionHandler != null) {
-              connectionHandler.handle(conn);
-            }
-          }
-        }
-
-        @Override
-        void handleStream(HttpClientStream stream) {
-          connected(stream, headersCompletionHandler);
-        }
-
-        @Override
-        boolean isCancelled() {
-          // No need to synchronize as the thread is the same that set exceptionOccurred to true
-          // exceptionOccurred=true getting the connection => it's a TimeoutException
-          return exceptionOccurred != null || reset != null;
-        }
-      };
 
       // We defer actual connection until the first part of body is written or end is called
       // This gives the user an opportunity to set an exception handler before connecting so
       // they can capture any exceptions on connection
-      client.getConnectionForRequest(ssl, port, host, waiter);
       connecting = true;
+      client.getConnectionForRequest(context, peerAddress, this, netSocketPromise, ssl, server, ar -> {
+        if (ar.succeeded()) {
+          HttpClientStream stream = ar.result();
+          // No need to synchronize as the thread is the same that set exceptionOccurred to true
+          // exceptionOccurred=true getting the connection => it's a TimeoutException
+          if (reset != null) {
+            stream.reset(reset);
+          } else {
+            connected(headersHandler, stream);
+          }
+        } else {
+          handleException(ar.cause());
+        }
+      });
     }
   }
 
-  private void connected(HttpClientStream stream, Handler<HttpVersion> headersCompletionHandler) {
-
-    HttpClientConnection conn = stream.connection();
-
+  private void connected(Handler<AsyncResult<HttpVersion>> headersHandler, HttpClientStream stream) {
     synchronized (this) {
       this.stream = stream;
-      stream.beginRequest(this);
 
       // If anything was written or the request ended before we got the connection, then
       // we need to write it now
 
       if (pendingMaxSize != -1) {
-        this.stream.doSetWriteQueueMaxSize(pendingMaxSize);
+        stream.doSetWriteQueueMaxSize(pendingMaxSize);
       }
-
-      if (pendingChunks != null) {
-        ByteBuf pending = pendingChunks;
-        pendingChunks = null;
-
-        if (completed) {
-          // we also need to write the head so optimize this and write all out in once
-          writeHeadWithContent(pending, true);
-
-          conn.reportBytesWritten(written);
-
-          if (respHandler != null) {
-            this.stream.endRequest();
-          }
-        } else {
-          writeHeadWithContent(pending, false);
-          if (headersCompletionHandler != null) {
-            headersCompletionHandler.handle(stream.version());
-          }
-        }
-      } else {
-        if (completed) {
-          // we also need to write the head so optimize this and write all out in once
-          writeHeadWithContent(null, true);
-
-          conn.reportBytesWritten(written);
-
-          if (respHandler != null) {
-            this.stream.endRequest();
-          }
-        } else {
-          if (writeHead) {
-            writeHead();
-            if (headersCompletionHandler != null) {
-              headersCompletionHandler.handle(stream.version());
-            }
-          }
-        }
+      ByteBuf pending = pendingChunks;
+      pendingChunks = null;
+      Handler<AsyncResult<Void>> handler = null;
+      if (pendingHandlers != null) {
+        List<Handler<AsyncResult<Void>>> handlers = pendingHandlers;
+        pendingHandlers = null;
+        handler = ar -> {
+          handlers.forEach(h -> h.handle(ar));
+        };
       }
-
-      // Set the lock at the end of the block so we are sure that another non vertx thread will get access to the connection
-      // when this callback runs on the 'this' lock
-      this.lock = conn;
+      if (headersHandler != null) {
+        Handler<AsyncResult<Void>> others = handler;
+        handler = ar -> {
+          if (others != null) {
+            others.handle(ar);
+          }
+          if (ar.succeeded()) {
+            headersHandler.handle(Future.succeededFuture(stream.version()));
+          } else {
+            headersHandler.handle(Future.failedFuture(ar.cause()));
+          }
+        };
+      }
+      stream.writeHead(method, uri, headers, authority(), chunked, pending, ended, priority, handler);
+      if (ended) {
+        tryComplete();
+      }
+      this.connecting = false;
+      this.stream = stream;
     }
   }
 
-  private boolean contentLengthSet() {
-    return headers != null && headers().contains(CONTENT_LENGTH);
+  @Override
+  public Future<Void> end(String chunk) {
+    Promise<Void> promise = context.promise();
+    end(chunk, promise);
+    return promise.future();
   }
 
-  private void writeHead() {
-    stream.writeHead(method, rawMethod, uri, headers, hostHeader(), chunked);
-    headWritten = true;
+  @Override
+  public void end(String chunk, Handler<AsyncResult<Void>> handler) {
+    end(Buffer.buffer(chunk), handler);
   }
 
-  private void writeHeadWithContent(ByteBuf buf, boolean end) {
-    stream.writeHeadWithContent(method, rawMethod, uri, headers, hostHeader(), chunked, buf, end);
-    headWritten = true;
+  @Override
+  public Future<Void> end(String chunk, String enc) {
+    Promise<Void> promise = context.promise();
+    end(chunk, enc, promise);
+    return promise.future();
   }
 
-  private void write(ByteBuf buff, boolean end) {
+  @Override
+  public void end(String chunk, String enc, Handler<AsyncResult<Void>> handler) {
+    Objects.requireNonNull(enc, "no null encoding accepted");
+    end(Buffer.buffer(chunk, enc), handler);
+  }
+
+  @Override
+  public Future<Void> end(Buffer chunk) {
+    Promise<Void> promise = context.promise();
+    write(chunk.getByteBuf(), true, promise);
+    return promise.future();
+  }
+
+  @Override
+  public void end(Buffer chunk, Handler<AsyncResult<Void>> handler) {
+    write(chunk.getByteBuf(), true, handler);
+  }
+
+  @Override
+  public Future<Void> end() {
+    Promise<Void> promise = context.promise();
+    end(promise);
+    return promise.future();
+  }
+
+  @Override
+  public void end(Handler<AsyncResult<Void>> handler) {
+    write(null, true, handler);
+  }
+
+  @Override
+  public Future<Void> write(Buffer chunk) {
+    Promise<Void> promise = context.promise();
+    write(chunk, promise);
+    return promise.future();
+  }
+
+  @Override
+  public void write(Buffer chunk, Handler<AsyncResult<Void>> handler) {
+    ByteBuf buf = chunk.getByteBuf();
+    write(buf, false, handler);
+  }
+
+  @Override
+  public Future<Void> write(String chunk) {
+    Promise<Void> promise = context.promise();
+    write(chunk, promise);
+    return promise.future();
+  }
+
+  @Override
+  public void write(String chunk, Handler<AsyncResult<Void>> handler) {
+    write(Buffer.buffer(chunk).getByteBuf(), false, handler);
+  }
+
+  @Override
+  public Future<Void> write(String chunk, String enc) {
+    Promise<Void> promise = context.promise();
+    write(chunk, enc, promise);
+    return promise.future();
+  }
+
+  @Override
+  public void write(String chunk, String enc, Handler<AsyncResult<Void>> handler) {
+    Objects.requireNonNull(enc, "no null encoding accepted");
+    write(Buffer.buffer(chunk, enc).getByteBuf(), false, handler);
+  }
+
+  private boolean requiresContentLength() {
+    return !chunked && (headers == null || !headers.contains(CONTENT_LENGTH));
+  }
+
+  private void write(ByteBuf buff, boolean end, Handler<AsyncResult<Void>> completionHandler) {
     if (buff == null && !end) {
-      // nothing to write to the connection just return
       return;
     }
-
-    if (end) {
-      if (buff != null && !chunked && !contentLengthSet()) {
-        headers().set(CONTENT_LENGTH, String.valueOf(buff.writerIndex()));
+    HttpClientStream s;
+    synchronized (this) {
+      if (ended) {
+        completionHandler.handle(Future.failedFuture(new IllegalStateException("Request already complete")));
+        return;
       }
-    } else {
-      if (!chunked && !contentLengthSet()) {
-        throw new IllegalStateException("You must set the Content-Length header to be the total size of the message "
-            + "body BEFORE sending any data if you are not using HTTP chunked encoding.");
-      }
-    }
-
-    if (buff != null) {
-      written += buff.readableBytes();
-      if (followRedirects > 0) {
-        if (cachedChunks == null) {
-          cachedChunks = Unpooled.compositeBuffer();
-        }
-        cachedChunks.addComponent(buff).writerIndex(cachedChunks.writerIndex() + buff.writerIndex());
-      }
-    }
-
-    if (stream == null) {
-      if (buff != null) {
-        if (pendingChunks == null) {
-          pendingChunks = buff;
-        } else {
-          CompositeByteBuf pending;
-          if (pendingChunks instanceof CompositeByteBuf) {
-            pending = (CompositeByteBuf) pendingChunks;
-          } else {
-            pending = Unpooled.compositeBuffer();
-            pending.addComponent(pendingChunks).writerIndex(pendingChunks.writerIndex());
-            pendingChunks = pending;
-          }
-          pending.addComponent(buff).writerIndex(pending.writerIndex() + buff.writerIndex());
-        }
-      }
-      connect(null);
-    } else {
-      if (!headWritten) {
-        writeHeadWithContent(buff, end);
-      } else {
-        stream.writeBuffer(buff, end);
-      }
+      checkResponseHandler();
       if (end) {
-        stream.connection().reportBytesWritten(written);
-        if (respHandler != null) {
-          stream.endRequest();
+        if (buff != null && requiresContentLength()) {
+          headers().set(CONTENT_LENGTH, String.valueOf(buff.readableBytes()));
         }
+      } else if (requiresContentLength()) {
+        throw new IllegalStateException("You must set the Content-Length header to be the total size of the message "
+          + "body BEFORE sending any data if you are not using HTTP chunked encoding.");
       }
+      ended |= end;
+      if (stream == null) {
+        if (buff != null) {
+          if (pendingChunks == null) {
+            pendingChunks = buff;
+          } else {
+            CompositeByteBuf pending;
+            if (pendingChunks instanceof CompositeByteBuf) {
+              pending = (CompositeByteBuf) pendingChunks;
+            } else {
+              pending = Unpooled.compositeBuffer();
+              pending.addComponent(true, pendingChunks);
+              pendingChunks = pending;
+            }
+            pending.addComponent(true, buff);
+          }
+        }
+        if (completionHandler != null) {
+          if (pendingHandlers == null) {
+            pendingHandlers = new ArrayList<>();
+          }
+          pendingHandlers.add(completionHandler);
+        }
+        connect(null);
+        return;
+      }
+      s = stream;
     }
-
+    s.writeBuffer(buff, end, completionHandler);
     if (end) {
-      completed = true;
-      if (completionHandler != null) {
-        completionHandler.handle(null);
-      }
+      tryComplete();
     }
   }
 
-  void handleResponseEnd() {
-    synchronized (getLock()) {
-      response = null;
-    }
-  }
-
-  protected void checkComplete() {
-    if (completed) {
+  private void checkEnded() {
+    if (ended) {
       throw new IllegalStateException("Request already complete");
     }
   }
 
   private void checkResponseHandler() {
-    if (respHandler == null) {
-      throw new IllegalStateException("You must set an handler for the HttpClientResponse before connecting");
+/*
+    if (stream == null && !connecting && responsePromise.future().getHandler() == null) {
+      throw new IllegalStateException("You must set a response handler before connecting to the server");
     }
+*/
   }
 
-  Handler<HttpClientRequest> pushHandler() {
-    synchronized (getLock()) {
-      return pushHandler;
+  synchronized Handler<HttpClientRequest> pushHandler() {
+    return pushHandler;
+  }
+
+  @Override
+  public synchronized HttpClientRequest setStreamPriority(StreamPriority priority) {
+    if (stream != null) {
+      stream.updatePriority(priority);
+    } else {
+      this.priority = priority;
     }
+    return this;
+  }
+
+  @Override
+  public synchronized StreamPriority getStreamPriority() {
+    HttpClientStream s = stream;
+    return s != null ? s.priority() : priority;
   }
 }

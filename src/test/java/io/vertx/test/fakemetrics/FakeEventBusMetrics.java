@@ -1,22 +1,17 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- *  ------------------------------------------------------
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *      The Eclipse Public License is available at
- *      http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *      The Apache License v2.0 is available at
- *      http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.test.fakemetrics;
 
-import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.eventbus.Message;
 import io.vertx.core.eventbus.ReplyFailure;
 import io.vertx.core.spi.metrics.EventBusMetrics;
 
@@ -26,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
@@ -39,10 +36,6 @@ public class FakeEventBusMetrics extends FakeMetricsBase implements EventBusMetr
   private final Map<String, AtomicInteger> decoded = new ConcurrentHashMap<>();
   private final List<String> replyFailureAddresses = Collections.synchronizedList(new ArrayList<>());
   private final List<ReplyFailure> replyFailures = Collections.synchronizedList(new ArrayList<>());
-
-  public FakeEventBusMetrics(EventBus eventBus) {
-    super(eventBus);
-  }
 
   public Map<String, AtomicInteger> getEncoded() {
     return encoded;
@@ -90,7 +83,10 @@ public class FakeEventBusMetrics extends FakeMetricsBase implements EventBusMetr
   }
 
   public void handlerUnregistered(HandlerMetric handler) {
-    registrations.remove(handler);
+    if (handler == null) {
+      throw new NullPointerException("Must not be null");
+    }
+    assertTrue(registrations.remove(handler));
   }
 
   @Override
@@ -102,17 +98,15 @@ public class FakeEventBusMetrics extends FakeMetricsBase implements EventBusMetr
   }
 
   @Override
-  public void beginHandleMessage(HandlerMetric handler, boolean local) {
-    handler.beginCount.incrementAndGet();
-    if (local) {
-      handler.localBeginCount.incrementAndGet();
-    }
+  public void discardMessage(HandlerMetric handler, boolean local, Message<?> msg) {
+    handler.discardCount.incrementAndGet();
   }
 
-  public void endHandleMessage(HandlerMetric handler, Throwable failure) {
-    handler.endCount.incrementAndGet();
-    if (failure != null) {
-      handler.failureCount.incrementAndGet();
+  @Override
+  public void messageDelivered(HandlerMetric handler, boolean local) {
+    handler.deliveredCount.incrementAndGet();
+    if (local) {
+      handler.localDeliveredCount.incrementAndGet();
     }
   }
 
@@ -155,6 +149,4 @@ public class FakeEventBusMetrics extends FakeMetricsBase implements EventBusMetr
     return true;
   }
 
-  public void close() {
-  }
 }

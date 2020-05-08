@@ -1,17 +1,12 @@
 /*
- * Copyright (c) 2011-2014 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.spi.metrics;
@@ -50,7 +45,9 @@ public interface HttpClientMetrics<R, W, S, E, T> extends TCPMetrics<S> {
    * @param maxPoolSize the server max pool size
    * @return the endpoint metric
    */
-  E createEndpoint(String host, int port, int maxPoolSize);
+  default E createEndpoint(String host, int port, int maxPoolSize) {
+    return null;
+  }
 
   /**
    * Called when an endpoint is closed.
@@ -59,21 +56,25 @@ public interface HttpClientMetrics<R, W, S, E, T> extends TCPMetrics<S> {
    * @param port the server port
    * @param endpointMetric the server metric returned by {@link #createEndpoint}
    */
-  void closeEndpoint(String host, int port, E endpointMetric);
+  default void closeEndpoint(String host, int port, E endpointMetric) {
+  }
 
   /**
    * Called when a connection is requested.
    *
    * @param endpointMetric the endpoint metric returned by {@link #createEndpoint}
    */
-  T enqueueRequest(E endpointMetric);
+  default T enqueueRequest(E endpointMetric) {
+    return null;
+  }
 
   /**
    * Called when a request for connection is satisfied.
    *
    * @param endpointMetric the endpoint metric returned by {@link #createEndpoint}
    */
-  void dequeueRequest(E endpointMetric, T taskMetric);
+  default void dequeueRequest(E endpointMetric, T taskMetric) {
+  }
 
   /**
    * Called when a connection is made to a endpoint.
@@ -81,7 +82,8 @@ public interface HttpClientMetrics<R, W, S, E, T> extends TCPMetrics<S> {
    * @param endpointMetric the endpoint metric
    * @param socketMetric the socket metric
    */
-  void endpointConnected(E endpointMetric, S socketMetric);
+  default void endpointConnected(E endpointMetric, S socketMetric) {
+  }
 
   /**
    * Called when a connection to an endpoint is closed.
@@ -89,7 +91,8 @@ public interface HttpClientMetrics<R, W, S, E, T> extends TCPMetrics<S> {
    * @param endpointMetric the endpoint metric
    * @param socketMetric the socket metric
    */
-  void endpointDisconnected(E endpointMetric, S socketMetric);
+  default void endpointDisconnected(E endpointMetric, S socketMetric) {
+  }
 
   /**
    * Called when an http client request begins. Vert.x will invoke {@link #requestEnd} when the request
@@ -105,14 +108,17 @@ public interface HttpClientMetrics<R, W, S, E, T> extends TCPMetrics<S> {
    * @param request the {@link HttpClientRequest}
    * @return the request metric
    */
-  R requestBegin(E endpointMetric, S socketMetric, SocketAddress localAddress, SocketAddress remoteAddress, HttpClientRequest request);
+  default R requestBegin(E endpointMetric, S socketMetric, SocketAddress localAddress, SocketAddress remoteAddress, HttpClientRequest request) {
+    return null;
+  }
 
   /**
    * Callend when an http client request ends.
    *
    * @param requestMetric the request metric
    */
-  void requestEnd(R requestMetric);
+  default void requestEnd(R requestMetric) {
+  }
 
   /**
    * Called when an http client response begins. Vert.x will invoke {@link #responseEnd} when the response has ended
@@ -121,7 +127,8 @@ public interface HttpClientMetrics<R, W, S, E, T> extends TCPMetrics<S> {
    * @param requestMetric the request metric
    * @param response the {@link io.vertx.core.http.HttpClientResponse}
    */
-  void responseBegin(R requestMetric, HttpClientResponse response);
+  default void responseBegin(R requestMetric, HttpClientResponse response) {
+  }
 
   /**
    * Called when an http client response is pushed.
@@ -133,7 +140,9 @@ public interface HttpClientMetrics<R, W, S, E, T> extends TCPMetrics<S> {
    * @param request the http server request
    * @return the request metric
    */
-  R responsePushed(E endpointMetric, S socketMetric, SocketAddress localAddress, SocketAddress remoteAddress, HttpClientRequest request);
+  default R responsePushed(E endpointMetric, S socketMetric, SocketAddress localAddress, SocketAddress remoteAddress, HttpClientRequest request) {
+    return null;
+  }
 
   /**
    * Called when the http client request couldn't complete successfully, for instance the connection
@@ -141,7 +150,8 @@ public interface HttpClientMetrics<R, W, S, E, T> extends TCPMetrics<S> {
    *
    * @param requestMetric the request metric
    */
-  void requestReset(R requestMetric);
+  default void requestReset(R requestMetric) {
+  }
 
   /**
    * Called when an http client response has ended
@@ -149,7 +159,8 @@ public interface HttpClientMetrics<R, W, S, E, T> extends TCPMetrics<S> {
    * @param requestMetric the request metric
    * @param response the {@link io.vertx.core.http.HttpClientResponse}
    */
-  void responseEnd(R requestMetric, HttpClientResponse response);
+  default void responseEnd(R requestMetric, HttpClientResponse response) {
+  }
 
   /**
    * Called when a web socket connects.
@@ -159,12 +170,15 @@ public interface HttpClientMetrics<R, W, S, E, T> extends TCPMetrics<S> {
    * @param webSocket the server web socket
    * @return the web socket metric
    */
-  W connected(E endpointMetric, S socketMetric, WebSocket webSocket);
+  default W connected(E endpointMetric, S socketMetric, WebSocket webSocket) {
+    return null;
+  }
 
   /**
    * Called when the web socket has disconnected.
    *
    * @param webSocketMetric the web socket metric
    */
-  void disconnected(W webSocketMetric);
+  default void disconnected(W webSocketMetric) {
+  }
 }

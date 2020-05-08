@@ -1,17 +1,12 @@
 /*
- *  Copyright (c) 2011-2015 The original author or authors
- *  ------------------------------------------------------
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *       The Eclipse Public License is available at
- *       http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *       The Apache License v2.0 is available at
- *       http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.impl.launcher.commands;
@@ -23,8 +18,8 @@ import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.cli.annotations.Description;
 import io.vertx.core.cli.annotations.Option;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
+import io.vertx.core.impl.logging.Logger;
+import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.spi.launcher.DefaultCommand;
 
 import java.io.File;
@@ -98,7 +93,7 @@ public abstract class ClasspathHandler extends DefaultCommand {
       classloader = (classpath == null || classpath.isEmpty()) ?
           ClasspathHandler.class.getClassLoader() : createClassloader();
       Class<?> clazz = classloader.loadClass("io.vertx.core.impl.launcher.commands.VertxIsolatedDeployer");
-      return clazz.newInstance();
+      return clazz.getDeclaredConstructor().newInstance();
     } catch (Exception e) {
       log.error("Failed to load or instantiate the isolated deployer", e);
       throw new IllegalStateException(e);
@@ -161,6 +156,15 @@ public abstract class ClasspathHandler extends DefaultCommand {
       Thread.currentThread().setContextClassLoader(classloader);
       Method method = manager.getClass().getMethod("deploy", String.class, Vertx.class, DeploymentOptions.class,
           Handler.class);
+
+      if (executionContext.get("Default-Verticle-Factory") != null) {
+        // there is a configured default
+        if (verticle.indexOf(':') == -1) {
+          // and the verticle is not using a explicit factory
+          verticle = executionContext.get("Default-Verticle-Factory") + ":" + verticle;
+        }
+      }
+
       method.invoke(manager, verticle, vertx, options, completionHandler);
     } catch (InvocationTargetException e) {
       log.error("Failed to deploy verticle " + verticle, e.getCause());

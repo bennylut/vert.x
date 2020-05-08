@@ -1,25 +1,21 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- *  ------------------------------------------------------
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *      The Eclipse Public License is available at
- *      http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *      The Apache License v2.0 is available at
- *      http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.datagram.impl;
 
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.datagram.DatagramSocket;
 import io.vertx.core.streams.WriteStream;
 
 /**
@@ -27,7 +23,7 @@ import io.vertx.core.streams.WriteStream;
  *
 * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
 */
-class PacketWriteStreamImpl implements WriteStream<Buffer>, Handler<AsyncResult<DatagramSocket>> {
+class PacketWriteStreamImpl implements WriteStream<Buffer>, Handler<AsyncResult<Void>> {
 
   private DatagramSocketImpl datagramSocket;
   private Handler<Throwable> exceptionHandler;
@@ -41,7 +37,7 @@ class PacketWriteStreamImpl implements WriteStream<Buffer>, Handler<AsyncResult<
   }
 
   @Override
-  public void handle(AsyncResult<DatagramSocket> event) {
+  public void handle(AsyncResult<Void> event) {
     if (event.failed() && exceptionHandler != null) {
       exceptionHandler.handle(event.cause());
     }
@@ -54,9 +50,20 @@ class PacketWriteStreamImpl implements WriteStream<Buffer>, Handler<AsyncResult<
   }
 
   @Override
-  public PacketWriteStreamImpl write(Buffer data) {
-    datagramSocket.send(data, port, host, this);
-    return this;
+  public Future<Void> write(Buffer data) {
+    Promise<Void> promise = Promise.promise();
+    write(data, promise);
+    return promise.future();
+  }
+
+  @Override
+  public void write(Buffer data, Handler<AsyncResult<Void>> handler) {
+    datagramSocket.send(data, port, host, ar -> {
+      PacketWriteStreamImpl.this.handle(ar);
+      if (handler != null) {
+        handler.handle(ar.mapEmpty());
+      }
+    });
   }
 
   @Override
@@ -75,6 +82,14 @@ class PacketWriteStreamImpl implements WriteStream<Buffer>, Handler<AsyncResult<
   }
 
   @Override
-  public void end() {
+  public Future<Void> end() {
+    Promise<Void> promide = Promise.promise();
+    end(promide);
+    return promide.future();
+  }
+
+  @Override
+  public void end(Handler<AsyncResult<Void>> handler) {
+    datagramSocket.close(handler);
   }
 }

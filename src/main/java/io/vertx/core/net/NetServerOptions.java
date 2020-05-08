@@ -1,17 +1,12 @@
 /*
- * Copyright (c) 2011-2014 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.net;
@@ -21,12 +16,15 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.ClientAuth;
 import io.vertx.core.json.JsonObject;
 
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
 /**
  * Options for configuring a {@link io.vertx.core.net.NetServer}.
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@DataObject(generateConverter = true)
+@DataObject(generateConverter = true, publicConverter = false)
 public class NetServerOptions extends TCPSSLOptions {
 
   // Server specific HTTP stuff
@@ -51,10 +49,34 @@ public class NetServerOptions extends TCPSSLOptions {
    */
   public static final ClientAuth DEFAULT_CLIENT_AUTH = ClientAuth.NONE;
 
+  /**
+   * Default value of whether the server supports SNI = false
+   */
+  public static final boolean DEFAULT_SNI = false;
+
+  /**
+   * Default value of whether the server supports HA PROXY protocol = false
+   */
+  public static final boolean DEFAULT_USE_PROXY_PROTOCOL = false;
+
+  /**
+   * The default value of HA PROXY protocol timeout = 10
+   */
+  public static final long DEFAULT_PROXY_PROTOCOL_TIMEOUT = 10L;
+
+  /**
+   * Default HA PROXY protocol time unit = SECONDS
+   */
+  public static final TimeUnit DEFAULT_PROXY_PROTOCOL_TIMEOUT_TIME_UNIT = TimeUnit.SECONDS;
+
   private int port;
   private String host;
   private int acceptBacklog;
-  private ClientAuth clientAuth = DEFAULT_CLIENT_AUTH;
+  private ClientAuth clientAuth;
+  private boolean sni;
+  private boolean useProxyProtocol;
+  private long proxyProtocolTimeout;
+  private TimeUnit proxyProtocolTimeoutUnit;
 
   /**
    * Default constructor
@@ -75,6 +97,12 @@ public class NetServerOptions extends TCPSSLOptions {
     this.host = other.getHost();
     this.acceptBacklog = other.getAcceptBacklog();
     this.clientAuth = other.getClientAuth();
+    this.sni = other.isSni();
+    this.useProxyProtocol = other.isUseProxyProtocol();
+    this.proxyProtocolTimeout = other.proxyProtocolTimeout;
+    this.proxyProtocolTimeoutUnit = other.getProxyProtocolTimeoutUnit() != null ?
+      other.getProxyProtocolTimeoutUnit() :
+      DEFAULT_PROXY_PROTOCOL_TIMEOUT_TIME_UNIT;
   }
 
   /**
@@ -118,6 +146,12 @@ public class NetServerOptions extends TCPSSLOptions {
   }
 
   @Override
+  public NetServerOptions setReusePort(boolean reusePort) {
+    super.setReusePort(reusePort);
+    return this;
+  }
+
+  @Override
   public NetServerOptions setTrafficClass(int trafficClass) {
     super.setTrafficClass(trafficClass);
     return this;
@@ -142,14 +176,14 @@ public class NetServerOptions extends TCPSSLOptions {
   }
 
   @Override
-  public NetServerOptions setUsePooledBuffers(boolean usePooledBuffers) {
-    super.setUsePooledBuffers(usePooledBuffers);
+  public NetServerOptions setIdleTimeout(int idleTimeout) {
+    super.setIdleTimeout(idleTimeout);
     return this;
   }
 
   @Override
-  public NetServerOptions setIdleTimeout(int idleTimeout) {
-    super.setIdleTimeout(idleTimeout);
+  public NetServerOptions setIdleTimeoutUnit(TimeUnit idleTimeoutUnit) {
+    super.setIdleTimeoutUnit(idleTimeoutUnit);
     return this;
   }
 
@@ -238,6 +272,26 @@ public class NetServerOptions extends TCPSSLOptions {
   }
 
   @Override
+  public NetServerOptions removeEnabledSecureTransportProtocol(String protocol) {
+    return (NetServerOptions) super.removeEnabledSecureTransportProtocol(protocol);
+  }
+
+  @Override
+  public NetServerOptions setTcpFastOpen(boolean tcpFastOpen) {
+    return (NetServerOptions) super.setTcpFastOpen(tcpFastOpen);
+  }
+
+  @Override
+  public NetServerOptions setTcpCork(boolean tcpCork) {
+    return (NetServerOptions) super.setTcpCork(tcpCork);
+  }
+
+  @Override
+  public NetServerOptions setTcpQuickAck(boolean tcpQuickAck) {
+    return (NetServerOptions) super.setTcpQuickAck(tcpQuickAck);
+  }
+
+  @Override
   public NetServerOptions addCrlPath(String crlPath) throws NullPointerException {
     return (NetServerOptions) super.addCrlPath(crlPath);
   }
@@ -245,6 +299,21 @@ public class NetServerOptions extends TCPSSLOptions {
   @Override
   public NetServerOptions addCrlValue(Buffer crlValue) throws NullPointerException {
     return (NetServerOptions) super.addCrlValue(crlValue);
+  }
+
+  @Override
+  public NetServerOptions setEnabledSecureTransportProtocols(Set<String> enabledSecureTransportProtocols) {
+    return (NetServerOptions) super.setEnabledSecureTransportProtocols(enabledSecureTransportProtocols);
+  }
+
+  @Override
+  public NetServerOptions setSslHandshakeTimeout(long sslHandshakeTimeout) {
+    return (NetServerOptions) super.setSslHandshakeTimeout(sslHandshakeTimeout);
+  }
+
+  @Override
+  public NetServerOptions setSslHandshakeTimeoutUnit(TimeUnit sslHandshakeTimeoutUnit) {
+    return (NetServerOptions) super.setSslHandshakeTimeoutUnit(sslHandshakeTimeoutUnit);
   }
 
   /**
@@ -305,27 +374,6 @@ public class NetServerOptions extends TCPSSLOptions {
     return this;
   }
 
-  /**
-   *
-   * @return true if client auth is required
-   */
-  @Deprecated
-  public boolean isClientAuthRequired() {
-    return clientAuth == ClientAuth.REQUIRED;
-  }
-
-  /**
-   * Set whether client auth is required
-   *
-   * @param clientAuthRequired  true if client auth is required
-   * @return a reference to this, so the API can be used fluently
-   */
-  @Deprecated
-  public NetServerOptions setClientAuthRequired(boolean clientAuthRequired) {
-    this.clientAuth = clientAuthRequired ? ClientAuth.REQUIRED : ClientAuth.NONE;
-    return this;
-  }
-
   public ClientAuth getClientAuth() {
     return clientAuth;
   }
@@ -348,30 +396,75 @@ public class NetServerOptions extends TCPSSLOptions {
     return (NetServerOptions) super.setLogActivity(logEnabled);
   }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof NetServerOptions)) return false;
-    if (!super.equals(o)) return false;
-
-    NetServerOptions that = (NetServerOptions) o;
-
-    if (acceptBacklog != that.acceptBacklog) return false;
-    if (clientAuth != that.clientAuth) return false;
-    if (port != that.port) return false;
-    if (host != null ? !host.equals(that.host) : that.host != null) return false;
-
-    return true;
+  /**
+   * @return whether the server supports Server Name Indication
+   */
+  public boolean isSni() {
+    return sni;
   }
 
-  @Override
-  public int hashCode() {
-    int result = super.hashCode();
-    result = 31 * result + port;
-    result = 31 * result + (host != null ? host.hashCode() : 0);
-    result = 31 * result + acceptBacklog;
-    result = 31 * result + clientAuth.hashCode();
-    return result;
+  /**
+   * Set whether the server supports Server Name Indiciation
+   *
+   * @return a reference to this, so the API can be used fluently
+   */
+  public NetServerOptions setSni(boolean sni) {
+    this.sni = sni;
+    return this;
+  }
+
+  /**
+   * @return whether the server uses the HA Proxy protocol
+   */
+  public boolean isUseProxyProtocol() { return useProxyProtocol; }
+
+  /**
+   * Set whether the server uses the HA Proxy protocol
+   *
+   * @return a reference to this, so the API can be used fluently
+   */
+  public NetServerOptions setUseProxyProtocol(boolean useProxyProtocol) {
+    this.useProxyProtocol = useProxyProtocol;
+    return this;
+  }
+
+  /**
+   * @return the Proxy protocol timeout, in time unit specified by {@link #getProxyProtocolTimeoutUnit()}.
+   */
+  public long getProxyProtocolTimeout() {
+    return proxyProtocolTimeout;
+  }
+
+  /**
+   * Set the Proxy protocol timeout, default time unit is seconds.
+   *
+   * @param proxyProtocolTimeout the Proxy protocol timeout to set
+   * @return a reference to this, so the API can be used fluently
+   */
+  public NetServerOptions setProxyProtocolTimeout(long proxyProtocolTimeout) {
+    if (proxyProtocolTimeout < 0) {
+      throw new IllegalArgumentException("proxyProtocolTimeout must be >= 0");
+    }
+    this.proxyProtocolTimeout = proxyProtocolTimeout;
+    return this;
+  }
+
+  /**
+   * Set the Proxy protocol timeout unit. If not specified, default is seconds.
+   *
+   * @param proxyProtocolTimeoutUnit specify time unit.
+   * @return a reference to this, so the API can be used fluently
+   */
+  public NetServerOptions setProxyProtocolTimeoutUnit(TimeUnit proxyProtocolTimeoutUnit) {
+    this.proxyProtocolTimeoutUnit = proxyProtocolTimeoutUnit;
+    return this;
+  }
+
+  /**
+   * @return the Proxy protocol timeout unit.
+   */
+  public TimeUnit getProxyProtocolTimeoutUnit() {
+    return proxyProtocolTimeoutUnit;
   }
 
   private void init() {
@@ -379,6 +472,9 @@ public class NetServerOptions extends TCPSSLOptions {
     this.host = DEFAULT_HOST;
     this.acceptBacklog = DEFAULT_ACCEPT_BACKLOG;
     this.clientAuth = DEFAULT_CLIENT_AUTH;
+    this.sni = DEFAULT_SNI;
+    this.useProxyProtocol = DEFAULT_USE_PROXY_PROTOCOL;
+    this.proxyProtocolTimeout = DEFAULT_PROXY_PROTOCOL_TIMEOUT;
+    this.proxyProtocolTimeoutUnit = DEFAULT_PROXY_PROTOCOL_TIMEOUT_TIME_UNIT;
   }
-
 }

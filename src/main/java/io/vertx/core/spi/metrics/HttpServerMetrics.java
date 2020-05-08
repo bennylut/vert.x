@@ -1,17 +1,12 @@
 /*
- * Copyright (c) 2011-2014 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.spi.metrics;
@@ -50,7 +45,9 @@ public interface HttpServerMetrics<R, W, S> extends TCPMetrics<S> {
    * @param request the http server reuqest
    * @return the request metric
    */
-  R requestBegin(S socketMetric, HttpServerRequest request);
+  default R requestBegin(S socketMetric, HttpServerRequest request) {
+    return null;
+  }
 
   /**
    * Called when the http server request couldn't complete successfully, for instance the connection
@@ -58,7 +55,18 @@ public interface HttpServerMetrics<R, W, S> extends TCPMetrics<S> {
    *
    * @param requestMetric the request metric
    */
-  void requestReset(R requestMetric);
+  default void requestReset(R requestMetric) {
+
+  }
+
+  /**
+   * Called when an http server response begins.
+   *
+   * @param requestMetric the request metric
+   * @param response the http server request
+   */
+  default void responseBegin(R requestMetric, HttpServerResponse response) {
+  }
 
   /**
    * Called when an http server response is pushed.
@@ -68,7 +76,9 @@ public interface HttpServerMetrics<R, W, S> extends TCPMetrics<S> {
    * @param uri the pushed response uri
    * @param response the http server response  @return the request metric
    */
-  R responsePushed(S socketMetric, HttpMethod method, String uri, HttpServerResponse response);
+  default R responsePushed(S socketMetric, HttpMethod method, String uri, HttpServerResponse response) {
+    return null;
+  }
 
   /**
    * Called when an http server response has ended.
@@ -76,30 +86,26 @@ public interface HttpServerMetrics<R, W, S> extends TCPMetrics<S> {
    * @param requestMetric the request metric
    * @param response the http server request
    */
-  void responseEnd(R requestMetric, HttpServerResponse response);
-
-  /**
-   * Called when an http server request is upgrade to a websocket.
-   *
-   * @param requestMetric the request metric
-   * @param serverWebSocket the server web socket
-   * @return the server web socket metric
-   */
-  W upgrade(R requestMetric, ServerWebSocket serverWebSocket);
+  default void responseEnd(R requestMetric, HttpServerResponse response) {
+  }
 
   /**
    * Called when a server web socket connects.
    *
    * @param socketMetric the socket metric
+   * @param requestMetric the request metric
    * @param serverWebSocket the server web socket
    * @return the server web socket metric
    */
-  W connected(S socketMetric, ServerWebSocket serverWebSocket);
+  default W connected(S socketMetric, R requestMetric, ServerWebSocket serverWebSocket) {
+    return null;
+  }
 
   /**
    * Called when the server web socket has disconnected.
    *
    * @param serverWebSocketMetric the server web socket metric
    */
-  void disconnected(W serverWebSocketMetric);
+  default void disconnected(W serverWebSocketMetric) {
+  }
 }

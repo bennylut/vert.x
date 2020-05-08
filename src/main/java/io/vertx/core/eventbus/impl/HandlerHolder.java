@@ -1,41 +1,53 @@
+/*
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
+ */
+
 package io.vertx.core.eventbus.impl;
 
 import io.vertx.core.Context;
-import io.vertx.core.spi.metrics.EventBusMetrics;
+import io.vertx.core.impl.ContextInternal;
 
 /**
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
 public class HandlerHolder<T> {
 
-  private final EventBusMetrics metrics;
-  private final Context context;
-  private final HandlerRegistration<T> handler;
-  private final boolean replyHandler;
-  private final boolean localOnly;
+  public final ContextInternal context;
+  public final String address;
+  public final HandlerRegistration<T> handler;
+  public final boolean replyHandler;
+  public final boolean localOnly;
   private boolean removed;
 
-  public HandlerHolder(EventBusMetrics metrics, HandlerRegistration<T> handler, boolean replyHandler, boolean localOnly,
-                       Context context) {
-    this.metrics = metrics;
+  public HandlerHolder(HandlerRegistration<T> handler,
+                       String address,
+                       boolean replyHandler,
+                       boolean localOnly,
+                       ContextInternal context) {
     this.context = context;
     this.handler = handler;
+    this.address = address;
     this.replyHandler = replyHandler;
     this.localOnly = localOnly;
   }
 
   // We use a synchronized block to protect removed as it can be unregistered from a different thread
-  public void setRemoved() {
-    boolean unregisterMetric = false;
+  boolean setRemoved() {
+    boolean unregistered = false;
     synchronized (this) {
       if (!removed) {
         removed = true;
-        unregisterMetric = true;
+        unregistered = true;
       }
     }
-    if (unregisterMetric) {
-      metrics.handlerUnregistered(handler.getMetric());
-    }
+    return unregistered;
   }
 
   // Because of biased locks the overhead of the synchronized lock should be very low as it's almost always
@@ -58,7 +70,7 @@ public class HandlerHolder<T> {
     return handler != null ? handler.hashCode() : 0;
   }
 
-  public Context getContext() {
+  public ContextInternal getContext() {
     return context;
   }
 

@@ -1,98 +1,78 @@
-/*
- * Copyright 2014 Red Hat, Inc.
- *
- * Red Hat licenses this file to you under the Apache License, version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License.  You may obtain a copy of the License at:
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations
- * under the License.
- */
-
 package io.vertx.core;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.JsonArray;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 
 /**
- * Converter for {@link io.vertx.core.DeploymentOptions}.
- *
+ * Converter and mapper for {@link io.vertx.core.DeploymentOptions}.
  * NOTE: This class has been automatically generated from the {@link io.vertx.core.DeploymentOptions} original class using Vert.x codegen.
  */
 public class DeploymentOptionsConverter {
 
-  public static void fromJson(JsonObject json, DeploymentOptions obj) {
-    if (json.getValue("config") instanceof JsonObject) {
-      obj.setConfig(((JsonObject)json.getValue("config")).copy());
-    }
-    if (json.getValue("extraClasspath") instanceof JsonArray) {
-      java.util.ArrayList<java.lang.String> list = new java.util.ArrayList<>();
-      json.getJsonArray("extraClasspath").forEach( item -> {
-        if (item instanceof String)
-          list.add((String)item);
-      });
-      obj.setExtraClasspath(list);
-    }
-    if (json.getValue("ha") instanceof Boolean) {
-      obj.setHa((Boolean)json.getValue("ha"));
-    }
-    if (json.getValue("instances") instanceof Number) {
-      obj.setInstances(((Number)json.getValue("instances")).intValue());
-    }
-    if (json.getValue("isolatedClasses") instanceof JsonArray) {
-      java.util.ArrayList<java.lang.String> list = new java.util.ArrayList<>();
-      json.getJsonArray("isolatedClasses").forEach( item -> {
-        if (item instanceof String)
-          list.add((String)item);
-      });
-      obj.setIsolatedClasses(list);
-    }
-    if (json.getValue("isolationGroup") instanceof String) {
-      obj.setIsolationGroup((String)json.getValue("isolationGroup"));
-    }
-    if (json.getValue("maxWorkerExecuteTime") instanceof Number) {
-      obj.setMaxWorkerExecuteTime(((Number)json.getValue("maxWorkerExecuteTime")).longValue());
-    }
-    if (json.getValue("multiThreaded") instanceof Boolean) {
-      obj.setMultiThreaded((Boolean)json.getValue("multiThreaded"));
-    }
-    if (json.getValue("worker") instanceof Boolean) {
-      obj.setWorker((Boolean)json.getValue("worker"));
-    }
-    if (json.getValue("workerPoolName") instanceof String) {
-      obj.setWorkerPoolName((String)json.getValue("workerPoolName"));
-    }
-    if (json.getValue("workerPoolSize") instanceof Number) {
-      obj.setWorkerPoolSize(((Number)json.getValue("workerPoolSize")).intValue());
+
+   static void fromJson(Iterable<java.util.Map.Entry<String, Object>> json, DeploymentOptions obj) {
+    for (java.util.Map.Entry<String, Object> member : json) {
+      switch (member.getKey()) {
+        case "config":
+          if (member.getValue() instanceof JsonObject) {
+            obj.setConfig(((JsonObject)member.getValue()).copy());
+          }
+          break;
+        case "ha":
+          if (member.getValue() instanceof Boolean) {
+            obj.setHa((Boolean)member.getValue());
+          }
+          break;
+        case "instances":
+          if (member.getValue() instanceof Number) {
+            obj.setInstances(((Number)member.getValue()).intValue());
+          }
+          break;
+        case "maxWorkerExecuteTime":
+          if (member.getValue() instanceof Number) {
+            obj.setMaxWorkerExecuteTime(((Number)member.getValue()).longValue());
+          }
+          break;
+        case "maxWorkerExecuteTimeUnit":
+          if (member.getValue() instanceof String) {
+            obj.setMaxWorkerExecuteTimeUnit(java.util.concurrent.TimeUnit.valueOf((String)member.getValue()));
+          }
+          break;
+        case "worker":
+          if (member.getValue() instanceof Boolean) {
+            obj.setWorker((Boolean)member.getValue());
+          }
+          break;
+        case "workerPoolName":
+          if (member.getValue() instanceof String) {
+            obj.setWorkerPoolName((String)member.getValue());
+          }
+          break;
+        case "workerPoolSize":
+          if (member.getValue() instanceof Number) {
+            obj.setWorkerPoolSize(((Number)member.getValue()).intValue());
+          }
+          break;
+      }
     }
   }
 
-  public static void toJson(DeploymentOptions obj, JsonObject json) {
+   static void toJson(DeploymentOptions obj, JsonObject json) {
+    toJson(obj, json.getMap());
+  }
+
+   static void toJson(DeploymentOptions obj, java.util.Map<String, Object> json) {
     if (obj.getConfig() != null) {
       json.put("config", obj.getConfig());
     }
-    if (obj.getExtraClasspath() != null) {
-      JsonArray array = new JsonArray();
-      obj.getExtraClasspath().forEach(item -> array.add(item));
-      json.put("extraClasspath", array);
-    }
     json.put("ha", obj.isHa());
     json.put("instances", obj.getInstances());
-    if (obj.getIsolatedClasses() != null) {
-      JsonArray array = new JsonArray();
-      obj.getIsolatedClasses().forEach(item -> array.add(item));
-      json.put("isolatedClasses", array);
-    }
-    if (obj.getIsolationGroup() != null) {
-      json.put("isolationGroup", obj.getIsolationGroup());
-    }
     json.put("maxWorkerExecuteTime", obj.getMaxWorkerExecuteTime());
-    json.put("multiThreaded", obj.isMultiThreaded());
+    if (obj.getMaxWorkerExecuteTimeUnit() != null) {
+      json.put("maxWorkerExecuteTimeUnit", obj.getMaxWorkerExecuteTimeUnit().name());
+    }
     json.put("worker", obj.isWorker());
     if (obj.getWorkerPoolName() != null) {
       json.put("workerPoolName", obj.getWorkerPoolName());

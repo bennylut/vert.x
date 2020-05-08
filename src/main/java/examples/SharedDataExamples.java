@@ -1,25 +1,18 @@
 /*
- * Copyright 2014 Red Hat, Inc.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *  The Eclipse Public License is available at
- *  http://www.eclipse.org/legal/epl-v10.html
- *
- *  The Apache License v2.0 is available at
- *  http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package examples;
 
-import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.net.*;
 import io.vertx.core.shareddata.*;
 
 /**
@@ -27,45 +20,54 @@ import io.vertx.core.shareddata.*;
  */
 public class SharedDataExamples {
 
-  public void example1(Vertx vertx) {
+  public void localMap(Vertx vertx) {
+    SharedData sharedData = vertx.sharedData();
 
-    SharedData sd = vertx.sharedData();
-
-    LocalMap<String, String> map1 = sd.getLocalMap("mymap1");
+    LocalMap<String, String> map1 = sharedData.getLocalMap("mymap1");
 
     map1.put("foo", "bar"); // Strings are immutable so no need to copy
 
-    LocalMap<String, Buffer> map2 = sd.getLocalMap("mymap2");
+    LocalMap<String, Buffer> map2 = sharedData.getLocalMap("mymap2");
 
     map2.put("eek", Buffer.buffer().appendInt(123)); // This buffer will be copied before adding to map
 
     // Then... in another part of your application:
 
-    map1 = sd.getLocalMap("mymap1");
+    map1 = sharedData.getLocalMap("mymap1");
 
     String val = map1.get("foo");
 
-    map2 = sd.getLocalMap("mymap2");
+    map2 = sharedData.getLocalMap("mymap2");
 
     Buffer buff = map2.get("eek");
   }
 
-  public void example2(Vertx vertx) {
+  public void asyncMap(Vertx vertx) {
+    SharedData sharedData = vertx.sharedData();
 
-    SharedData sd = vertx.sharedData();
-
-    sd.<String, String>getClusterWideMap("mymap", res -> {
+    sharedData.<String, String>getAsyncMap("mymap", res -> {
       if (res.succeeded()) {
         AsyncMap<String, String> map = res.result();
       } else {
         // Something went wrong!
       }
     });
+  }
 
+  public void localAsyncMap(Vertx vertx) {
+    SharedData sharedData = vertx.sharedData();
+
+    sharedData.<String, String>getLocalAsyncMap("mymap", res -> {
+      if (res.succeeded()) {
+        // Local-only async map
+        AsyncMap<String, String> map = res.result();
+      } else {
+        // Something went wrong!
+      }
+    });
   }
 
   public void example3(AsyncMap<String, String> map) {
-
     map.put("foo", "bar", resPut -> {
       if (resPut.succeeded()) {
         // Successfully put the value
@@ -73,11 +75,9 @@ public class SharedDataExamples {
         // Something went wrong!
       }
     });
-
   }
 
   public void example4(AsyncMap<String, String> map) {
-
     map.get("foo", resGet -> {
       if (resGet.succeeded()) {
         // Successfully got the value
@@ -86,11 +86,12 @@ public class SharedDataExamples {
         // Something went wrong!
       }
     });
-
   }
 
-  public void example5(Vertx vertx, SharedData sd) {
-    sd.getLock("mylock", res -> {
+  public void lock(Vertx vertx) {
+    SharedData sharedData = vertx.sharedData();
+
+    sharedData.getLock("mylock", res -> {
       if (res.succeeded()) {
         // Got the lock!
         Lock lock = res.result();
@@ -105,8 +106,10 @@ public class SharedDataExamples {
     });
   }
 
-  public void example6(SharedData sd) {
-    sd.getLockWithTimeout("mylock", 10000, res -> {
+  public void lockWithTimeout(Vertx vertx) {
+    SharedData sharedData = vertx.sharedData();
+
+    sharedData.getLockWithTimeout("mylock", 10000, res -> {
       if (res.succeeded()) {
         // Got the lock!
         Lock lock = res.result();
@@ -117,8 +120,28 @@ public class SharedDataExamples {
     });
   }
 
-  public void example7(SharedData sd) {
-    sd.getCounter("mycounter", res -> {
+  public void localLock(Vertx vertx) {
+    SharedData sharedData = vertx.sharedData();
+
+    sharedData.getLocalLock("mylock", res -> {
+      if (res.succeeded()) {
+        // Local-only lock
+        Lock lock = res.result();
+
+        // 5 seconds later we release the lock so someone else can get it
+
+        vertx.setTimer(5000, tid -> lock.release());
+
+      } else {
+        // Something went wrong
+      }
+    });
+  }
+
+  public void counter(Vertx vertx) {
+    SharedData sharedData = vertx.sharedData();
+
+    sharedData.getCounter("mycounter", res -> {
       if (res.succeeded()) {
         Counter counter = res.result();
       } else {
@@ -127,6 +150,16 @@ public class SharedDataExamples {
     });
   }
 
+  public void localCounter(Vertx vertx) {
+    SharedData sharedData = vertx.sharedData();
 
-
+    sharedData.getLocalCounter("mycounter", res -> {
+      if (res.succeeded()) {
+        // Local-only counter
+        Counter counter = res.result();
+      } else {
+        // Something went wrong!
+      }
+    });
+  }
 }

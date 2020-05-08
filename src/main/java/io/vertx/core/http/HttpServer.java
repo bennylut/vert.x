@@ -1,29 +1,25 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.http;
 
 import io.vertx.codegen.annotations.CacheReturn;
 import io.vertx.codegen.annotations.GenIgnore;
-import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.metrics.Measured;
+import io.vertx.core.net.SocketAddress;
 import io.vertx.core.streams.ReadStream;
 
 /**
@@ -32,7 +28,7 @@ import io.vertx.core.streams.ReadStream;
  * You receive HTTP requests by providing a {@link #requestHandler}. As requests arrive on the server the handler
  * will be called with the requests.
  * <p>
- * You receive WebSockets by providing a {@link #websocketHandler}. As WebSocket connections arrive on the server, the
+ * You receive WebSockets by providing a {@link #webSocketHandler}. As WebSocket connections arrive on the server, the
  * WebSocket is passed to the handler.
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
@@ -66,6 +62,8 @@ public interface HttpServer extends Measured {
 
   /**
    * Set a connection handler for the server.
+   * <br/>
+   * The handler will always be called on the event-loop thread.
    *
    * @return a reference to this, so the API can be used fluently
    */
@@ -73,28 +71,38 @@ public interface HttpServer extends Measured {
   HttpServer connectionHandler(Handler<HttpConnection> handler);
 
   /**
-   * Return the websocket stream for the server. If a websocket connect handshake is successful a
-   * new {@link ServerWebSocket} instance will be created and passed to the stream {@link io.vertx.core.streams.ReadStream#handler(io.vertx.core.Handler)}.
+   * Set an exception handler called for socket errors happening before the HTTP connection
+   * is established, e.g during the TLS handshake.
    *
-   * @return the websocket stream
+   * @param handler the handler to set
+   * @return a reference to this, so the API can be used fluently
    */
-  @CacheReturn
-  ReadStream<ServerWebSocket> websocketStream();
+  @Fluent
+  HttpServer exceptionHandler(Handler<Throwable> handler);
 
   /**
-   * Set the websocket handler for the server to {@code wsHandler}. If a websocket connect handshake is successful a
+   * Return the WebSocket stream for the server. If a WebSocket connect handshake is successful a
+   * new {@link ServerWebSocket} instance will be created and passed to the stream {@link io.vertx.core.streams.ReadStream#handler(io.vertx.core.Handler)}.
+   *
+   * @return the WebSocket stream
+   */
+  @CacheReturn
+  ReadStream<ServerWebSocket> webSocketStream();
+
+  /**
+   * Set the WebSocket handler for the server to {@code wsHandler}. If a WebSocket connect handshake is successful a
    * new {@link ServerWebSocket} instance will be created and passed to the handler.
    *
    * @return a reference to this, so the API can be used fluently
    */
   @Fluent
-  HttpServer websocketHandler(Handler<ServerWebSocket> handler);
+  HttpServer webSocketHandler(Handler<ServerWebSocket> handler);
 
   /**
-   * @return the websocketHandler
+   * @return the WebSocket handler
    */
   @GenIgnore
-  Handler<ServerWebSocket> websocketHandler();
+  Handler<ServerWebSocket> webSocketHandler();
 
   /**
    * Tell the server to start listening. The server will listen on the port and host specified in the
@@ -102,10 +110,9 @@ public interface HttpServer extends Measured {
    * <p>
    * The listen happens asynchronously and the server may not be listening until some time after the call has returned.
    *
-   * @return a reference to this, so the API can be used fluently
+   * @return a future completed with the listen operation result
    */
-  @Fluent
-  HttpServer listen();
+  Future<HttpServer> listen();
 
   /**
    * Tell the server to start listening. The server will listen on the port and host specified here,
@@ -116,10 +123,9 @@ public interface HttpServer extends Measured {
    * @param port  the port to listen on
    * @param host  the host to listen on
    *
-   * @return a reference to this, so the API can be used fluently
+   * @return a future completed with the listen operation result
    */
-  @Fluent
-  HttpServer listen(int port, String host);
+  Future<HttpServer> listen(int port, String host);
 
   /**
    * Like {@link #listen(int, String)} but supplying a handler that will be called when the server is actually
@@ -133,15 +139,30 @@ public interface HttpServer extends Measured {
   HttpServer listen(int port, String host, Handler<AsyncResult<HttpServer>> listenHandler);
 
   /**
+   * Tell the server to start listening on the given address supplying
+   * a handler that will be called when the server is actually
+   * listening (or has failed).
+   *
+   * @param address the address to listen on
+   * @param listenHandler  the listen handler
+   */
+  @Fluent
+  HttpServer listen(SocketAddress address, Handler<AsyncResult<HttpServer>> listenHandler);
+
+  /**
+   * Like {@link #listen(SocketAddress, Handler)} but returns a {@code Future} of the asynchronous result
+   */
+  Future<HttpServer> listen(SocketAddress address);
+
+  /**
    * Like {@link #listen(int, String)} but the server will listen on host "0.0.0.0" and port specified here ignoring
    * any value in the {@link io.vertx.core.http.HttpServerOptions} that was used when creating the server.
    *
    * @param port  the port to listen on
    *
-   * @return a reference to this, so the API can be used fluently
+   * @return a future completed with the listen operation result
    */
-  @Fluent
-  HttpServer listen(int port);
+  Future<HttpServer> listen(int port);
 
   /**
    * Like {@link #listen(int)} but supplying a handler that will be called when the server is actually listening (or has failed).
@@ -164,8 +185,10 @@ public interface HttpServer extends Measured {
    * Close the server. Any open HTTP connections will be closed.
    * <p>
    * The close happens asynchronously and the server may not be closed until some time after the call has returned.
+   *
+   * @return a future completed with the result
    */
-  void close();
+  Future<Void> close();
 
   /**
    * Like {@link #close} but supplying a handler that will be called when the server is actually closed (or has failed).

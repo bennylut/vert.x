@@ -1,28 +1,24 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
+
 package io.vertx.core.http.impl;
 
+import io.vertx.core.Context;
 import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.AsyncFile;
 import io.vertx.core.file.OpenOptions;
 import io.vertx.core.http.HttpServerFileUpload;
-import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.streams.Pump;
+import io.vertx.core.streams.Pipe;
+import io.vertx.core.streams.ReadStream;
 
 import java.nio.charset.Charset;
 
@@ -37,8 +33,8 @@ import java.nio.charset.Charset;
  */
 class HttpServerFileUploadImpl implements HttpServerFileUpload {
 
-  private final HttpServerRequest req;
-  private final Vertx vertx;
+  private final ReadStream<Buffer> stream;
+  private final Context context;
   private final String name;
   private final String filename;
   private final String contentType;
@@ -51,24 +47,50 @@ class HttpServerFileUploadImpl implements HttpServerFileUpload {
   private Handler<Throwable> exceptionHandler;
 
   private long size;
-  private boolean paused;
-  private Buffer pauseBuff;
-  private boolean complete;
   private boolean lazyCalculateSize;
 
-  HttpServerFileUploadImpl(Vertx vertx, HttpServerRequest req, String name, String filename, String contentType,
+  HttpServerFileUploadImpl(Context context, ReadStream<Buffer> stream, String name, String filename, String contentType,
                            String contentTransferEncoding,
                            Charset charset, long size) {
-    this.vertx = vertx;
-    this.req = req;
+    this.context = context;
+    this.stream = stream;
     this.name = name;
     this.filename = filename;
     this.contentType = contentType;
     this.contentTransferEncoding = contentTransferEncoding;
     this.charset = charset;
     this.size = size;
-    if (size == 0) {
-      lazyCalculateSize = true;
+    this.lazyCalculateSize = size == 0;
+
+    stream.handler(this::handleData);
+    stream.endHandler(v -> this.handleEnd());
+  }
+
+  private void handleData(Buffer data) {
+    Handler<Buffer> h;
+    synchronized (HttpServerFileUploadImpl.this) {
+      h = dataHandler;
+      size += data.length();
+    }
+    if (h != null) {
+      h.handle(data);
+    }
+  }
+
+  private void handleEnd() {
+    Handler<Void> handler;
+    synchronized (this) {
+      lazyCalculateSize = false;
+      handler = endHandler;
+    }
+    if (handler != null) {
+      handler.handle(null);
+    }
+  }
+
+  private void notifyExceptionHandler(Throwable cause) {
+    if (exceptionHandler != null) {
+      exceptionHandler.handle(cause);
     }
   }
 
@@ -104,30 +126,25 @@ class HttpServerFileUploadImpl implements HttpServerFileUpload {
 
   @Override
   public synchronized HttpServerFileUpload handler(Handler<Buffer> handler) {
-    this.dataHandler = handler;
+    dataHandler = handler;
     return this;
   }
 
   @Override
-  public synchronized HttpServerFileUpload pause() {
-    req.pause();
-    paused = true;
+  public HttpServerFileUpload pause() {
+    stream.pause();
     return this;
   }
 
   @Override
-  public synchronized HttpServerFileUpload resume() {
-    if (paused) {
-      req.resume();
-      paused = false;
-      if (pauseBuff != null) {
-        doReceiveData(pauseBuff);
-        pauseBuff = null;
-      }
-      if (complete) {
-        handleComplete();
-      }
-    }
+  public HttpServerFileUpload fetch(long amount) {
+    stream.fetch(amount);
+    return this;
+  }
+
+  @Override
+  public HttpServerFileUpload resume() {
+    stream.resume();
     return this;
   }
 
@@ -145,14 +162,24 @@ class HttpServerFileUploadImpl implements HttpServerFileUpload {
 
   @Override
   public HttpServerFileUpload streamToFileSystem(String filename) {
-    pause();
-    vertx.fileSystem().open(filename, new OpenOptions(), ar -> {
+    Pipe<Buffer> pipe = stream.pipe().endOnComplete(false);
+    context.owner().fileSystem().open(filename, new OpenOptions(), ar -> {
       if (ar.succeeded()) {
         file =  ar.result();
-        Pump p = Pump.pump(HttpServerFileUploadImpl.this, ar.result());
-        p.start();
-        resume();
+        pipe.to(file, ar2 -> {
+          file.close(ar3 -> {
+            Throwable failure = ar2.failed() ? ar2.cause() : ar3.failed() ? ar3.cause() : null;
+            if (failure != null) {
+              notifyExceptionHandler(failure);
+            }
+            synchronized (HttpServerFileUploadImpl.this) {
+              size = file.getWritePos();
+            }
+            handleEnd();
+          });
+        });
       } else {
+        pipe.close();
         notifyExceptionHandler(ar.cause());
       }
     });
@@ -164,60 +191,8 @@ class HttpServerFileUploadImpl implements HttpServerFileUpload {
     return !lazyCalculateSize;
   }
 
-  synchronized void receiveData(Buffer data) {
-    if (data.length() != 0) {
-      // Can sometimes receive zero length packets from Netty!
-      if (lazyCalculateSize) {
-        size += data.length();
-      }
-      doReceiveData(data);
-    }
-  }
-
-  synchronized void doReceiveData(Buffer data) {
-    if (!paused) {
-      if (dataHandler != null) {
-        dataHandler.handle(data);
-      }
-    } else {
-      if (pauseBuff == null) {
-        pauseBuff = Buffer.buffer();
-      }
-      pauseBuff.appendBuffer(data);
-    }
-  }
-
-  synchronized void complete() {
-    if (paused) {
-      complete = true;
-    } else {
-      handleComplete();
-    }
-  }
-
-  private void handleComplete() {
-    lazyCalculateSize = false;
-    if (file == null) {
-      notifyEndHandler();
-    } else {
-      file.close(ar -> {
-        if (ar.failed()) {
-          notifyExceptionHandler(ar.cause());
-        }
-        notifyEndHandler();
-      });
-    }
-  }
-
-  private void notifyEndHandler() {
-    if (endHandler != null) {
-      endHandler.handle(null);
-    }
-  }
-
-  private void notifyExceptionHandler(Throwable cause) {
-    if (exceptionHandler != null) {
-      exceptionHandler.handle(cause);
-    }
+  @Override
+  public synchronized AsyncFile file() {
+    return file;
   }
 }

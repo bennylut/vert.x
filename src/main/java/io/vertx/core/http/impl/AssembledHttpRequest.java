@@ -1,29 +1,20 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
+
 package io.vertx.core.http.impl;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.DecoderResult;
 import io.netty.handler.codec.UnsupportedMessageTypeException;
-import io.netty.handler.codec.http.DefaultHttpContent;
-import io.netty.handler.codec.http.HttpContent;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.*;
 
 
 /**
@@ -96,7 +87,7 @@ class AssembledHttpRequest implements HttpContent, HttpRequest {
 
   @Override
   public HttpMethod getMethod() {
-    return request.getMethod();
+    return request.method();
   }
 
   @Override
@@ -106,7 +97,7 @@ class AssembledHttpRequest implements HttpContent, HttpRequest {
 
   @Override
   public String getUri() {
-    return request.getUri();
+    return request.uri();
   }
 
   @Override
@@ -126,7 +117,7 @@ class AssembledHttpRequest implements HttpContent, HttpRequest {
 
   @Override
   public HttpVersion getProtocolVersion() {
-    return request.getProtocolVersion();
+    return request.protocolVersion();
   }
 
   @Override
@@ -146,7 +137,7 @@ class AssembledHttpRequest implements HttpContent, HttpRequest {
 
   @Override
   public DecoderResult getDecoderResult() {
-    return request.getDecoderResult();
+    return request.decoderResult();
   }
 
   @Override

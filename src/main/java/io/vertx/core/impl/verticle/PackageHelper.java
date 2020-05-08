@@ -1,32 +1,28 @@
 /*
- * Copyright (c) 2011-2014 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
+
 package io.vertx.core.impl.verticle;
 
 import javax.tools.JavaFileObject;
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.JarURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
+
+import static io.vertx.core.net.impl.URIDecoder.decodeURIComponent;
 
 /**
  * @author Janne Hietam&auml;ki
@@ -50,12 +46,7 @@ public class PackageHelper {
     while (urlEnumeration.hasMoreElements()) {
       URL resource = urlEnumeration.nextElement();
       //Need to urldecode it too, since bug in JDK URL class which does not url decode it, so if it contains spaces you are screwed
-      File directory;
-      try {
-        directory = new File(URLDecoder.decode(resource.getFile(), "UTF-8"));
-      } catch (UnsupportedEncodingException e) {
-        throw new IllegalStateException("Failed to decode " + e.getMessage());
-      }
+      final File directory = new File(decodeURIComponent(resource.getFile(), false));
       if (directory.isDirectory()) {
         result.addAll(browseDir(packageName, directory));
       } else {

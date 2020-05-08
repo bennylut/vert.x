@@ -1,32 +1,25 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- *  ------------------------------------------------------
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *      The Eclipse Public License is available at
- *      http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *      The Apache License v2.0 is available at
- *      http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.http.impl;
 
-import io.netty.handler.codec.http2.Http2Exception;
-import io.netty.handler.codec.http2.Http2Stream;
 import io.vertx.codegen.annotations.Nullable;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
+import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.http.HttpClientRequest;
-import io.vertx.core.http.HttpClientResponse;
-import io.vertx.core.http.HttpConnection;
-import io.vertx.core.http.HttpMethod;
-import io.vertx.core.http.HttpVersion;
+import io.vertx.core.http.*;
+import io.vertx.core.net.SocketAddress;
 
 /**
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
@@ -34,57 +27,36 @@ import io.vertx.core.http.HttpVersion;
 class HttpClientRequestPushPromise extends HttpClientRequestBase {
 
   private final Http2ClientConnection conn;
-  private final Http2ClientConnection.Http2ClientStream stream;
-  private final String rawMethod;
+  private final Http2ClientConnection.StreamImpl stream;
   private final MultiMap headers;
-  private Handler<HttpClientResponse> respHandler;
 
   public HttpClientRequestPushPromise(
-      Http2ClientConnection conn,
-      Http2Stream stream,
-      HttpClientImpl client,
-      boolean ssl,
-      HttpMethod method,
-      String rawMethod,
-      String uri,
-      String host,
-      int port,
-      MultiMap headers) throws Http2Exception {
-    super(client, ssl, method, host, port, uri);
+    Http2ClientConnection conn,
+    HttpClientImpl client,
+    boolean ssl,
+    HttpMethod method,
+    String uri,
+    String host,
+    int port,
+    MultiMap headers) {
+    super(client, conn.getContext().promise(), ssl, method, SocketAddress.inetSocketAddress(port, host), host, port, uri);
     this.conn = conn;
-    this.stream = new Http2ClientConnection.Http2ClientStream(conn, this, stream, false);
-    this.rawMethod = rawMethod;
+    this.stream = new Http2ClientConnection.StreamImpl(conn, conn.getContext(), this, null);
     this.headers = headers;
   }
 
-  Http2ClientConnection.Http2ClientStream getStream() {
+  Http2ClientConnection.StreamImpl getStream() {
     return stream;
   }
 
   @Override
-  protected Object getLock() {
-    return this; //
+  void handleResponse(Promise<HttpClientResponse> promise, HttpClientResponse resp, long timeoutMs) {
+    promise.complete(resp);
   }
 
   @Override
-  protected void doHandleResponse(HttpClientResponseImpl resp, long timeoutMs) {
-    synchronized (getLock()) {
-      if (respHandler != null) {
-        respHandler.handle(resp);
-      }
-    }
-  }
-
-  @Override
-  protected void checkComplete() {
-  }
-
-  @Override
-  public HttpClientRequest handler(Handler<HttpClientResponse> handler) {
-    synchronized (getLock()) {
-      respHandler = handler;
-      return this;
-    }
+  public HttpClientRequest exceptionHandler(Handler<Throwable> handler) {
+    return this;
   }
 
   @Override
@@ -93,16 +65,9 @@ class HttpClientRequestPushPromise extends HttpClientRequestBase {
   }
 
   @Override
-  public HttpClientRequest connectionHandler(@Nullable Handler<HttpConnection> handler) {
-    return this;
-  }
-
-  @Override
-  public boolean reset(long code) {
-    synchronized (conn) {
-      stream.resetRequest(code);
-      return true;
-    }
+  boolean reset(Throwable cause) {
+    stream.reset(cause);
+    return true;
   }
 
   @Override
@@ -110,29 +75,10 @@ class HttpClientRequestPushPromise extends HttpClientRequestBase {
     return false;
   }
 
-  @Override
-  public HttpMethod method() {
-    return method;
-  }
 
   @Override
-  public String getRawMethod() {
-    return rawMethod;
-  }
-
-  @Override
-  public HttpClientRequest setRawMethod(String method) {
-    throw new IllegalStateException();
-  }
-
-  @Override
-  public String uri() {
-    return uri;
-  }
-
-  @Override
-  public String getHost() {
-    return host;
+  public String getAuthority() {
+    return server.host();
   }
 
   @Override
@@ -141,7 +87,7 @@ class HttpClientRequestPushPromise extends HttpClientRequestBase {
   }
 
   @Override
-  public HttpClientRequest write(Buffer data) {
+  public Future<Void> write(Buffer data) {
     throw new IllegalStateException();
   }
 
@@ -156,22 +102,12 @@ class HttpClientRequestPushPromise extends HttpClientRequestBase {
   }
 
   @Override
-  public HttpClientRequest pause() {
-    throw new IllegalStateException();
-  }
-
-  @Override
-  public HttpClientRequest resume() {
-    throw new IllegalStateException();
-  }
-
-  @Override
-  public HttpClientRequest endHandler(Handler<Void> endHandler) {
-    throw new IllegalStateException();
-  }
-
-  @Override
   public HttpClientRequest setFollowRedirects(boolean followRedirect) {
+    throw new IllegalStateException();
+  }
+
+  @Override
+  public HttpClientRequest setMaxRedirects(int maxRedirects) {
     throw new IllegalStateException();
   }
 
@@ -181,7 +117,7 @@ class HttpClientRequestPushPromise extends HttpClientRequestBase {
   }
 
   @Override
-  public HttpClientRequest setHost(String host) {
+  public HttpClientRequest setAuthority(String authority) {
     throw new IllegalStateException();
   }
 
@@ -206,12 +142,27 @@ class HttpClientRequestPushPromise extends HttpClientRequestBase {
   }
 
   @Override
-  public HttpClientRequest write(String chunk) {
+  public Future<Void> write(String chunk) {
     throw new IllegalStateException();
   }
 
   @Override
-  public HttpClientRequest write(String chunk, String enc) {
+  public Future<Void> write(String chunk, String enc) {
+    throw new IllegalStateException();
+  }
+
+  @Override
+  public void write(Buffer data, Handler<AsyncResult<Void>> handler) {
+    throw new IllegalStateException();
+  }
+
+  @Override
+  public void write(String chunk, Handler<AsyncResult<Void>> handler) {
+    throw new IllegalStateException();
+  }
+
+  @Override
+  public void write(String chunk, String enc, Handler<AsyncResult<Void>> handler) {
     throw new IllegalStateException();
   }
 
@@ -221,27 +172,42 @@ class HttpClientRequestPushPromise extends HttpClientRequestBase {
   }
 
   @Override
-  public HttpClientRequest sendHead() {
+  public Future<HttpVersion> sendHead() {
     throw new IllegalStateException();
   }
 
   @Override
-  public HttpClientRequest sendHead(Handler<HttpVersion> completionHandler) {
+  public HttpClientRequest sendHead(Handler<AsyncResult<HttpVersion>> completionHandler) {
     throw new IllegalStateException();
   }
 
   @Override
-  public void end(String chunk) {
+  public Future<Void> end(String chunk) {
     throw new IllegalStateException();
   }
 
   @Override
-  public void end(String chunk, String enc) {
+  public void end(String chunk, Handler<AsyncResult<Void>> handler) {
     throw new IllegalStateException();
   }
 
   @Override
-  public void end(Buffer chunk) {
+  public Future<Void> end(String chunk, String enc) {
+    throw new IllegalStateException();
+  }
+
+  @Override
+  public void end(String chunk, String enc, Handler<AsyncResult<Void>> handler) {
+    throw new IllegalStateException();
+  }
+
+  @Override
+  public Future<Void> end(Buffer chunk) {
+    throw new IllegalStateException();
+  }
+
+  @Override
+  public void end(Buffer chunk, Handler<AsyncResult<Void>> handler) {
     throw new IllegalStateException();
   }
 
@@ -251,13 +217,23 @@ class HttpClientRequestPushPromise extends HttpClientRequestBase {
   }
 
   @Override
-  public void end() {
+  public Future<Void> end() {
+    throw new IllegalStateException();
+  }
+
+  @Override
+  public void end(Handler<AsyncResult<Void>> handler) {
     throw new IllegalStateException();
   }
 
   @Override
   public boolean writeQueueFull() {
     throw new IllegalStateException();
+  }
+
+  @Override
+  public StreamPriority getStreamPriority() {
+    return stream.priority();
   }
 
   @Override

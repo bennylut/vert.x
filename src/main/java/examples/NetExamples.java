@@ -1,17 +1,12 @@
 /*
- * Copyright 2014 Red Hat, Inc.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *  The Eclipse Public License is available at
- *  http://www.eclipse.org/legal/epl-v10.html
- *
- *  The Apache License v2.0 is available at
- *  http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package examples;
@@ -24,6 +19,7 @@ import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.net.*;
 
 import java.security.cert.CertificateException;
+import java.util.Arrays;
 
 /**
  * Created by tim on 19/01/15.
@@ -511,12 +507,15 @@ public class NetExamples {
     NetServer server = vertx.createNetServer(options);
   }
 
+  /**
+   * The default protocols are defined in {@link io.vertx.core.net.TCPSSLOptions#DEFAULT_ENABLED_SECURE_TRANSPORT_PROTOCOLS}, but you can change them.
+   */
   public void example45(Vertx vertx, JksOptions keyStoreOptions) {
     NetServerOptions options = new NetServerOptions().
       setSsl(true).
       setKeyStoreOptions(keyStoreOptions).
-      addEnabledSecureTransportProtocol("TLSv1.1").
-      addEnabledSecureTransportProtocol("TLSv1.2");
+      removeEnabledSecureTransportProtocol("TLSv1").
+      addEnabledSecureTransportProtocol("TLSv1.3");
     NetServer server = vertx.createNetServer(options);
   }
 
@@ -563,8 +562,8 @@ public class NetExamples {
       .setKeyCertOptions(certificate.keyCertOptions())
       .setTrustOptions(certificate.trustOptions());
 
-    NetServer server = vertx.createNetServer(serverOptions)
-      .connectHandler(socket -> socket.write("Hello!").end())
+    vertx.createNetServer(serverOptions)
+      .connectHandler(socket -> socket.end(Buffer.buffer("Hello!")))
       .listen(1234, "localhost");
 
     NetClientOptions clientOptions = new NetClientOptions()
@@ -597,5 +596,58 @@ public class NetExamples {
       .setTrustOptions(certificate.trustOptions()))
       .requestHandler(req -> req.response().end("Hello!"))
       .listen(8080);
+  }
+
+  public void example51(Vertx vertx) {
+    NetServerOptions options = new NetServerOptions().setUseProxyProtocol(true);
+    NetServer server = vertx.createNetServer(options);
+    server.connectHandler(so -> {
+      // Print the actual client address provided by the HA proxy protocol instead of the proxy address
+      System.out.println(so.remoteAddress());
+
+      // Print the address of the proxy
+      System.out.println(so.localAddress());
+    });
+  }
+
+  public void configureSNIServer(Vertx vertx) {
+    JksOptions keyCertOptions = new JksOptions().setPath("keystore.jks").setPassword("wibble");
+
+    NetServer netServer = vertx.createNetServer(new NetServerOptions()
+        .setKeyStoreOptions(keyCertOptions)
+        .setSsl(true)
+        .setSni(true)
+    );
+  }
+
+  public void configureSNIServerWithPems(Vertx vertx) {
+    PemKeyCertOptions keyCertOptions = new PemKeyCertOptions()
+        .setKeyPaths(Arrays.asList("default-key.pem", "host1-key.pem", "etc..."))
+        .setCertPaths(Arrays.asList("default-cert.pem", "host2-key.pem", "etc...")
+        );
+
+    NetServer netServer = vertx.createNetServer(new NetServerOptions()
+        .setPemKeyCertOptions(keyCertOptions)
+        .setSsl(true)
+        .setSni(true)
+    );
+  }
+
+  public void useSNIInClient(Vertx vertx, JksOptions trustOptions) {
+
+    NetClient client = vertx.createNetClient(new NetClientOptions()
+        .setTrustStoreOptions(trustOptions)
+        .setSsl(true)
+    );
+
+    // Connect to 'localhost' and present 'server.name' server name
+    client.connect(1234, "localhost", "server.name", res -> {
+      if (res.succeeded()) {
+        System.out.println("Connected!");
+        NetSocket socket = res.result();
+      } else {
+        System.out.println("Failed to connect: " + res.cause().getMessage());
+      }
+    });
   }
 }

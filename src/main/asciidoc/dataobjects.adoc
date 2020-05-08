@@ -9,76 +9,63 @@
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[cacheMaxTimeToLive]]`cacheMaxTimeToLive`|`Number (int)`|
-+++
+|[[cacheMaxTimeToLive]]`@cacheMaxTimeToLive`|`Number (int)`|+++
 Set the cache maximum TTL value in seconds. After successful resolution IP addresses are cached with their DNS response TTL,
  use this to set a maximum value to all responses TTL.
 +++
-|[[cacheMinTimeToLive]]`cacheMinTimeToLive`|`Number (int)`|
-+++
+|[[cacheMinTimeToLive]]`@cacheMinTimeToLive`|`Number (int)`|+++
 Set the cache minimum TTL value in seconds. After resolution successful IP addresses are cached with their DNS response TTL,
  use this to set a minimum value to all responses TTL.
 +++
-|[[cacheNegativeTimeToLive]]`cacheNegativeTimeToLive`|`Number (int)`|
-+++
+|[[cacheNegativeTimeToLive]]`@cacheNegativeTimeToLive`|`Number (int)`|+++
 Set the negative cache TTL value in seconds. After a failed hostname resolution, DNS queries won't be retried
  for a period of time equals to the negative TTL. This allows to reduce the response time of negative replies
  and reduce the amount of messages to DNS servers.
 +++
-|[[hostsPath]]`hostsPath`|`String`|
-+++
+|[[hostsPath]]`@hostsPath`|`String`|+++
 Set the path of an alternate hosts configuration file to use instead of the one provided by the os.
  <p/>
  The default value is null, so the operating system hosts config is used.
 +++
-|[[hostsValue]]`hostsValue`|`Buffer`|
-+++
+|[[hostsValue]]`@hostsValue`|`Buffer`|+++
 Set an alternate hosts configuration file to use instead of the one provided by the os.
  <p/>
  The value should contain the hosts content literaly, for instance <i>127.0.0.1 localhost</i>
  <p/>
  The default value is null, so the operating system hosts config is used.
 +++
-|[[maxQueries]]`maxQueries`|`Number (int)`|
-+++
+|[[maxQueries]]`@maxQueries`|`Number (int)`|+++
 Set the maximum number of queries when an hostname is resolved.
 +++
-|[[ndots]]`ndots`|`Number (int)`|
-+++
+|[[ndots]]`@ndots`|`Number (int)`|+++
 Set the ndots value used when resolving using search domains, the default value is <code>-1</code> which
  determines the value from the OS on Linux or uses the value <code>1</code>.
 +++
-|[[optResourceEnabled]]`optResourceEnabled`|`Boolean`|
-+++
+|[[optResourceEnabled]]`@optResourceEnabled`|`Boolean`|+++
 Set to true to enable the automatic inclusion in DNS queries of an optional record that hints
  the remote DNS server about how much data the resolver can read per response.
 +++
-|[[queryTimeout]]`queryTimeout`|`Number (long)`|
-+++
+|[[queryTimeout]]`@queryTimeout`|`Number (long)`|+++
 Set the query timeout in milliseconds, i.e the amount of time after a query is considered to be failed.
 +++
-|[[rdFlag]]`rdFlag`|`Boolean`|
-+++
+|[[rdFlag]]`@rdFlag`|`Boolean`|+++
 Set the DNS queries <i>Recursion Desired</i> flag value.
 +++
-|[[rotateServers]]`rotateServers`|`Boolean`|
-+++
+|[[rotateServers]]`@rotateServers`|`Boolean`|+++
 Set to <code>true</code> to enable round-robin selection of the dns server to use. It spreads the query load
  among the servers and avoids all lookup to hit the first server of the list.
 +++
-|[[searchDomains]]`searchDomains`|`Array of String`|
-+++
+|[[searchDomains]]`@searchDomains`|`Array of String`|+++
 Set the lists of DNS search domains.
  <p/>
  When the search domain list is null, the effective search domain list will be populated using
  the system DNS search domains.
 +++
-|[[servers]]`servers`|`Array of String`|
-+++
+|[[servers]]`@servers`|`Array of String`|+++
 Set the list of DNS server addresses, an address is the IP  of the dns server, followed by an optional
  colon and a port, e.g <code>8.8.8.8</code> or {code 192.168.0.1:40000}. When the list is empty, the resolver
  will use the list of the system DNS server addresses from the environment, if that list cannot be retrieved
@@ -95,36 +82,29 @@ Set the list of DNS server addresses, an address is the IP  of the dns server, f
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[argName]]`argName`|`String`|
-+++
+|[[argName]]`@argName`|`String`|+++
 Sets the argument name of this link.
 +++
-|[[defaultValue]]`defaultValue`|`String`|
-+++
+|[[defaultValue]]`@defaultValue`|`String`|+++
 Sets the default value of this link.
 +++
-|[[description]]`description`|`String`|
-+++
+|[[description]]`@description`|`String`|+++
 Sets the description of the link.
 +++
-|[[hidden]]`hidden`|`Boolean`|
-+++
+|[[hidden]]`@hidden`|`Boolean`|+++
 Sets whether or not the current link is hidden.
 +++
-|[[index]]`index`|`Number (int)`|
-+++
+|[[index]]`@index`|`Number (int)`|+++
 Sets the argument index.
 +++
-|[[multiValued]]`multiValued`|`Boolean`|
-+++
+|[[multiValued]]`@multiValued`|`Boolean`|+++
 Sets whether or not the argument can receive several values. Only the last argument can receive several values.
 +++
-|[[required]]`required`|`Boolean`|
-+++
+|[[required]]`@required`|`Boolean`|+++
 Sets whether or not the current link is required.
 +++
 |===
@@ -137,122 +117,120 @@ Sets whether or not the current link is required.
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[connectTimeout]]`connectTimeout`|`Number (int)`|
-+++
+|[[connectTimeout]]`@connectTimeout`|`Number (int)`|+++
 Set the connect timeout
 +++
-|[[crlPaths]]`crlPaths`|`Array of String`|
-+++
+|[[crlPaths]]`@crlPaths`|`Array of String`|+++
 Add a CRL path
 +++
-|[[crlValues]]`crlValues`|`Array of Buffer`|
-+++
+|[[crlValues]]`@crlValues`|`Array of Buffer`|+++
 Add a CRL value
 +++
-|[[enabledCipherSuites]]`enabledCipherSuites`|`Array of String`|
-+++
+|[[enabledCipherSuites]]`@enabledCipherSuites`|`Array of String`|+++
 Add an enabled cipher suite, appended to the ordered suites.
 +++
-|[[enabledSecureTransportProtocols]]`enabledSecureTransportProtocols`|`Array of String`|
+|[[enabledSecureTransportProtocols]]`@enabledSecureTransportProtocols`|`Array of String`|+++
+Sets the list of enabled SSL/TLS protocols.
 +++
-Add an enabled SSL/TLS protocols, appended to the ordered protocols.
-+++
-|[[idleTimeout]]`idleTimeout`|`Number (int)`|
-+++
-Set the idle timeout, in seconds. zero means don't timeout.
+|[[idleTimeout]]`@idleTimeout`|`Number (int)`|+++
+Set the idle timeout, default time unit is seconds. Zero means don't timeout.
  This determines if a connection will timeout and be closed if no data is received within the timeout.
+
+ If you want change default time unit, use link
 +++
-|[[jdkSslEngineOptions]]`jdkSslEngineOptions`|`link:dataobjects.html#JdkSSLEngineOptions[JdkSSLEngineOptions]`|-
-|[[keyStoreOptions]]`keyStoreOptions`|`link:dataobjects.html#JksOptions[JksOptions]`|
+|[[idleTimeoutUnit]]`@idleTimeoutUnit`|`link:enums.html#TimeUnit[TimeUnit]`|+++
+Set the idle timeout unit. If not specified, default is seconds.
 +++
-Set the key/cert options in jks format, aka Java keystore.
-+++
-|[[localAddress]]`localAddress`|`String`|
-+++
+|[[localAddress]]`@localAddress`|`String`|+++
 Set the local interface to bind for network connections. When the local address is null,
  it will pick any local address, the default local address is null.
 +++
-|[[logActivity]]`logActivity`|`Boolean`|
-+++
+|[[logActivity]]`@logActivity`|`Boolean`|+++
 Set to true to enabled network activity logging: Netty's pipeline is configured for logging on Netty's logger.
 +++
-|[[metricsName]]`metricsName`|`String`|
-+++
+|[[metricsName]]`@metricsName`|`String`|+++
 Set the metrics name identifying the reported metrics, useful for grouping metrics
  with the same name.
 +++
-|[[openSslEngineOptions]]`openSslEngineOptions`|`link:dataobjects.html#OpenSSLEngineOptions[OpenSSLEngineOptions]`|-
-|[[pemKeyCertOptions]]`pemKeyCertOptions`|`link:dataobjects.html#PemKeyCertOptions[PemKeyCertOptions]`|
-+++
-Set the key/cert store options in pem format.
-+++
-|[[pemTrustOptions]]`pemTrustOptions`|`link:dataobjects.html#PemTrustOptions[PemTrustOptions]`|
-+++
-Set the trust options in pem format
-+++
-|[[pfxKeyCertOptions]]`pfxKeyCertOptions`|`link:dataobjects.html#PfxOptions[PfxOptions]`|
-+++
-Set the key/cert options in pfx format.
-+++
-|[[pfxTrustOptions]]`pfxTrustOptions`|`link:dataobjects.html#PfxOptions[PfxOptions]`|
-+++
-Set the trust options in pfx format
-+++
-|[[proxyOptions]]`proxyOptions`|`link:dataobjects.html#ProxyOptions[ProxyOptions]`|
-+++
-Set proxy options for connections via CONNECT proxy (e.g. Squid) or a SOCKS proxy.
-+++
-|[[receiveBufferSize]]`receiveBufferSize`|`Number (int)`|
-+++
+|[[receiveBufferSize]]`@receiveBufferSize`|`Number (int)`|+++
 Set the TCP receive buffer size
 +++
-|[[reuseAddress]]`reuseAddress`|`Boolean`|
-+++
+|[[reuseAddress]]`@reuseAddress`|`Boolean`|+++
 Set the value of reuse address
 +++
-|[[sendBufferSize]]`sendBufferSize`|`Number (int)`|
+|[[reusePort]]`@reusePort`|`Boolean`|+++
+Set the value of reuse port.
+ <p/>
+ This is only supported by native transports.
 +++
+|[[sendBufferSize]]`@sendBufferSize`|`Number (int)`|+++
 Set the TCP send buffer size
 +++
-|[[soLinger]]`soLinger`|`Number (int)`|
-+++
+|[[soLinger]]`@soLinger`|`Number (int)`|+++
 Set whether SO_linger keep alive is enabled
 +++
-|[[ssl]]`ssl`|`Boolean`|
-+++
+|[[ssl]]`@ssl`|`Boolean`|+++
 Set whether SSL/TLS is enabled
 +++
-|[[tcpKeepAlive]]`tcpKeepAlive`|`Boolean`|
+|[[sslHandshakeTimeout]]`@sslHandshakeTimeout`|`Number (long)`|+++
+Set the SSL handshake timeout, default time unit is seconds.
 +++
+|[[sslHandshakeTimeoutUnit]]`@sslHandshakeTimeoutUnit`|`link:enums.html#TimeUnit[TimeUnit]`|+++
+Set the SSL handshake timeout unit. If not specified, default is seconds.
++++
+|[[tcpCork]]`@tcpCork`|`Boolean`|+++
+Enable the <code>TCP_CORK</code> option - only with linux native transport.
++++
+|[[tcpFastOpen]]`@tcpFastOpen`|`Boolean`|+++
+Enable the <code>TCP_FASTOPEN</code> option - only with linux native transport.
++++
+|[[tcpKeepAlive]]`@tcpKeepAlive`|`Boolean`|+++
 Set whether TCP keep alive is enabled
 +++
-|[[tcpNoDelay]]`tcpNoDelay`|`Boolean`|
-+++
+|[[tcpNoDelay]]`@tcpNoDelay`|`Boolean`|+++
 Set whether TCP no delay is enabled
 +++
-|[[trafficClass]]`trafficClass`|`Number (int)`|
+|[[tcpQuickAck]]`@tcpQuickAck`|`Boolean`|+++
+Enable the <code>TCP_QUICKACK</code> option - only with linux native transport.
 +++
+|[[trafficClass]]`@trafficClass`|`Number (int)`|+++
 Set the value of traffic class
 +++
-|[[trustAll]]`trustAll`|`Boolean`|
-+++
+|[[trustAll]]`@trustAll`|`Boolean`|+++
 Set whether all server certificates should be trusted
 +++
-|[[trustStoreOptions]]`trustStoreOptions`|`link:dataobjects.html#JksOptions[JksOptions]`|
-+++
-Set the trust options in jks format, aka Java truststore
-+++
-|[[useAlpn]]`useAlpn`|`Boolean`|
-+++
+|[[useAlpn]]`@useAlpn`|`Boolean`|+++
 Set the ALPN usage.
 +++
-|[[usePooledBuffers]]`usePooledBuffers`|`Boolean`|
+|===
+
+[[CopyOptions]]
+== CopyOptions
+
+++++
+ Describes the copy (and move) options.
+++++
+'''
+
+[cols=">25%,25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[atomicMove]]`@atomicMove`|`Boolean`|+++
+Whether move should be performed as an atomic filesystem operation. Defaults to <code>false</code>.
 +++
-Set whether Netty pooled buffers are enabled
+|[[copyAttributes]]`@copyAttributes`|`Boolean`|+++
+Whether the file attributes should be copied. Defaults to <code>false</code>.
++++
+|[[nofollowLinks]]`@nofollowLinks`|`Boolean`|+++
+Whether symbolic links should not be followed during copy or move operations. Defaults to <code>false</code>.
++++
+|[[replaceExisting]]`@replaceExisting`|`Boolean`|+++
+Whether an existing file, empty directory, or link should be replaced. Defaults to <code>false</code>.
 +++
 |===
 
@@ -264,48 +242,43 @@ Set whether Netty pooled buffers are enabled
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[broadcast]]`broadcast`|`Boolean`|
+|[[broadcast]]`@broadcast`|`Boolean`|+++
+Set if the socket can send or receive broadcast packets
 +++
-Set if the socket can receive broadcast packets
-+++
-|[[ipV6]]`ipV6`|`Boolean`|
-+++
+|[[ipV6]]`@ipV6`|`Boolean`|+++
 Set if IP v6 should be used
 +++
-|[[logActivity]]`logActivity`|`Boolean`|
-+++
+|[[logActivity]]`@logActivity`|`Boolean`|+++
 Set to true to enabled network activity logging: Netty's pipeline is configured for logging on Netty's logger.
 +++
-|[[loopbackModeDisabled]]`loopbackModeDisabled`|`Boolean`|
-+++
+|[[loopbackModeDisabled]]`@loopbackModeDisabled`|`Boolean`|+++
 Set if loopback mode is disabled
 +++
-|[[multicastNetworkInterface]]`multicastNetworkInterface`|`String`|
-+++
+|[[multicastNetworkInterface]]`@multicastNetworkInterface`|`String`|+++
 Set the multicast network interface address
 +++
-|[[multicastTimeToLive]]`multicastTimeToLive`|`Number (int)`|
-+++
+|[[multicastTimeToLive]]`@multicastTimeToLive`|`Number (int)`|+++
 Set the multicast ttl value
 +++
-|[[receiveBufferSize]]`receiveBufferSize`|`Number (int)`|
-+++
+|[[receiveBufferSize]]`@receiveBufferSize`|`Number (int)`|+++
 Set the TCP receive buffer size
 +++
-|[[reuseAddress]]`reuseAddress`|`Boolean`|
-+++
+|[[reuseAddress]]`@reuseAddress`|`Boolean`|+++
 Set the value of reuse address
 +++
-|[[sendBufferSize]]`sendBufferSize`|`Number (int)`|
+|[[reusePort]]`@reusePort`|`Boolean`|+++
+Set the value of reuse port.
+ <p/>
+ This is only supported by native transports.
 +++
+|[[sendBufferSize]]`@sendBufferSize`|`Number (int)`|+++
 Set the TCP send buffer size
 +++
-|[[trafficClass]]`trafficClass`|`Number (int)`|
-+++
+|[[trafficClass]]`@trafficClass`|`Number (int)`|+++
 Set the value of traffic class
 +++
 |===
@@ -321,23 +294,26 @@ Set the value of traffic class
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[codecName]]`codecName`|`String`|
-+++
+|[[codecName]]`@codecName`|`String`|+++
 Set the codec name.
 +++
-|[[headers]]`headers`|`String`|
-+++
+|[[headers]]`@headers`|`String`|+++
 Add a message header.
  <p>
  Message headers can be sent with any message and will be accessible with link
  at the recipient.
 +++
-|[[sendTimeout]]`sendTimeout`|`Number (long)`|
+|[[localOnly]]`@localOnly`|`Boolean`|+++
+Whether a message should be delivered to local consumers only. Defaults to <code>false</code>.
+
+ <p>
+ <strong>This option is effective in clustered mode only and does not apply to reply messages</strong>.
 +++
+|[[sendTimeout]]`@sendTimeout`|`Number (long)`|+++
 Set the send timeout.
 +++
 |===
@@ -351,56 +327,65 @@ Set the send timeout.
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[config]]`config`|`Json object`|
-+++
+|[[config]]`@config`|`Json object`|+++
 Set the JSON configuration that will be passed to the verticle(s) when it's deployed
 +++
-|[[extraClasspath]]`extraClasspath`|`Array of String`|
-+++
-Set any extra classpath to be used when deploying the verticle.
- <p>
- Ignored if no isolation group is set.
-+++
-|[[ha]]`ha`|`Boolean`|
-+++
+|[[ha]]`@ha`|`Boolean`|+++
 Set whether the verticle(s) will be deployed as HA.
 +++
-|[[instances]]`instances`|`Number (int)`|
-+++
+|[[instances]]`@instances`|`Number (int)`|+++
 Set the number of instances that should be deployed.
 +++
-|[[isolatedClasses]]`isolatedClasses`|`Array of String`|
+|[[maxWorkerExecuteTime]]`@maxWorkerExecuteTime`|`Number (long)`|+++
+Sets the value of max worker execute time, in link.
+ <p>
+ The default value of link is
 +++
-Set the isolated class names.
+|[[maxWorkerExecuteTimeUnit]]`@maxWorkerExecuteTimeUnit`|`link:enums.html#TimeUnit[TimeUnit]`|+++
+Set the time unit of <code>maxWorkerExecuteTime</code>
 +++
-|[[isolationGroup]]`isolationGroup`|`String`|
-+++
-Set the isolation group that will be used when deploying the verticle(s)
-+++
-|[[maxWorkerExecuteTime]]`maxWorkerExecuteTime`|`Number (long)`|
-+++
-Sets the value of max worker execute time, in ns.
-+++
-|[[multiThreaded]]`multiThreaded`|`Boolean`|
-+++
-Set whether the verticle(s) should be deployed as a multi-threaded worker verticle
-+++
-|[[worker]]`worker`|`Boolean`|
-+++
+|[[worker]]`@worker`|`Boolean`|+++
 Set whether the verticle(s) should be deployed as a worker verticle
 +++
-|[[workerPoolName]]`workerPoolName`|`String`|
-+++
+|[[workerPoolName]]`@workerPoolName`|`String`|+++
 Set the worker pool name to use for this verticle. When no name is set, the Vert.x
  worker pool will be used, when a name is set, the verticle will use a named worker pool.
 +++
-|[[workerPoolSize]]`workerPoolSize`|`Number (int)`|
-+++
+|[[workerPoolSize]]`@workerPoolSize`|`Number (int)`|+++
 Set the maximum number of worker threads to be used by the Vert.x instance.
++++
+|===
+
+[[DnsClientOptions]]
+== DnsClientOptions
+
+++++
+ Configuration options for Vert.x DNS client.
+++++
+'''
+
+[cols=">25%,25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[host]]`@host`|`String`|+++
+Set the host name to be used by this client in requests.
++++
+|[[logActivity]]`@logActivity`|`Boolean`|+++
+Set to true to enabled network activity logging: Netty's pipeline is configured for logging on Netty's logger.
++++
+|[[port]]`@port`|`Number (int)`|+++
+Set the port to be used by this client in requests.
++++
+|[[queryTimeout]]`@queryTimeout`|`Number (long)`|+++
+Set the query timeout in milliseconds, i.e the amount of time after a query is considered to be failed.
++++
+|[[recursionDesired]]`@recursionDesired`|`Boolean`|+++
+Set whether or not recursion is desired
 +++
 |===
 
@@ -412,28 +397,23 @@ Set the maximum number of worker threads to be used by the Vert.x instance.
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[acceptBacklog]]`acceptBacklog`|`Number (int)`|
-+++
+|[[acceptBacklog]]`@acceptBacklog`|`Number (int)`|+++
 Set the accept back log.
 +++
-|[[clientAuth]]`clientAuth`|`link:enums.html#ClientAuth[ClientAuth]`|
-+++
+|[[clientAuth]]`@clientAuth`|`link:enums.html#ClientAuth[ClientAuth]`|+++
 Set whether client auth is required
 +++
-|[[clusterPingInterval]]`clusterPingInterval`|`Number (long)`|
-+++
+|[[clusterPingInterval]]`@clusterPingInterval`|`Number (long)`|+++
 Set the value of cluster ping interval, in ms.
 +++
-|[[clusterPingReplyInterval]]`clusterPingReplyInterval`|`Number (long)`|
-+++
+|[[clusterPingReplyInterval]]`@clusterPingReplyInterval`|`Number (long)`|+++
 Set the value of cluster ping reply interval, in ms.
 +++
-|[[clusterPublicHost]]`clusterPublicHost`|`String`|
-+++
+|[[clusterPublicHost]]`@clusterPublicHost`|`String`|+++
 Set the public facing hostname to be used for clustering.
  Sometimes, e.g. when running on certain clouds, the local address the server listens on for clustering is
  not the same address that other nodes connect to it at, as the OS / cloud infrastructure does some kind of
@@ -442,128 +422,125 @@ Set the public facing hostname to be used for clustering.
  <p>
  The default value is null which means use the same as the cluster hostname.
 +++
-|[[clusterPublicPort]]`clusterPublicPort`|`Number (int)`|
-+++
+|[[clusterPublicPort]]`@clusterPublicPort`|`Number (int)`|+++
 See link for an explanation.
 +++
-|[[clustered]]`clustered`|`Boolean`|
-+++
-Sets whether or not the event bus is clustered.
-+++
-|[[connectTimeout]]`connectTimeout`|`Number (int)`|
-+++
+|[[connectTimeout]]`@connectTimeout`|`Number (int)`|+++
 Sets the connect timeout
 +++
-|[[crlPaths]]`crlPaths`|`Array of String`|
-+++
+|[[crlPaths]]`@crlPaths`|`Array of String`|+++
 Add a CRL path
 +++
-|[[crlValues]]`crlValues`|`Array of Buffer`|
-+++
+|[[crlValues]]`@crlValues`|`Array of Buffer`|+++
 Add a CRL value
 +++
-|[[enabledCipherSuites]]`enabledCipherSuites`|`Array of String`|
-+++
+|[[enabledCipherSuites]]`@enabledCipherSuites`|`Array of String`|+++
 Add an enabled cipher suite, appended to the ordered suites.
 +++
-|[[enabledSecureTransportProtocols]]`enabledSecureTransportProtocols`|`Array of String`|
+|[[enabledSecureTransportProtocols]]`@enabledSecureTransportProtocols`|`Array of String`|+++
+Sets the list of enabled SSL/TLS protocols.
 +++
-Add an enabled SSL/TLS protocols, appended to the ordered protocols.
-+++
-|[[host]]`host`|`String`|
-+++
+|[[host]]`@host`|`String`|+++
 Sets the host.
 +++
-|[[idleTimeout]]`idleTimeout`|`Number (int)`|
-+++
-Set the idle timeout, in seconds. zero means don't timeout.
+|[[idleTimeout]]`@idleTimeout`|`Number (int)`|+++
+Set the idle timeout, default time unit is seconds. Zero means don't timeout.
  This determines if a connection will timeout and be closed if no data is received within the timeout.
+
+ If you want change default time unit, use link
 +++
-|[[jdkSslEngineOptions]]`jdkSslEngineOptions`|`link:dataobjects.html#JdkSSLEngineOptions[JdkSSLEngineOptions]`|-
-|[[keyStoreOptions]]`keyStoreOptions`|`link:dataobjects.html#JksOptions[JksOptions]`|
+|[[idleTimeoutUnit]]`@idleTimeoutUnit`|`link:enums.html#TimeUnit[TimeUnit]`|+++
+Set the idle timeout unit. If not specified, default is seconds.
 +++
-Set the key/cert options in jks format, aka Java keystore.
-+++
-|[[logActivity]]`logActivity`|`Boolean`|
-+++
+|[[logActivity]]`@logActivity`|`Boolean`|+++
 Set to true to enabled network activity logging: Netty's pipeline is configured for logging on Netty's logger.
 +++
-|[[openSslEngineOptions]]`openSslEngineOptions`|`link:dataobjects.html#OpenSSLEngineOptions[OpenSSLEngineOptions]`|-
-|[[pemKeyCertOptions]]`pemKeyCertOptions`|`link:dataobjects.html#PemKeyCertOptions[PemKeyCertOptions]`|
-+++
-Set the key/cert store options in pem format.
-+++
-|[[pemTrustOptions]]`pemTrustOptions`|`link:dataobjects.html#PemTrustOptions[PemTrustOptions]`|
-+++
-Set the trust options in pem format
-+++
-|[[pfxKeyCertOptions]]`pfxKeyCertOptions`|`link:dataobjects.html#PfxOptions[PfxOptions]`|
-+++
-Set the key/cert options in pfx format.
-+++
-|[[pfxTrustOptions]]`pfxTrustOptions`|`link:dataobjects.html#PfxOptions[PfxOptions]`|
-+++
-Set the trust options in pfx format
-+++
-|[[port]]`port`|`Number (int)`|
-+++
+|[[port]]`@port`|`Number (int)`|+++
 Sets the port.
 +++
-|[[receiveBufferSize]]`receiveBufferSize`|`Number (int)`|
-+++
+|[[receiveBufferSize]]`@receiveBufferSize`|`Number (int)`|+++
 Set the TCP receive buffer size
 +++
-|[[reconnectAttempts]]`reconnectAttempts`|`Number (int)`|
-+++
+|[[reconnectAttempts]]`@reconnectAttempts`|`Number (int)`|+++
 Sets the value of reconnect attempts.
 +++
-|[[reconnectInterval]]`reconnectInterval`|`Number (long)`|
-+++
+|[[reconnectInterval]]`@reconnectInterval`|`Number (long)`|+++
 Set the reconnect interval.
 +++
-|[[reuseAddress]]`reuseAddress`|`Boolean`|
-+++
+|[[reuseAddress]]`@reuseAddress`|`Boolean`|+++
 Set the value of reuse address
 +++
-|[[sendBufferSize]]`sendBufferSize`|`Number (int)`|
+|[[reusePort]]`@reusePort`|`Boolean`|+++
+Set the value of reuse port.
+ <p/>
+ This is only supported by native transports.
 +++
+|[[sendBufferSize]]`@sendBufferSize`|`Number (int)`|+++
 Set the TCP send buffer size
 +++
-|[[soLinger]]`soLinger`|`Number (int)`|
-+++
+|[[soLinger]]`@soLinger`|`Number (int)`|+++
 Set whether SO_linger keep alive is enabled
 +++
-|[[ssl]]`ssl`|`Boolean`|
-+++
+|[[ssl]]`@ssl`|`Boolean`|+++
 Set whether SSL/TLS is enabled
 +++
-|[[tcpKeepAlive]]`tcpKeepAlive`|`Boolean`|
+|[[sslHandshakeTimeout]]`@sslHandshakeTimeout`|`Number (long)`|+++
+Set the SSL handshake timeout, default time unit is seconds.
 +++
+|[[sslHandshakeTimeoutUnit]]`@sslHandshakeTimeoutUnit`|`link:enums.html#TimeUnit[TimeUnit]`|+++
+Set the SSL handshake timeout unit. If not specified, default is seconds.
++++
+|[[tcpCork]]`@tcpCork`|`Boolean`|+++
+Enable the <code>TCP_CORK</code> option - only with linux native transport.
++++
+|[[tcpFastOpen]]`@tcpFastOpen`|`Boolean`|+++
+Enable the <code>TCP_FASTOPEN</code> option - only with linux native transport.
++++
+|[[tcpKeepAlive]]`@tcpKeepAlive`|`Boolean`|+++
 Set whether TCP keep alive is enabled
 +++
-|[[tcpNoDelay]]`tcpNoDelay`|`Boolean`|
-+++
+|[[tcpNoDelay]]`@tcpNoDelay`|`Boolean`|+++
 Set whether TCP no delay is enabled
 +++
-|[[trafficClass]]`trafficClass`|`Number (int)`|
+|[[tcpQuickAck]]`@tcpQuickAck`|`Boolean`|+++
+Enable the <code>TCP_QUICKACK</code> option - only with linux native transport.
 +++
+|[[trafficClass]]`@trafficClass`|`Number (int)`|+++
 Set the value of traffic class
 +++
-|[[trustAll]]`trustAll`|`Boolean`|
-+++
+|[[trustAll]]`@trustAll`|`Boolean`|+++
 Set whether all server certificates should be trusted.
 +++
-|[[trustStoreOptions]]`trustStoreOptions`|`link:dataobjects.html#JksOptions[JksOptions]`|
-+++
-Set the trust options in jks format, aka Java truststore
-+++
-|[[useAlpn]]`useAlpn`|`Boolean`|
-+++
+|[[useAlpn]]`@useAlpn`|`Boolean`|+++
 Set the ALPN usage.
 +++
-|[[usePooledBuffers]]`usePooledBuffers`|`Boolean`|
+|===
+
+[[FileSystemOptions]]
+== FileSystemOptions
+
+++++
+ Vert.x file system base configuration, this class can be extended by provider implementations to configure
+ those specific implementations.
+++++
+'''
+
+[cols=">25%,25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[classPathResolvingEnabled]]`@classPathResolvingEnabled`|`Boolean`|+++
+When vert.x cannot find the file on the filesystem it tries to resolve the
+ file from the class path when this is set to <code>true</code>.
 +++
-Set whether Netty pooled buffers are enabled
+|[[fileCacheDir]]`@fileCacheDir`|`String`|+++
+When vert.x reads a file that is packaged with the application it gets
+ extracted to this directory first and subsequent reads will use the extracted
+ file to get better IO performance.
++++
+|[[fileCachingEnabled]]`@fileCachingEnabled`|`Boolean`|+++
+Set to <code>true</code> to cache files on the real file system
+ when the filesystem performs class path resolving.
 +++
 |===
 
@@ -575,20 +552,17 @@ Set whether Netty pooled buffers are enabled
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[debugData]]`debugData`|`Buffer`|
-+++
+|[[debugData]]`@debugData`|`Buffer`|+++
 Set the additional debug data
 +++
-|[[errorCode]]`errorCode`|`Number (long)`|
-+++
+|[[errorCode]]`@errorCode`|`Number (long)`|+++
 
 +++
-|[[lastStreamId]]`lastStreamId`|`Number (int)`|
-+++
+|[[lastStreamId]]`@lastStreamId`|`Number (int)`|+++
 Set the last stream id.
 +++
 |===
@@ -604,32 +578,26 @@ Set the last stream id.
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[headerTableSize]]`headerTableSize`|`Number (long)`|
-+++
+|[[headerTableSize]]`@headerTableSize`|`Number (long)`|+++
 Set  HTTP/2 setting.
 +++
-|[[initialWindowSize]]`initialWindowSize`|`Number (int)`|
-+++
+|[[initialWindowSize]]`@initialWindowSize`|`Number (int)`|+++
 Set the  HTTP/2 setting
 +++
-|[[maxConcurrentStreams]]`maxConcurrentStreams`|`Number (long)`|
-+++
+|[[maxConcurrentStreams]]`@maxConcurrentStreams`|`Number (long)`|+++
 Set the  HTTP/2 setting
 +++
-|[[maxFrameSize]]`maxFrameSize`|`Number (int)`|
-+++
+|[[maxFrameSize]]`@maxFrameSize`|`Number (int)`|+++
 Set the  HTTP/2 setting
 +++
-|[[maxHeaderListSize]]`maxHeaderListSize`|`Number (long)`|
-+++
+|[[maxHeaderListSize]]`@maxHeaderListSize`|`Number (long)`|+++
 Set the  HTTP/2 setting
 +++
-|[[pushEnabled]]`pushEnabled`|`Boolean`|
-+++
+|[[pushEnabled]]`@pushEnabled`|`Boolean`|+++
 Set the  HTTP/2 setting
 +++
 |===
@@ -642,12 +610,11 @@ Set the  HTTP/2 setting
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[alpnVersions]]`alpnVersions`|`Array of link:enums.html#HttpVersion[HttpVersion]`|
-+++
+|[[alpnVersions]]`@alpnVersions`|`Array of link:enums.html#HttpVersion[HttpVersion]`|+++
 Set the list of protocol versions to provide to the server during the Application-Layer Protocol Negotiation.
  When the list is empty, the client provides a best effort list according to link:
 
@@ -656,53 +623,56 @@ Set the list of protocol versions to provide to the server during the Applicatio
    <li>otherwise: [link]</li>
  </ul>
 +++
-|[[connectTimeout]]`connectTimeout`|`Number (int)`|
-+++
+|[[connectTimeout]]`@connectTimeout`|`Number (int)`|+++
 Set the connect timeout
 +++
-|[[crlPaths]]`crlPaths`|`Array of String`|
-+++
+|[[crlPaths]]`@crlPaths`|`Array of String`|+++
 Add a CRL path
 +++
-|[[crlValues]]`crlValues`|`Array of Buffer`|
-+++
+|[[crlValues]]`@crlValues`|`Array of Buffer`|+++
 Add a CRL value
 +++
-|[[defaultHost]]`defaultHost`|`String`|
+|[[decoderInitialBufferSize]]`@decoderInitialBufferSize`|`Number (int)`|+++
+set to <code>initialBufferSizeHttpDecoder</code> the initial buffer of the HttpDecoder.
 +++
+|[[defaultHost]]`@defaultHost`|`String`|+++
 Set the default host name to be used by this client in requests if none is provided when making the request.
 +++
-|[[defaultPort]]`defaultPort`|`Number (int)`|
-+++
+|[[defaultPort]]`@defaultPort`|`Number (int)`|+++
 Set the default port to be used by this client in requests if none is provided when making the request.
 +++
-|[[enabledCipherSuites]]`enabledCipherSuites`|`Array of String`|
-+++
+|[[enabledCipherSuites]]`@enabledCipherSuites`|`Array of String`|+++
 Add an enabled cipher suite, appended to the ordered suites.
 +++
-|[[enabledSecureTransportProtocols]]`enabledSecureTransportProtocols`|`Array of String`|
+|[[enabledSecureTransportProtocols]]`@enabledSecureTransportProtocols`|`Array of String`|+++
+Sets the list of enabled SSL/TLS protocols.
 +++
-Add an enabled SSL/TLS protocols, appended to the ordered protocols.
+|[[forceSni]]`@forceSni`|`Boolean`|+++
+By default, the server name is only sent for Fully Qualified Domain Name (FQDN), setting
+ this property to <code>true</code> forces the server name to be always sent.
 +++
-|[[http2ClearTextUpgrade]]`http2ClearTextUpgrade`|`Boolean`|
-+++
+|[[http2ClearTextUpgrade]]`@http2ClearTextUpgrade`|`Boolean`|+++
 Set to <code>true</code> when an <i>h2c</i> connection is established using an HTTP/1.1 upgrade request, and <code>false</code>
  when an <i>h2c</i> connection is established directly (with prior knowledge).
 +++
-|[[http2ConnectionWindowSize]]`http2ConnectionWindowSize`|`Number (int)`|
-+++
+|[[http2ConnectionWindowSize]]`@http2ConnectionWindowSize`|`Number (int)`|+++
 Set the default HTTP/2 connection window size. It overrides the initial window
  size set by link, so the connection window size
  is greater than for its streams, in order the data throughput.
  <p/>
  A value of <code>-1</code> reuses the initial window size setting.
 +++
-|[[http2MaxPoolSize]]`http2MaxPoolSize`|`Number (int)`|
+|[[http2KeepAliveTimeout]]`@http2KeepAliveTimeout`|`Number (int)`|+++
+Set the keep alive timeout for HTTP/2 connections, in seconds.
+ <p/>
+ This value determines how long a connection remains unused in the pool before being evicted and closed.
+ <p/>
+ A timeout of <code>0</code> means there is no timeout.
 +++
+|[[http2MaxPoolSize]]`@http2MaxPoolSize`|`Number (int)`|+++
 Set the maximum pool size for HTTP/2 connections
 +++
-|[[http2MultiplexingLimit]]`http2MultiplexingLimit`|`Number (int)`|
-+++
+|[[http2MultiplexingLimit]]`@http2MultiplexingLimit`|`Number (int)`|+++
 Set a client limit of the number concurrent streams for each HTTP/2 connection, this limits the number
  of streams the client can create for a connection. The effective number of streams for a
  connection is the min of this value and the server's initial settings.
@@ -710,166 +680,172 @@ Set a client limit of the number concurrent streams for each HTTP/2 connection, 
  Setting the value to <code>-1</code> means to use the value sent by the server's initial settings.
  <code>-1</code> is the default value.
 +++
-|[[idleTimeout]]`idleTimeout`|`Number (int)`|
-+++
-Set the idle timeout, in seconds. zero means don't timeout.
+|[[idleTimeout]]`@idleTimeout`|`Number (int)`|+++
+Set the idle timeout, default time unit is seconds. Zero means don't timeout.
  This determines if a connection will timeout and be closed if no data is received within the timeout.
+
+ If you want change default time unit, use link
 +++
-|[[initialSettings]]`initialSettings`|`link:dataobjects.html#Http2Settings[Http2Settings]`|
+|[[idleTimeoutUnit]]`@idleTimeoutUnit`|`link:enums.html#TimeUnit[TimeUnit]`|+++
+Set the idle timeout unit. If not specified, default is seconds.
 +++
-Set the HTTP/2 connection settings immediately sent by to the server when the client connects.
-+++
-|[[jdkSslEngineOptions]]`jdkSslEngineOptions`|`link:dataobjects.html#JdkSSLEngineOptions[JdkSSLEngineOptions]`|-
-|[[keepAlive]]`keepAlive`|`Boolean`|
-+++
+|[[keepAlive]]`@keepAlive`|`Boolean`|+++
 Set whether keep alive is enabled on the client
 +++
-|[[keyStoreOptions]]`keyStoreOptions`|`link:dataobjects.html#JksOptions[JksOptions]`|
+|[[keepAliveTimeout]]`@keepAliveTimeout`|`Number (int)`|+++
+Set the keep alive timeout for HTTP/1.x, in seconds.
+ <p/>
+ This value determines how long a connection remains unused in the pool before being evicted and closed.
+ <p/>
+ A timeout of <code>0</code> means there is no timeout.
 +++
-Set the key/cert options in jks format, aka Java keystore.
-+++
-|[[localAddress]]`localAddress`|`String`|
-+++
+|[[localAddress]]`@localAddress`|`String`|+++
 Set the local interface to bind for network connections. When the local address is null,
  it will pick any local address, the default local address is null.
 +++
-|[[logActivity]]`logActivity`|`Boolean`|
-+++
+|[[logActivity]]`@logActivity`|`Boolean`|+++
 Set to true to enabled network activity logging: Netty's pipeline is configured for logging on Netty's logger.
 +++
-|[[maxChunkSize]]`maxChunkSize`|`Number (int)`|
-+++
+|[[maxChunkSize]]`@maxChunkSize`|`Number (int)`|+++
 Set the maximum HTTP chunk size
 +++
-|[[maxHeaderSize]]`maxHeaderSize`|`Number (int)`|
-+++
+|[[maxHeaderSize]]`@maxHeaderSize`|`Number (int)`|+++
 Set the maximum length of all headers for HTTP/1.x .
 +++
-|[[maxInitialLineLength]]`maxInitialLineLength`|`Number (int)`|
-+++
+|[[maxInitialLineLength]]`@maxInitialLineLength`|`Number (int)`|+++
 Set the maximum length of the initial line for HTTP/1.x (e.g. <code>"HTTP/1.1 200 OK"</code>)
 +++
-|[[maxPoolSize]]`maxPoolSize`|`Number (int)`|
-+++
+|[[maxPoolSize]]`@maxPoolSize`|`Number (int)`|+++
 Set the maximum pool size for connections
 +++
-|[[maxRedirects]]`maxRedirects`|`Number (int)`|
-+++
+|[[maxRedirects]]`@maxRedirects`|`Number (int)`|+++
 Set to <code>maxRedirects</code> the maximum number of redirection a request can follow.
 +++
-|[[maxWaitQueueSize]]`maxWaitQueueSize`|`Number (int)`|
-+++
+|[[maxWaitQueueSize]]`@maxWaitQueueSize`|`Number (int)`|+++
 Set the maximum requests allowed in the wait queue, any requests beyond the max size will result in
  a ConnectionPoolTooBusyException.  If the value is set to a negative number then the queue will be unbounded.
 +++
-|[[maxWebsocketFrameSize]]`maxWebsocketFrameSize`|`Number (int)`|
+|[[maxWebSocketFrameSize]]`@maxWebSocketFrameSize`|`Number (int)`|+++
+Set the max WebSocket frame size
 +++
-Set the max websocket frame size
+|[[maxWebSocketMessageSize]]`@maxWebSocketMessageSize`|`Number (int)`|+++
+Set the max WebSocket message size
 +++
-|[[maxWebsocketMessageSize]]`maxWebsocketMessageSize`|`Number (int)`|
-+++
-Set the max websocket message size
-+++
-|[[metricsName]]`metricsName`|`String`|
-+++
+|[[metricsName]]`@metricsName`|`String`|+++
 Set the metrics name identifying the reported metrics, useful for grouping metrics
  with the same name.
 +++
-|[[openSslEngineOptions]]`openSslEngineOptions`|`link:dataobjects.html#OpenSSLEngineOptions[OpenSSLEngineOptions]`|-
-|[[pemKeyCertOptions]]`pemKeyCertOptions`|`link:dataobjects.html#PemKeyCertOptions[PemKeyCertOptions]`|
-+++
-Set the key/cert store options in pem format.
-+++
-|[[pemTrustOptions]]`pemTrustOptions`|`link:dataobjects.html#PemTrustOptions[PemTrustOptions]`|
-+++
-Set the trust options in pem format
-+++
-|[[pfxKeyCertOptions]]`pfxKeyCertOptions`|`link:dataobjects.html#PfxOptions[PfxOptions]`|
-+++
-Set the key/cert options in pfx format.
-+++
-|[[pfxTrustOptions]]`pfxTrustOptions`|`link:dataobjects.html#PfxOptions[PfxOptions]`|
-+++
-Set the trust options in pfx format
-+++
-|[[pipelining]]`pipelining`|`Boolean`|
-+++
+|[[pipelining]]`@pipelining`|`Boolean`|+++
 Set whether pipe-lining is enabled on the client
 +++
-|[[pipeliningLimit]]`pipeliningLimit`|`Number (int)`|
-+++
+|[[pipeliningLimit]]`@pipeliningLimit`|`Number (int)`|+++
 Set the limit of pending requests a pipe-lined HTTP/1 connection can send.
 +++
-|[[protocolVersion]]`protocolVersion`|`link:enums.html#HttpVersion[HttpVersion]`|
+|[[poolCleanerPeriod]]`@poolCleanerPeriod`|`Number (int)`|+++
+Set the connection pool cleaner period in milli seconds, a non positive value disables expiration checks and connections
+ will remain in the pool until they are closed.
 +++
+|[[protocolVersion]]`@protocolVersion`|`link:enums.html#HttpVersion[HttpVersion]`|+++
 Set the protocol version.
 +++
-|[[proxyOptions]]`proxyOptions`|`link:dataobjects.html#ProxyOptions[ProxyOptions]`|
-+++
-Set proxy options for connections via CONNECT proxy (e.g. Squid) or a SOCKS proxy.
-+++
-|[[receiveBufferSize]]`receiveBufferSize`|`Number (int)`|
-+++
+|[[receiveBufferSize]]`@receiveBufferSize`|`Number (int)`|+++
 Set the TCP receive buffer size
 +++
-|[[reuseAddress]]`reuseAddress`|`Boolean`|
-+++
+|[[reuseAddress]]`@reuseAddress`|`Boolean`|+++
 Set the value of reuse address
 +++
-|[[sendBufferSize]]`sendBufferSize`|`Number (int)`|
+|[[reusePort]]`@reusePort`|`Boolean`|+++
+Set the value of reuse port.
+ <p/>
+ This is only supported by native transports.
 +++
+|[[sendBufferSize]]`@sendBufferSize`|`Number (int)`|+++
 Set the TCP send buffer size
 +++
-|[[sendUnmaskedFrames]]`sendUnmaskedFrames`|`Boolean`|
+|[[sendUnmaskedFrames]]`@sendUnmaskedFrames`|`Boolean`|+++
+Set <code>true</code> when the client wants to skip frame masking.
+ <p>
+ You may want to set it <code>true</code> on server by server WebSocket communication: in this case you are by passing
+ RFC6455 protocol.
+ <p>
+ It's <code>false</code> as default.
 +++
-Set true when the client wants to skip frame masking.
- You may want to set it true on server by server websocket communication: In this case you are by passing RFC6455 protocol.
- It's false as default.
-+++
-|[[soLinger]]`soLinger`|`Number (int)`|
-+++
+|[[soLinger]]`@soLinger`|`Number (int)`|+++
 Set whether SO_linger keep alive is enabled
 +++
-|[[ssl]]`ssl`|`Boolean`|
-+++
+|[[ssl]]`@ssl`|`Boolean`|+++
 Set whether SSL/TLS is enabled
 +++
-|[[tcpKeepAlive]]`tcpKeepAlive`|`Boolean`|
+|[[sslHandshakeTimeout]]`@sslHandshakeTimeout`|`Number (long)`|+++
+Set the SSL handshake timeout, default time unit is seconds.
 +++
+|[[sslHandshakeTimeoutUnit]]`@sslHandshakeTimeoutUnit`|`link:enums.html#TimeUnit[TimeUnit]`|+++
+Set the SSL handshake timeout unit. If not specified, default is seconds.
++++
+|[[tcpCork]]`@tcpCork`|`Boolean`|+++
+Enable the <code>TCP_CORK</code> option - only with linux native transport.
++++
+|[[tcpFastOpen]]`@tcpFastOpen`|`Boolean`|+++
+Enable the <code>TCP_FASTOPEN</code> option - only with linux native transport.
++++
+|[[tcpKeepAlive]]`@tcpKeepAlive`|`Boolean`|+++
 Set whether TCP keep alive is enabled
 +++
-|[[tcpNoDelay]]`tcpNoDelay`|`Boolean`|
-+++
+|[[tcpNoDelay]]`@tcpNoDelay`|`Boolean`|+++
 Set whether TCP no delay is enabled
 +++
-|[[trafficClass]]`trafficClass`|`Number (int)`|
+|[[tcpQuickAck]]`@tcpQuickAck`|`Boolean`|+++
+Enable the <code>TCP_QUICKACK</code> option - only with linux native transport.
 +++
+|[[trafficClass]]`@trafficClass`|`Number (int)`|+++
 Set the value of traffic class
 +++
-|[[trustAll]]`trustAll`|`Boolean`|
-+++
+|[[trustAll]]`@trustAll`|`Boolean`|+++
 Set whether all server certificates should be trusted
 +++
-|[[trustStoreOptions]]`trustStoreOptions`|`link:dataobjects.html#JksOptions[JksOptions]`|
-+++
-Set the trust options in jks format, aka Java truststore
-+++
-|[[tryUseCompression]]`tryUseCompression`|`Boolean`|
-+++
+|[[tryUseCompression]]`@tryUseCompression`|`Boolean`|+++
 Set whether compression is enabled
 +++
-|[[useAlpn]]`useAlpn`|`Boolean`|
+|[[tryUsePerFrameWebSocketCompression]]`@tryUsePerFrameWebSocketCompression`|`Boolean`|+++
+Set whether the client will offer the WebSocket per-frame deflate compression extension.
 +++
+|[[tryUsePerMessageWebSocketCompression]]`@tryUsePerMessageWebSocketCompression`|`Boolean`|+++
+Set whether the client will offer the WebSocket per-message deflate compression extension.
++++
+|[[tryWebSocketDeflateFrameCompression]]`@tryWebSocketDeflateFrameCompression`|`Boolean`|+++
+
++++
+|[[useAlpn]]`@useAlpn`|`Boolean`|+++
 Set the ALPN usage.
 +++
-|[[usePooledBuffers]]`usePooledBuffers`|`Boolean`|
-+++
-Set whether Netty pooled buffers are enabled
-+++
-|[[verifyHost]]`verifyHost`|`Boolean`|
-+++
+|[[verifyHost]]`@verifyHost`|`Boolean`|+++
 Set whether hostname verification is enabled
 +++
+|[[webSocketCompressionAllowClientNoContext]]`@webSocketCompressionAllowClientNoContext`|`Boolean`|+++
+Set whether the <code>client_no_context_takeover</code> parameter of the WebSocket per-message
+ deflate compression extension will be offered.
++++
+|[[webSocketCompressionLevel]]`@webSocketCompressionLevel`|`Number (int)`|+++
+Set the WebSocket deflate compression level.
++++
+|[[webSocketCompressionRequestServerNoContext]]`@webSocketCompressionRequestServerNoContext`|`Boolean`|+++
+Set whether the <code>server_no_context_takeover</code> parameter of the WebSocket per-message
+ deflate compression extension will be offered.
++++
+|===
+
+[[HttpMethod]]
+== HttpMethod
+
+++++
+ Represents an HTTP method.
+++++
+'''
+
+[cols=">25%,25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
 |===
 
 [[HttpServerOptions]]
@@ -880,203 +856,190 @@ Set whether hostname verification is enabled
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[acceptBacklog]]`acceptBacklog`|`Number (int)`|
-+++
+|[[acceptBacklog]]`@acceptBacklog`|`Number (int)`|+++
 Set the accept back log
 +++
-|[[acceptUnmaskedFrames]]`acceptUnmaskedFrames`|`Boolean`|
+|[[acceptUnmaskedFrames]]`@acceptUnmaskedFrames`|`Boolean`|+++
+Set <code>true</code> when the server accepts unmasked frame.
+ As default Server doesn't accept unmasked frame, you can bypass this behaviour (RFC 6455) setting <code>true</code>.
+ It's set to <code>false</code> as default.
 +++
-Set true when the server accepts unmasked frame.
- As default Server doesn't accept unmasked frame, you can bypass this behaviour (RFC 6455) setting true
- It's set to false as default.
-+++
-|[[alpnVersions]]`alpnVersions`|`Array of link:enums.html#HttpVersion[HttpVersion]`|
-+++
+|[[alpnVersions]]`@alpnVersions`|`Array of link:enums.html#HttpVersion[HttpVersion]`|+++
 Set the list of protocol versions to provide to the server during the Application-Layer Protocol Negotiatiation.
 +++
-|[[clientAuth]]`clientAuth`|`link:enums.html#ClientAuth[ClientAuth]`|
-+++
+|[[clientAuth]]`@clientAuth`|`link:enums.html#ClientAuth[ClientAuth]`|+++
 Set whether client auth is required
 +++
-|[[clientAuthRequired]]`clientAuthRequired`|`Boolean`|
-+++
-Set whether client auth is required
-+++
-|[[compressionLevel]]`compressionLevel`|`Number (int)`|
-+++
-This method allows to set the compression level to be used in http1.x/2 response bodies 
+|[[compressionLevel]]`@compressionLevel`|`Number (int)`|+++
+This method allows to set the compression level to be used in http1.x/2 response bodies
  when compression support is turned on (@see setCompressionSupported) and the client advertises
  to support <code>deflate/gzip</code> compression in the <code>Accept-Encoding</code> header
- 
+
  default value is : 6 (Netty legacy)
- 
+
  The compression level determines how much the data is compressed on a scale from 1 to 9,
  where '9' is trying to achieve the maximum compression ratio while '1' instead is giving
- priority to speed instead of compression ratio using some algorithm optimizations and skipping 
+ priority to speed instead of compression ratio using some algorithm optimizations and skipping
  pedantic loops that usually gives just little improvements
- 
- While one can think that best value is always the maximum compression ratio, 
+
+ While one can think that best value is always the maximum compression ratio,
  there's a trade-off to consider: the most compressed level requires the most
- computatinal work to compress/decompress data, e.g. more dictionary lookups and loops.
- 
- E.g. you have it set fairly high on a high-volume website, you may experience performance degradation 
- and latency on resource serving due to CPU overload, and, however - as the comptational work is required also client side 
+ computational work to compress/decompress data, e.g. more dictionary lookups and loops.
+
+ E.g. you have it set fairly high on a high-volume website, you may experience performance degradation
+ and latency on resource serving due to CPU overload, and, however - as the computational work is required also client side
  while decompressing - setting an higher compression level can result in an overall higher page load time
  especially nowadays when many clients are handled mobile devices with a low CPU profile.
- 
+
  see also: http://www.gzip.org/algorithm.txt
 +++
-|[[compressionSupported]]`compressionSupported`|`Boolean`|
-+++
-Set whether the server should support gzip/deflate compression 
+|[[compressionSupported]]`@compressionSupported`|`Boolean`|+++
+Set whether the server should support gzip/deflate compression
  (serving compressed responses to clients advertising support for them with Accept-Encoding header)
 +++
-|[[crlPaths]]`crlPaths`|`Array of String`|
-+++
+|[[crlPaths]]`@crlPaths`|`Array of String`|+++
 Add a CRL path
 +++
-|[[crlValues]]`crlValues`|`Array of Buffer`|
-+++
+|[[crlValues]]`@crlValues`|`Array of Buffer`|+++
 Add a CRL value
 +++
-|[[decompressionSupported]]`decompressionSupported`|`Boolean`|
+|[[decoderInitialBufferSize]]`@decoderInitialBufferSize`|`Number (int)`|+++
+Set the initial buffer size for the HTTP decoder
 +++
+|[[decompressionSupported]]`@decompressionSupported`|`Boolean`|+++
 Set whether the server supports decompression
 +++
-|[[enabledCipherSuites]]`enabledCipherSuites`|`Array of String`|
-+++
+|[[enabledCipherSuites]]`@enabledCipherSuites`|`Array of String`|+++
 Add an enabled cipher suite, appended to the ordered suites.
 +++
-|[[enabledSecureTransportProtocols]]`enabledSecureTransportProtocols`|`Array of String`|
+|[[enabledSecureTransportProtocols]]`@enabledSecureTransportProtocols`|`Array of String`|+++
+Sets the list of enabled SSL/TLS protocols.
 +++
-Add an enabled SSL/TLS protocols, appended to the ordered protocols.
-+++
-|[[handle100ContinueAutomatically]]`handle100ContinueAutomatically`|`Boolean`|
-+++
+|[[handle100ContinueAutomatically]]`@handle100ContinueAutomatically`|`Boolean`|+++
 Set whether 100 Continue should be handled automatically
 +++
-|[[host]]`host`|`String`|
-+++
+|[[host]]`@host`|`String`|+++
 Set the host
 +++
-|[[http2ConnectionWindowSize]]`http2ConnectionWindowSize`|`Number (int)`|
-+++
+|[[http2ConnectionWindowSize]]`@http2ConnectionWindowSize`|`Number (int)`|+++
 Set the default HTTP/2 connection window size. It overrides the initial window
  size set by link, so the connection window size
  is greater than for its streams, in order the data throughput.
  <p/>
  A value of <code>-1</code> reuses the initial window size setting.
 +++
-|[[idleTimeout]]`idleTimeout`|`Number (int)`|
-+++
-Set the idle timeout, in seconds. zero means don't timeout.
+|[[idleTimeout]]`@idleTimeout`|`Number (int)`|+++
+Set the idle timeout, default time unit is seconds. Zero means don't timeout.
  This determines if a connection will timeout and be closed if no data is received within the timeout.
+
+ If you want change default time unit, use link
 +++
-|[[initialSettings]]`initialSettings`|`link:dataobjects.html#Http2Settings[Http2Settings]`|
+|[[idleTimeoutUnit]]`@idleTimeoutUnit`|`link:enums.html#TimeUnit[TimeUnit]`|+++
+Set the idle timeout unit. If not specified, default is seconds.
 +++
-Set the HTTP/2 connection settings immediatly sent by the server when a client connects.
-+++
-|[[jdkSslEngineOptions]]`jdkSslEngineOptions`|`link:dataobjects.html#JdkSSLEngineOptions[JdkSSLEngineOptions]`|-
-|[[keyStoreOptions]]`keyStoreOptions`|`link:dataobjects.html#JksOptions[JksOptions]`|
-+++
-Set the key/cert options in jks format, aka Java keystore.
-+++
-|[[logActivity]]`logActivity`|`Boolean`|
-+++
+|[[logActivity]]`@logActivity`|`Boolean`|+++
 Set to true to enabled network activity logging: Netty's pipeline is configured for logging on Netty's logger.
 +++
-|[[maxChunkSize]]`maxChunkSize`|`Number (int)`|
+|[[maxChunkSize]]`@maxChunkSize`|`Number (int)`|+++
+Set the maximum HTTP chunk size that link will receive
 +++
-Set the maximum HTTP chunk size
-+++
-|[[maxHeaderSize]]`maxHeaderSize`|`Number (int)`|
-+++
+|[[maxHeaderSize]]`@maxHeaderSize`|`Number (int)`|+++
 Set the maximum length of all headers for HTTP/1.x .
 +++
-|[[maxInitialLineLength]]`maxInitialLineLength`|`Number (int)`|
-+++
+|[[maxInitialLineLength]]`@maxInitialLineLength`|`Number (int)`|+++
 Set the maximum length of the initial line for HTTP/1.x (e.g. <code>"GET / HTTP/1.0"</code>)
 +++
-|[[maxWebsocketFrameSize]]`maxWebsocketFrameSize`|`Number (int)`|
+|[[maxWebSocketFrameSize]]`@maxWebSocketFrameSize`|`Number (int)`|+++
+Set the maximum WebSocket frames size
 +++
-Set the maximum websocket frames size
+|[[maxWebSocketMessageSize]]`@maxWebSocketMessageSize`|`Number (int)`|+++
+Set the maximum WebSocket message size
 +++
-|[[maxWebsocketMessageSize]]`maxWebsocketMessageSize`|`Number (int)`|
+|[[perFrameWebSocketCompressionSupported]]`@perFrameWebSocketCompressionSupported`|`Boolean`|+++
+Enable or disable support for the WebSocket per-frame deflate compression extension.
 +++
-Set the maximum websocket message size
+|[[perMessageWebSocketCompressionSupported]]`@perMessageWebSocketCompressionSupported`|`Boolean`|+++
+Enable or disable support for WebSocket per-message deflate compression extension.
 +++
-|[[openSslEngineOptions]]`openSslEngineOptions`|`link:dataobjects.html#OpenSSLEngineOptions[OpenSSLEngineOptions]`|-
-|[[pemKeyCertOptions]]`pemKeyCertOptions`|`link:dataobjects.html#PemKeyCertOptions[PemKeyCertOptions]`|
-+++
-Set the key/cert store options in pem format.
-+++
-|[[pemTrustOptions]]`pemTrustOptions`|`link:dataobjects.html#PemTrustOptions[PemTrustOptions]`|
-+++
-Set the trust options in pem format
-+++
-|[[pfxKeyCertOptions]]`pfxKeyCertOptions`|`link:dataobjects.html#PfxOptions[PfxOptions]`|
-+++
-Set the key/cert options in pfx format.
-+++
-|[[pfxTrustOptions]]`pfxTrustOptions`|`link:dataobjects.html#PfxOptions[PfxOptions]`|
-+++
-Set the trust options in pfx format
-+++
-|[[port]]`port`|`Number (int)`|
-+++
+|[[port]]`@port`|`Number (int)`|+++
 Set the port
 +++
-|[[receiveBufferSize]]`receiveBufferSize`|`Number (int)`|
+|[[proxyProtocolTimeout]]`@proxyProtocolTimeout`|`Number (long)`|+++
+Set the Proxy protocol timeout, default time unit is seconds.
 +++
+|[[proxyProtocolTimeoutUnit]]`@proxyProtocolTimeoutUnit`|`link:enums.html#TimeUnit[TimeUnit]`|+++
+Set the Proxy protocol timeout unit. If not specified, default is seconds.
++++
+|[[receiveBufferSize]]`@receiveBufferSize`|`Number (int)`|+++
 Set the TCP receive buffer size
 +++
-|[[reuseAddress]]`reuseAddress`|`Boolean`|
-+++
+|[[reuseAddress]]`@reuseAddress`|`Boolean`|+++
 Set the value of reuse address
 +++
-|[[sendBufferSize]]`sendBufferSize`|`Number (int)`|
+|[[reusePort]]`@reusePort`|`Boolean`|+++
+Set the value of reuse port.
+ <p/>
+ This is only supported by native transports.
 +++
+|[[sendBufferSize]]`@sendBufferSize`|`Number (int)`|+++
 Set the TCP send buffer size
 +++
-|[[soLinger]]`soLinger`|`Number (int)`|
+|[[sni]]`@sni`|`Boolean`|+++
+Set whether the server supports Server Name Indiciation
 +++
+|[[soLinger]]`@soLinger`|`Number (int)`|+++
 Set whether SO_linger keep alive is enabled
 +++
-|[[ssl]]`ssl`|`Boolean`|
-+++
+|[[ssl]]`@ssl`|`Boolean`|+++
 Set whether SSL/TLS is enabled
 +++
-|[[tcpKeepAlive]]`tcpKeepAlive`|`Boolean`|
+|[[sslHandshakeTimeout]]`@sslHandshakeTimeout`|`Number (long)`|+++
+Set the SSL handshake timeout, default time unit is seconds.
 +++
+|[[sslHandshakeTimeoutUnit]]`@sslHandshakeTimeoutUnit`|`link:enums.html#TimeUnit[TimeUnit]`|+++
+Set the SSL handshake timeout unit. If not specified, default is seconds.
++++
+|[[tcpCork]]`@tcpCork`|`Boolean`|+++
+Enable the <code>TCP_CORK</code> option - only with linux native transport.
++++
+|[[tcpFastOpen]]`@tcpFastOpen`|`Boolean`|+++
+Enable the <code>TCP_FASTOPEN</code> option - only with linux native transport.
++++
+|[[tcpKeepAlive]]`@tcpKeepAlive`|`Boolean`|+++
 Set whether TCP keep alive is enabled
 +++
-|[[tcpNoDelay]]`tcpNoDelay`|`Boolean`|
-+++
+|[[tcpNoDelay]]`@tcpNoDelay`|`Boolean`|+++
 Set whether TCP no delay is enabled
 +++
-|[[trafficClass]]`trafficClass`|`Number (int)`|
+|[[tcpQuickAck]]`@tcpQuickAck`|`Boolean`|+++
+Enable the <code>TCP_QUICKACK</code> option - only with linux native transport.
 +++
+|[[trafficClass]]`@trafficClass`|`Number (int)`|+++
 Set the value of traffic class
 +++
-|[[trustStoreOptions]]`trustStoreOptions`|`link:dataobjects.html#JksOptions[JksOptions]`|
-+++
-Set the trust options in jks format, aka Java truststore
-+++
-|[[useAlpn]]`useAlpn`|`Boolean`|
-+++
+|[[useAlpn]]`@useAlpn`|`Boolean`|+++
 Set the ALPN usage.
 +++
-|[[usePooledBuffers]]`usePooledBuffers`|`Boolean`|
+|[[useProxyProtocol]]`@useProxyProtocol`|`Boolean`|+++
+Set whether the server uses the HA Proxy protocol
 +++
-Set whether Netty pooled buffers are enabled
+|[[webSocketAllowServerNoContext]]`@webSocketAllowServerNoContext`|`Boolean`|+++
+Set whether the WebSocket server will accept the <code>server_no_context_takeover</code> parameter of the per-message
+ deflate compression extension offered by the client.
 +++
-|[[websocketSubProtocols]]`websocketSubProtocols`|`String`|
+|[[webSocketCompressionLevel]]`@webSocketCompressionLevel`|`Number (int)`|+++
+Set the WebSocket compression level.
 +++
-Set the websocket subprotocols supported by the server.
+|[[webSocketPreferredClientNoContext]]`@webSocketPreferredClientNoContext`|`Boolean`|+++
+Set whether the WebSocket server will accept the <code>client_no_context_takeover</code> parameter of the per-message
+ deflate compression extension offered by the client.
++++
+|[[webSocketSubProtocols]]`@webSocketSubProtocols`|`Array of String`|+++
+Set the WebSocket list of sub-protocol supported by the server.
 +++
 |===
 
@@ -1088,14 +1051,10 @@ Set the websocket subprotocols supported by the server.
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[alpnAvailable]]`alpnAvailable`|`Boolean`|
-+++
-
-+++
 |===
 
 [[JksOptions]]
@@ -1124,20 +1083,17 @@ Set the websocket subprotocols supported by the server.
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[password]]`password`|`String`|
-+++
+|[[password]]`@password`|`String`|+++
 Set the password for the key store
 +++
-|[[path]]`path`|`String`|
-+++
+|[[path]]`@path`|`String`|+++
 Set the path to the key store
 +++
-|[[value]]`value`|`Buffer`|
-+++
+|[[value]]`@value`|`Buffer`|+++
 Set the key store as a buffer
 +++
 |===
@@ -1151,12 +1107,11 @@ Set the key store as a buffer
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[enabled]]`enabled`|`Boolean`|
-+++
+|[[enabled]]`@enabled`|`Boolean`|+++
 Set whether metrics will be enabled on the Vert.x instance.
 +++
 |===
@@ -1169,135 +1124,104 @@ Set whether metrics will be enabled on the Vert.x instance.
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[connectTimeout]]`connectTimeout`|`Number (int)`|
-+++
+|[[connectTimeout]]`@connectTimeout`|`Number (int)`|+++
 Set the connect timeout
 +++
-|[[crlPaths]]`crlPaths`|`Array of String`|
-+++
+|[[crlPaths]]`@crlPaths`|`Array of String`|+++
 Add a CRL path
 +++
-|[[crlValues]]`crlValues`|`Array of Buffer`|
-+++
+|[[crlValues]]`@crlValues`|`Array of Buffer`|+++
 Add a CRL value
 +++
-|[[enabledCipherSuites]]`enabledCipherSuites`|`Array of String`|
-+++
+|[[enabledCipherSuites]]`@enabledCipherSuites`|`Array of String`|+++
 Add an enabled cipher suite, appended to the ordered suites.
 +++
-|[[enabledSecureTransportProtocols]]`enabledSecureTransportProtocols`|`Array of String`|
+|[[enabledSecureTransportProtocols]]`@enabledSecureTransportProtocols`|`Array of String`|+++
+Sets the list of enabled SSL/TLS protocols.
 +++
-Add an enabled SSL/TLS protocols, appended to the ordered protocols.
-+++
-|[[hostnameVerificationAlgorithm]]`hostnameVerificationAlgorithm`|`String`|
-+++
+|[[hostnameVerificationAlgorithm]]`@hostnameVerificationAlgorithm`|`String`|+++
 Set the hostname verification algorithm interval
  To disable hostname verification, set hostnameVerificationAlgorithm to an empty String
 +++
-|[[idleTimeout]]`idleTimeout`|`Number (int)`|
-+++
-Set the idle timeout, in seconds. zero means don't timeout.
+|[[idleTimeout]]`@idleTimeout`|`Number (int)`|+++
+Set the idle timeout, default time unit is seconds. Zero means don't timeout.
  This determines if a connection will timeout and be closed if no data is received within the timeout.
+
+ If you want change default time unit, use link
 +++
-|[[jdkSslEngineOptions]]`jdkSslEngineOptions`|`link:dataobjects.html#JdkSSLEngineOptions[JdkSSLEngineOptions]`|-
-|[[keyStoreOptions]]`keyStoreOptions`|`link:dataobjects.html#JksOptions[JksOptions]`|
+|[[idleTimeoutUnit]]`@idleTimeoutUnit`|`link:enums.html#TimeUnit[TimeUnit]`|+++
+Set the idle timeout unit. If not specified, default is seconds.
 +++
-Set the key/cert options in jks format, aka Java keystore.
-+++
-|[[localAddress]]`localAddress`|`String`|
-+++
+|[[localAddress]]`@localAddress`|`String`|+++
 Set the local interface to bind for network connections. When the local address is null,
  it will pick any local address, the default local address is null.
 +++
-|[[logActivity]]`logActivity`|`Boolean`|
-+++
+|[[logActivity]]`@logActivity`|`Boolean`|+++
 Set to true to enabled network activity logging: Netty's pipeline is configured for logging on Netty's logger.
 +++
-|[[metricsName]]`metricsName`|`String`|
-+++
+|[[metricsName]]`@metricsName`|`String`|+++
 Set the metrics name identifying the reported metrics, useful for grouping metrics
  with the same name.
 +++
-|[[openSslEngineOptions]]`openSslEngineOptions`|`link:dataobjects.html#OpenSSLEngineOptions[OpenSSLEngineOptions]`|-
-|[[pemKeyCertOptions]]`pemKeyCertOptions`|`link:dataobjects.html#PemKeyCertOptions[PemKeyCertOptions]`|
-+++
-Set the key/cert store options in pem format.
-+++
-|[[pemTrustOptions]]`pemTrustOptions`|`link:dataobjects.html#PemTrustOptions[PemTrustOptions]`|
-+++
-Set the trust options in pem format
-+++
-|[[pfxKeyCertOptions]]`pfxKeyCertOptions`|`link:dataobjects.html#PfxOptions[PfxOptions]`|
-+++
-Set the key/cert options in pfx format.
-+++
-|[[pfxTrustOptions]]`pfxTrustOptions`|`link:dataobjects.html#PfxOptions[PfxOptions]`|
-+++
-Set the trust options in pfx format
-+++
-|[[proxyOptions]]`proxyOptions`|`link:dataobjects.html#ProxyOptions[ProxyOptions]`|
-+++
-Set proxy options for connections via CONNECT proxy (e.g. Squid) or a SOCKS proxy.
-+++
-|[[receiveBufferSize]]`receiveBufferSize`|`Number (int)`|
-+++
+|[[receiveBufferSize]]`@receiveBufferSize`|`Number (int)`|+++
 Set the TCP receive buffer size
 +++
-|[[reconnectAttempts]]`reconnectAttempts`|`Number (int)`|
-+++
+|[[reconnectAttempts]]`@reconnectAttempts`|`Number (int)`|+++
 Set the value of reconnect attempts
 +++
-|[[reconnectInterval]]`reconnectInterval`|`Number (long)`|
-+++
+|[[reconnectInterval]]`@reconnectInterval`|`Number (long)`|+++
 Set the reconnect interval
 +++
-|[[reuseAddress]]`reuseAddress`|`Boolean`|
-+++
+|[[reuseAddress]]`@reuseAddress`|`Boolean`|+++
 Set the value of reuse address
 +++
-|[[sendBufferSize]]`sendBufferSize`|`Number (int)`|
+|[[reusePort]]`@reusePort`|`Boolean`|+++
+Set the value of reuse port.
+ <p/>
+ This is only supported by native transports.
 +++
+|[[sendBufferSize]]`@sendBufferSize`|`Number (int)`|+++
 Set the TCP send buffer size
 +++
-|[[soLinger]]`soLinger`|`Number (int)`|
-+++
+|[[soLinger]]`@soLinger`|`Number (int)`|+++
 Set whether SO_linger keep alive is enabled
 +++
-|[[ssl]]`ssl`|`Boolean`|
-+++
+|[[ssl]]`@ssl`|`Boolean`|+++
 Set whether SSL/TLS is enabled
 +++
-|[[tcpKeepAlive]]`tcpKeepAlive`|`Boolean`|
+|[[sslHandshakeTimeout]]`@sslHandshakeTimeout`|`Number (long)`|+++
+Set the SSL handshake timeout, default time unit is seconds.
 +++
+|[[sslHandshakeTimeoutUnit]]`@sslHandshakeTimeoutUnit`|`link:enums.html#TimeUnit[TimeUnit]`|+++
+Set the SSL handshake timeout unit. If not specified, default is seconds.
++++
+|[[tcpCork]]`@tcpCork`|`Boolean`|+++
+Enable the <code>TCP_CORK</code> option - only with linux native transport.
++++
+|[[tcpFastOpen]]`@tcpFastOpen`|`Boolean`|+++
+Enable the <code>TCP_FASTOPEN</code> option - only with linux native transport.
++++
+|[[tcpKeepAlive]]`@tcpKeepAlive`|`Boolean`|+++
 Set whether TCP keep alive is enabled
 +++
-|[[tcpNoDelay]]`tcpNoDelay`|`Boolean`|
-+++
+|[[tcpNoDelay]]`@tcpNoDelay`|`Boolean`|+++
 Set whether TCP no delay is enabled
 +++
-|[[trafficClass]]`trafficClass`|`Number (int)`|
+|[[tcpQuickAck]]`@tcpQuickAck`|`Boolean`|+++
+Enable the <code>TCP_QUICKACK</code> option - only with linux native transport.
 +++
+|[[trafficClass]]`@trafficClass`|`Number (int)`|+++
 Set the value of traffic class
 +++
-|[[trustAll]]`trustAll`|`Boolean`|
-+++
+|[[trustAll]]`@trustAll`|`Boolean`|+++
 Set whether all server certificates should be trusted
 +++
-|[[trustStoreOptions]]`trustStoreOptions`|`link:dataobjects.html#JksOptions[JksOptions]`|
-+++
-Set the trust options in jks format, aka Java truststore
-+++
-|[[useAlpn]]`useAlpn`|`Boolean`|
-+++
+|[[useAlpn]]`@useAlpn`|`Boolean`|+++
 Set the ALPN usage.
-+++
-|[[usePooledBuffers]]`usePooledBuffers`|`Boolean`|
-+++
-Set whether Netty pooled buffers are enabled
 +++
 |===
 
@@ -1309,120 +1233,104 @@ Set whether Netty pooled buffers are enabled
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[acceptBacklog]]`acceptBacklog`|`Number (int)`|
-+++
+|[[acceptBacklog]]`@acceptBacklog`|`Number (int)`|+++
 Set the accept back log
 +++
-|[[clientAuth]]`clientAuth`|`link:enums.html#ClientAuth[ClientAuth]`|
-+++
+|[[clientAuth]]`@clientAuth`|`link:enums.html#ClientAuth[ClientAuth]`|+++
 Set whether client auth is required
 +++
-|[[clientAuthRequired]]`clientAuthRequired`|`Boolean`|
-+++
-Set whether client auth is required
-+++
-|[[crlPaths]]`crlPaths`|`Array of String`|
-+++
+|[[crlPaths]]`@crlPaths`|`Array of String`|+++
 Add a CRL path
 +++
-|[[crlValues]]`crlValues`|`Array of Buffer`|
-+++
+|[[crlValues]]`@crlValues`|`Array of Buffer`|+++
 Add a CRL value
 +++
-|[[enabledCipherSuites]]`enabledCipherSuites`|`Array of String`|
-+++
+|[[enabledCipherSuites]]`@enabledCipherSuites`|`Array of String`|+++
 Add an enabled cipher suite, appended to the ordered suites.
 +++
-|[[enabledSecureTransportProtocols]]`enabledSecureTransportProtocols`|`Array of String`|
+|[[enabledSecureTransportProtocols]]`@enabledSecureTransportProtocols`|`Array of String`|+++
+Sets the list of enabled SSL/TLS protocols.
 +++
-Add an enabled SSL/TLS protocols, appended to the ordered protocols.
-+++
-|[[host]]`host`|`String`|
-+++
+|[[host]]`@host`|`String`|+++
 Set the host
 +++
-|[[idleTimeout]]`idleTimeout`|`Number (int)`|
-+++
-Set the idle timeout, in seconds. zero means don't timeout.
+|[[idleTimeout]]`@idleTimeout`|`Number (int)`|+++
+Set the idle timeout, default time unit is seconds. Zero means don't timeout.
  This determines if a connection will timeout and be closed if no data is received within the timeout.
+
+ If you want change default time unit, use link
 +++
-|[[jdkSslEngineOptions]]`jdkSslEngineOptions`|`link:dataobjects.html#JdkSSLEngineOptions[JdkSSLEngineOptions]`|-
-|[[keyStoreOptions]]`keyStoreOptions`|`link:dataobjects.html#JksOptions[JksOptions]`|
+|[[idleTimeoutUnit]]`@idleTimeoutUnit`|`link:enums.html#TimeUnit[TimeUnit]`|+++
+Set the idle timeout unit. If not specified, default is seconds.
 +++
-Set the key/cert options in jks format, aka Java keystore.
-+++
-|[[logActivity]]`logActivity`|`Boolean`|
-+++
+|[[logActivity]]`@logActivity`|`Boolean`|+++
 Set to true to enabled network activity logging: Netty's pipeline is configured for logging on Netty's logger.
 +++
-|[[openSslEngineOptions]]`openSslEngineOptions`|`link:dataobjects.html#OpenSSLEngineOptions[OpenSSLEngineOptions]`|-
-|[[pemKeyCertOptions]]`pemKeyCertOptions`|`link:dataobjects.html#PemKeyCertOptions[PemKeyCertOptions]`|
-+++
-Set the key/cert store options in pem format.
-+++
-|[[pemTrustOptions]]`pemTrustOptions`|`link:dataobjects.html#PemTrustOptions[PemTrustOptions]`|
-+++
-Set the trust options in pem format
-+++
-|[[pfxKeyCertOptions]]`pfxKeyCertOptions`|`link:dataobjects.html#PfxOptions[PfxOptions]`|
-+++
-Set the key/cert options in pfx format.
-+++
-|[[pfxTrustOptions]]`pfxTrustOptions`|`link:dataobjects.html#PfxOptions[PfxOptions]`|
-+++
-Set the trust options in pfx format
-+++
-|[[port]]`port`|`Number (int)`|
-+++
+|[[port]]`@port`|`Number (int)`|+++
 Set the port
 +++
-|[[receiveBufferSize]]`receiveBufferSize`|`Number (int)`|
+|[[proxyProtocolTimeout]]`@proxyProtocolTimeout`|`Number (long)`|+++
+Set the Proxy protocol timeout, default time unit is seconds.
 +++
+|[[proxyProtocolTimeoutUnit]]`@proxyProtocolTimeoutUnit`|`link:enums.html#TimeUnit[TimeUnit]`|+++
+Set the Proxy protocol timeout unit. If not specified, default is seconds.
++++
+|[[receiveBufferSize]]`@receiveBufferSize`|`Number (int)`|+++
 Set the TCP receive buffer size
 +++
-|[[reuseAddress]]`reuseAddress`|`Boolean`|
-+++
+|[[reuseAddress]]`@reuseAddress`|`Boolean`|+++
 Set the value of reuse address
 +++
-|[[sendBufferSize]]`sendBufferSize`|`Number (int)`|
+|[[reusePort]]`@reusePort`|`Boolean`|+++
+Set the value of reuse port.
+ <p/>
+ This is only supported by native transports.
 +++
+|[[sendBufferSize]]`@sendBufferSize`|`Number (int)`|+++
 Set the TCP send buffer size
 +++
-|[[soLinger]]`soLinger`|`Number (int)`|
+|[[sni]]`@sni`|`Boolean`|+++
+Set whether the server supports Server Name Indiciation
 +++
+|[[soLinger]]`@soLinger`|`Number (int)`|+++
 Set whether SO_linger keep alive is enabled
 +++
-|[[ssl]]`ssl`|`Boolean`|
-+++
+|[[ssl]]`@ssl`|`Boolean`|+++
 Set whether SSL/TLS is enabled
 +++
-|[[tcpKeepAlive]]`tcpKeepAlive`|`Boolean`|
+|[[sslHandshakeTimeout]]`@sslHandshakeTimeout`|`Number (long)`|+++
+Set the SSL handshake timeout, default time unit is seconds.
 +++
+|[[sslHandshakeTimeoutUnit]]`@sslHandshakeTimeoutUnit`|`link:enums.html#TimeUnit[TimeUnit]`|+++
+Set the SSL handshake timeout unit. If not specified, default is seconds.
++++
+|[[tcpCork]]`@tcpCork`|`Boolean`|+++
+Enable the <code>TCP_CORK</code> option - only with linux native transport.
++++
+|[[tcpFastOpen]]`@tcpFastOpen`|`Boolean`|+++
+Enable the <code>TCP_FASTOPEN</code> option - only with linux native transport.
++++
+|[[tcpKeepAlive]]`@tcpKeepAlive`|`Boolean`|+++
 Set whether TCP keep alive is enabled
 +++
-|[[tcpNoDelay]]`tcpNoDelay`|`Boolean`|
-+++
+|[[tcpNoDelay]]`@tcpNoDelay`|`Boolean`|+++
 Set whether TCP no delay is enabled
 +++
-|[[trafficClass]]`trafficClass`|`Number (int)`|
+|[[tcpQuickAck]]`@tcpQuickAck`|`Boolean`|+++
+Enable the <code>TCP_QUICKACK</code> option - only with linux native transport.
 +++
+|[[trafficClass]]`@trafficClass`|`Number (int)`|+++
 Set the value of traffic class
 +++
-|[[trustStoreOptions]]`trustStoreOptions`|`link:dataobjects.html#JksOptions[JksOptions]`|
-+++
-Set the trust options in jks format, aka Java truststore
-+++
-|[[useAlpn]]`useAlpn`|`Boolean`|
-+++
+|[[useAlpn]]`@useAlpn`|`Boolean`|+++
 Set the ALPN usage.
 +++
-|[[usePooledBuffers]]`usePooledBuffers`|`Boolean`|
-+++
-Set whether Netty pooled buffers are enabled
+|[[useProxyProtocol]]`@useProxyProtocol`|`Boolean`|+++
+Set whether the server uses the HA Proxy protocol
 +++
 |===
 
@@ -1433,28 +1341,28 @@ Set whether Netty pooled buffers are enabled
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[logActivity]]`logActivity`|`Boolean`|
-+++
+|[[logActivity]]`@logActivity`|`Boolean`|+++
 Set to true to enabled network activity logging: Netty's pipeline is configured for logging on Netty's logger.
 +++
-|[[receiveBufferSize]]`receiveBufferSize`|`Number (int)`|
-+++
+|[[receiveBufferSize]]`@receiveBufferSize`|`Number (int)`|+++
 Set the TCP receive buffer size
 +++
-|[[reuseAddress]]`reuseAddress`|`Boolean`|
-+++
+|[[reuseAddress]]`@reuseAddress`|`Boolean`|+++
 Set the value of reuse address
 +++
-|[[sendBufferSize]]`sendBufferSize`|`Number (int)`|
+|[[reusePort]]`@reusePort`|`Boolean`|+++
+Set the value of reuse port.
+ <p/>
+ This is only supported by native transports.
 +++
+|[[sendBufferSize]]`@sendBufferSize`|`Number (int)`|+++
 Set the TCP send buffer size
 +++
-|[[trafficClass]]`trafficClass`|`Number (int)`|
-+++
+|[[trafficClass]]`@trafficClass`|`Number (int)`|+++
 Set the value of traffic class
 +++
 |===
@@ -1467,48 +1375,41 @@ Set the value of traffic class
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[create]]`create`|`Boolean`|
+|[[append]]`@append`|`Boolean`|+++
+Whether the file should be opened in append mode. Defaults to <code>false</code>.
 +++
+|[[create]]`@create`|`Boolean`|+++
 Set whether the file should be created if it does not already exist.
 +++
-|[[createNew]]`createNew`|`Boolean`|
-+++
+|[[createNew]]`@createNew`|`Boolean`|+++
 Set whether the file should be created and fail if it does exist already.
 +++
-|[[deleteOnClose]]`deleteOnClose`|`Boolean`|
-+++
+|[[deleteOnClose]]`@deleteOnClose`|`Boolean`|+++
 Set whether the file should be deleted when it's closed, or the JVM is shutdown.
 +++
-|[[dsync]]`dsync`|`Boolean`|
-+++
+|[[dsync]]`@dsync`|`Boolean`|+++
 Set whether every write to the file's content  ill be written synchronously to the underlying hardware.
 +++
-|[[perms]]`perms`|`String`|
-+++
+|[[perms]]`@perms`|`String`|+++
 Set the permissions string
 +++
-|[[read]]`read`|`Boolean`|
-+++
+|[[read]]`@read`|`Boolean`|+++
 Set whether the file is to be opened for reading
 +++
-|[[sparse]]`sparse`|`Boolean`|
-+++
+|[[sparse]]`@sparse`|`Boolean`|+++
 Set whether a hint should be provided that the file to created is sparse
 +++
-|[[sync]]`sync`|`Boolean`|
-+++
+|[[sync]]`@sync`|`Boolean`|+++
 Set whether every write to the file's content and meta-data will be written synchronously to the underlying hardware.
 +++
-|[[truncateExisting]]`truncateExisting`|`Boolean`|
-+++
+|[[truncateExisting]]`@truncateExisting`|`Boolean`|+++
 Set whether the file should be truncated to zero length on opening if it exists and is opened for write
 +++
-|[[write]]`write`|`Boolean`|
-+++
+|[[write]]`@write`|`Boolean`|+++
 Set whether the file is to be opened for writing
 +++
 |===
@@ -1521,20 +1422,11 @@ Set whether the file is to be opened for writing
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[alpnAvailable]]`alpnAvailable`|`Boolean`|
-+++
-
-+++
-|[[available]]`available`|`Boolean`|
-+++
-
-+++
-|[[sessionCacheEnabled]]`sessionCacheEnabled`|`Boolean`|
-+++
+|[[sessionCacheEnabled]]`@sessionCacheEnabled`|`Boolean`|+++
 Set whether session cache is enabled in open SSL session server context
 +++
 |===
@@ -1550,65 +1442,52 @@ Set whether session cache is enabled in open SSL session server context
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[argName]]`argName`|`String`|
-+++
+|[[argName]]`@argName`|`String`|+++
 Sets te arg name for this option.
 +++
-|[[choices]]`choices`|`Array of String`|
-+++
+|[[choices]]`@choices`|`Array of String`|+++
 Sets the list of values accepted by this option. If the value set by the user does not match once of these
  values, a link exception is thrown.
 +++
-|[[defaultValue]]`defaultValue`|`String`|
-+++
+|[[defaultValue]]`@defaultValue`|`String`|+++
 Sets the default value of this option
 +++
-|[[description]]`description`|`String`|
-+++
+|[[description]]`@description`|`String`|+++
 Sets te description of this option.
 +++
-|[[flag]]`flag`|`Boolean`|
-+++
+|[[flag]]`@flag`|`Boolean`|+++
 Configures the current link to be a flag. It will be evaluated to <code>true</code> if it's found in
  the command line. If you need a flag that may receive a value, use, in this order:
  <code><pre>
    option.setFlag(true).setSingleValued(true)
  </pre></code>
 +++
-|[[help]]`help`|`Boolean`|
-+++
+|[[help]]`@help`|`Boolean`|+++
 Sets whether or not this option is a "help" option
 +++
-|[[hidden]]`hidden`|`Boolean`|
-+++
+|[[hidden]]`@hidden`|`Boolean`|+++
 Sets whether or not this option should be hidden
 +++
-|[[longName]]`longName`|`String`|
-+++
+|[[longName]]`@longName`|`String`|+++
 Sets the long name of this option.
 +++
-|[[multiValued]]`multiValued`|`Boolean`|
-+++
+|[[multiValued]]`@multiValued`|`Boolean`|+++
 Sets whether or not this option can receive several values.
 +++
-|[[name]]`name`|`String`|
-+++
+|[[name]]`@name`|`String`|+++
 
 +++
-|[[required]]`required`|`Boolean`|
-+++
+|[[required]]`@required`|`Boolean`|+++
 Sets whether or not this option is mandatory.
 +++
-|[[shortName]]`shortName`|`String`|
-+++
+|[[shortName]]`@shortName`|`String`|+++
 Sets the short name of this option.
 +++
-|[[singleValued]]`singleValued`|`Boolean`|
-+++
+|[[singleValued]]`@singleValued`|`Boolean`|+++
 Sets whether or not this option can receive a value.
 +++
 |===
@@ -1617,11 +1496,11 @@ Sets whether or not this option can receive a value.
 == PemKeyCertOptions
 
 ++++
- Key store options configuring a private key and its certificate based on
+ Key store options configuring a list of private key and its certificate based on
  <i>Privacy-enhanced Electronic Email</i> (PEM) files.
  <p>
 
- The key file must contain a <b>non encrypted</b> private key in <b>PKCS8</b> format wrapped in a PEM
+ A key file must contain a <b>non encrypted</b> private key in <b>PKCS8</b> format wrapped in a PEM
  block, for example:
  <p>
 
@@ -1633,7 +1512,19 @@ Sets whether or not this option can receive a value.
  -----END PRIVATE KEY-----
  </pre><p>
 
- The certificate file must contain an X.509 certificate wrapped in a PEM block, for example:
+ Or contain a <b>non encrypted</b> private key in <b>PKCS1</b> format wrapped in a PEM
+ block, for example:
+ <p>
+
+ <pre>
+ -----BEGIN RSA PRIVATE KEY-----
+ MIIEowIBAAKCAQEAlO4gbHeFb/fmbUF/tOJfNPJumJUEqgzAzx8MBXv9Acyw9IRa
+ ...
+ zJ14Yd+t2fsLYVs2H0gxaA4DW6neCzgY3eKpSU0EBHUCFSXp/1+/
+ -----END RSA PRIVATE KEY-----
+ </pre><p>
+
+ A certificate file must contain an X.509 certificate wrapped in a PEM block, for example:
  <p>
 
  <pre>
@@ -1644,7 +1535,7 @@ Sets whether or not this option can receive a value.
  -----END CERTIFICATE-----
  </pre>
 
- The key and certificate can either be loaded by Vert.x from the filesystem:
+ Keys and certificates can either be loaded by Vert.x from the filesystem:
  <p>
  <pre>
  HttpServerOptions options = new HttpServerOptions();
@@ -1658,28 +1549,45 @@ Sets whether or not this option can receive a value.
  Buffer cert = vertx.fileSystem().readFileSync("/mycert.pem");
  options.setPemKeyCertOptions(new PemKeyCertOptions().setKeyValue(key).setCertValue(cert));
  </pre>
+
+ Several key/certificate pairs can be used:
+ <p>
+ <pre>
+ HttpServerOptions options = new HttpServerOptions();
+ options.setPemKeyCertOptions(new PemKeyCertOptions()
+    .addKeyPath("/mykey1.pem").addCertPath("/mycert1.pem")
+    .addKeyPath("/mykey2.pem").addCertPath("/mycert2.pem"));
+ </pre>
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[certPath]]`certPath`|`String`|
+|[[certPath]]`@certPath`|`String`|+++
+Set the path of the first certificate, replacing the previous certificates paths
 +++
-Set the path to the certificate
+|[[certPaths]]`@certPaths`|`Array of String`|+++
+Set all the paths to the certificates files
 +++
-|[[certValue]]`certValue`|`Buffer`|
+|[[certValue]]`@certValue`|`Buffer`|+++
+Set the first certificate as a buffer, replacing the previous certificates buffers
 +++
-Set the certificate as a buffer
+|[[certValues]]`@certValues`|`Array of Buffer`|+++
+Set all the certificates as a list of buffer
 +++
-|[[keyPath]]`keyPath`|`String`|
+|[[keyPath]]`@keyPath`|`String`|+++
+Set the path of the first key file, replacing the keys paths
 +++
-Set the path to the key file
+|[[keyPaths]]`@keyPaths`|`Array of String`|+++
+Set all the paths to the keys files
 +++
-|[[keyValue]]`keyValue`|`Buffer`|
+|[[keyValue]]`@keyValue`|`Buffer`|+++
+Set the first key a a buffer, replacing the previous keys buffers
 +++
-Set the key a a buffer
+|[[keyValues]]`@keyValues`|`Array of Buffer`|+++
+Set all the keys as a list of buffer
 +++
 |===
 
@@ -1719,16 +1627,14 @@ Set the key a a buffer
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[certPaths]]`certPaths`|`Array of String`|
-+++
+|[[certPaths]]`@certPaths`|`Array of String`|+++
 Add a certificate path
 +++
-|[[certValues]]`certValues`|`Array of Buffer`|
-+++
+|[[certValues]]`@certValues`|`Array of Buffer`|+++
 Add a certificate value
 +++
 |===
@@ -1759,20 +1665,17 @@ Add a certificate value
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[password]]`password`|`String`|
-+++
+|[[password]]`@password`|`String`|+++
 Set the password
 +++
-|[[path]]`path`|`String`|
-+++
+|[[path]]`@path`|`String`|+++
 Set the path
 +++
-|[[value]]`value`|`Buffer`|
-+++
+|[[value]]`@value`|`Buffer`|+++
 Set the store as a buffer
 +++
 |===
@@ -1785,30 +1688,25 @@ Set the store as a buffer
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[host]]`host`|`String`|
-+++
+|[[host]]`@host`|`String`|+++
 Set proxy host.
 +++
-|[[password]]`password`|`String`|
-+++
+|[[password]]`@password`|`String`|+++
 Set proxy password.
 +++
-|[[port]]`port`|`Number (int)`|
-+++
+|[[port]]`@port`|`Number (int)`|+++
 Set proxy port.
 +++
-|[[type]]`type`|`link:enums.html#ProxyType[ProxyType]`|
-+++
+|[[type]]`@type`|`link:enums.html#ProxyType[ProxyType]`|+++
 Set proxy type.
 
  <p>ProxyType can be HTTP, SOCKS4 and SOCKS5
 +++
-|[[username]]`username`|`String`|
-+++
+|[[username]]`@username`|`String`|+++
 Set proxy username.
 +++
 |===
@@ -1817,29 +1715,63 @@ Set proxy username.
 == RequestOptions
 
 ++++
- Options describing how an link will make connect to make a request.
+ Options describing how an link will connect to make a request.
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[host]]`host`|`String`|
+|[[absoluteURI]]`@absoluteURI`|`String`|+++
+Parse an absolute URI to use, this will update the <code>ssl</code>, <code>host</code>,
+ <code>port</code> and <code>uri</code> fields.
 +++
+|[[followRedirects]]`@followRedirects`|`Boolean`|+++
+Set whether to follow HTTP redirect
++++
+|[[headers]]`@headers`|`String`|+++
+Add a request header.
++++
+|[[host]]`@host`|`String`|+++
 Set the host name to be used by the client request.
 +++
-|[[port]]`port`|`Number (int)`|
-+++
+|[[port]]`@port`|`Number (Integer)`|+++
 Set the port to be used by the client request.
 +++
-|[[ssl]]`ssl`|`Boolean`|
-+++
+|[[ssl]]`@ssl`|`Boolean`|+++
 Set whether SSL/TLS is enabled
 +++
-|[[uri]]`uri`|`String`|
+|[[timeout]]`@timeout`|`Number (long)`|+++
+Sets the amount of time after which if the request does not return any data within the timeout period an
+ link will be passed to the exception handler and
+ the request will be closed.
 +++
+|[[uri]]`@uri`|`String`|+++
 Set the request relative URI
++++
+|===
+
+[[StreamPriority]]
+== StreamPriority
+
+++++
+ This class represents HTTP/2 stream priority defined in RFC 7540 clause 5.3
+++++
+'''
+
+[cols=">25%,25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[dependency]]`@dependency`|`Number (int)`|+++
+Set the priority dependency value.
++++
+|[[exclusive]]`@exclusive`|`Boolean`|+++
+Set the priority exclusive value.
++++
+|[[weight]]`@weight`|`Number (short)`|+++
+Set the priority weight.
 +++
 |===
 
@@ -1851,100 +1783,98 @@ Set the request relative URI
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[crlPaths]]`crlPaths`|`Array of String`|
-+++
+|[[crlPaths]]`@crlPaths`|`Array of String`|+++
 Add a CRL path
 +++
-|[[crlValues]]`crlValues`|`Array of Buffer`|
-+++
+|[[crlValues]]`@crlValues`|`Array of Buffer`|+++
 Add a CRL value
 +++
-|[[enabledCipherSuites]]`enabledCipherSuites`|`Array of String`|
-+++
+|[[enabledCipherSuites]]`@enabledCipherSuites`|`Array of String`|+++
 Add an enabled cipher suite, appended to the ordered suites.
 +++
-|[[enabledSecureTransportProtocols]]`enabledSecureTransportProtocols`|`Array of String`|
+|[[enabledSecureTransportProtocols]]`@enabledSecureTransportProtocols`|`Array of String`|+++
+Sets the list of enabled SSL/TLS protocols.
 +++
-Add an enabled SSL/TLS protocols, appended to the ordered protocols.
-+++
-|[[idleTimeout]]`idleTimeout`|`Number (int)`|
-+++
-Set the idle timeout, in seconds. zero means don't timeout.
+|[[idleTimeout]]`@idleTimeout`|`Number (int)`|+++
+Set the idle timeout, default time unit is seconds. Zero means don't timeout.
  This determines if a connection will timeout and be closed if no data is received within the timeout.
+
+ If you want change default time unit, use link
 +++
-|[[jdkSslEngineOptions]]`jdkSslEngineOptions`|`link:dataobjects.html#JdkSSLEngineOptions[JdkSSLEngineOptions]`|-
-|[[keyStoreOptions]]`keyStoreOptions`|`link:dataobjects.html#JksOptions[JksOptions]`|
+|[[idleTimeoutUnit]]`@idleTimeoutUnit`|`link:enums.html#TimeUnit[TimeUnit]`|+++
+Set the idle timeout unit. If not specified, default is seconds.
 +++
-Set the key/cert options in jks format, aka Java keystore.
-+++
-|[[logActivity]]`logActivity`|`Boolean`|
-+++
+|[[logActivity]]`@logActivity`|`Boolean`|+++
 Set to true to enabled network activity logging: Netty's pipeline is configured for logging on Netty's logger.
 +++
-|[[openSslEngineOptions]]`openSslEngineOptions`|`link:dataobjects.html#OpenSSLEngineOptions[OpenSSLEngineOptions]`|-
-|[[pemKeyCertOptions]]`pemKeyCertOptions`|`link:dataobjects.html#PemKeyCertOptions[PemKeyCertOptions]`|
-+++
-Set the key/cert store options in pem format.
-+++
-|[[pemTrustOptions]]`pemTrustOptions`|`link:dataobjects.html#PemTrustOptions[PemTrustOptions]`|
-+++
-Set the trust options in pem format
-+++
-|[[pfxKeyCertOptions]]`pfxKeyCertOptions`|`link:dataobjects.html#PfxOptions[PfxOptions]`|
-+++
-Set the key/cert options in pfx format.
-+++
-|[[pfxTrustOptions]]`pfxTrustOptions`|`link:dataobjects.html#PfxOptions[PfxOptions]`|
-+++
-Set the trust options in pfx format
-+++
-|[[receiveBufferSize]]`receiveBufferSize`|`Number (int)`|
-+++
+|[[receiveBufferSize]]`@receiveBufferSize`|`Number (int)`|+++
 Set the TCP receive buffer size
 +++
-|[[reuseAddress]]`reuseAddress`|`Boolean`|
-+++
+|[[reuseAddress]]`@reuseAddress`|`Boolean`|+++
 Set the value of reuse address
 +++
-|[[sendBufferSize]]`sendBufferSize`|`Number (int)`|
+|[[reusePort]]`@reusePort`|`Boolean`|+++
+Set the value of reuse port.
+ <p/>
+ This is only supported by native transports.
 +++
+|[[sendBufferSize]]`@sendBufferSize`|`Number (int)`|+++
 Set the TCP send buffer size
 +++
-|[[soLinger]]`soLinger`|`Number (int)`|
-+++
+|[[soLinger]]`@soLinger`|`Number (int)`|+++
 Set whether SO_linger keep alive is enabled
 +++
-|[[ssl]]`ssl`|`Boolean`|
-+++
+|[[ssl]]`@ssl`|`Boolean`|+++
 Set whether SSL/TLS is enabled
 +++
-|[[tcpKeepAlive]]`tcpKeepAlive`|`Boolean`|
+|[[sslHandshakeTimeout]]`@sslHandshakeTimeout`|`Number (long)`|+++
+Set the SSL handshake timeout, default time unit is seconds.
 +++
+|[[sslHandshakeTimeoutUnit]]`@sslHandshakeTimeoutUnit`|`link:enums.html#TimeUnit[TimeUnit]`|+++
+Set the SSL handshake timeout unit. If not specified, default is seconds.
++++
+|[[tcpCork]]`@tcpCork`|`Boolean`|+++
+Enable the <code>TCP_CORK</code> option - only with linux native transport.
++++
+|[[tcpFastOpen]]`@tcpFastOpen`|`Boolean`|+++
+Enable the <code>TCP_FASTOPEN</code> option - only with linux native transport.
++++
+|[[tcpKeepAlive]]`@tcpKeepAlive`|`Boolean`|+++
 Set whether TCP keep alive is enabled
 +++
-|[[tcpNoDelay]]`tcpNoDelay`|`Boolean`|
-+++
+|[[tcpNoDelay]]`@tcpNoDelay`|`Boolean`|+++
 Set whether TCP no delay is enabled
 +++
-|[[trafficClass]]`trafficClass`|`Number (int)`|
+|[[tcpQuickAck]]`@tcpQuickAck`|`Boolean`|+++
+Enable the <code>TCP_QUICKACK</code> option - only with linux native transport.
 +++
+|[[trafficClass]]`@trafficClass`|`Number (int)`|+++
 Set the value of traffic class
 +++
-|[[trustStoreOptions]]`trustStoreOptions`|`link:dataobjects.html#JksOptions[JksOptions]`|
-+++
-Set the trust options in jks format, aka Java truststore
-+++
-|[[useAlpn]]`useAlpn`|`Boolean`|
-+++
+|[[useAlpn]]`@useAlpn`|`Boolean`|+++
 Set the ALPN usage.
 +++
-|[[usePooledBuffers]]`usePooledBuffers`|`Boolean`|
-+++
-Set whether Netty pooled buffers are enabled
+|===
+
+[[TracingOptions]]
+== TracingOptions
+
+++++
+ Vert.x tracing base configuration, this class can be extended by provider implementations to configure
+ those specific implementations.
+++++
+'''
+
+[cols=">25%,25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[enabled]]`@enabled`|`Boolean`|+++
+Set whether tracing will be enabled on the Vert.x instance.
 +++
 |===
 
@@ -1956,93 +1886,130 @@ Set whether Netty pooled buffers are enabled
 ++++
 '''
 
-[cols=">25%,^25%,50%"]
+[cols=">25%,25%,50%"]
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[addressResolverOptions]]`addressResolverOptions`|`link:dataobjects.html#AddressResolverOptions[AddressResolverOptions]`|
+|[[blockedThreadCheckInterval]]`@blockedThreadCheckInterval`|`Number (long)`|+++
+Sets the value of blocked thread check period, in link.
+ <p>
+ The default value of link is
 +++
-Sets the address resolver configuration to configure resolving DNS servers, cache TTL, etc...
+|[[blockedThreadCheckIntervalUnit]]`@blockedThreadCheckIntervalUnit`|`link:enums.html#TimeUnit[TimeUnit]`|+++
+Set the time unit of <code>blockedThreadCheckInterval</code>.
 +++
-|[[blockedThreadCheckInterval]]`blockedThreadCheckInterval`|`Number (long)`|
-+++
-Sets the value of blocked thread check period, in ms.
-+++
-|[[clusterHost]]`clusterHost`|`String`|
-+++
+|[[clusterHost]]`@clusterHost`|`String`|+++
 Set the hostname to be used for clustering.
 +++
-|[[clusterPingInterval]]`clusterPingInterval`|`Number (long)`|
-+++
+|[[clusterPingInterval]]`@clusterPingInterval`|`Number (long)`|+++
 Set the value of cluster ping interval, in ms.
 +++
-|[[clusterPingReplyInterval]]`clusterPingReplyInterval`|`Number (long)`|
-+++
+|[[clusterPingReplyInterval]]`@clusterPingReplyInterval`|`Number (long)`|+++
 Set the value of cluster ping reply interval, in ms.
 +++
-|[[clusterPort]]`clusterPort`|`Number (int)`|
-+++
+|[[clusterPort]]`@clusterPort`|`Number (int)`|+++
 Set the port to be used for clustering.
 +++
-|[[clusterPublicHost]]`clusterPublicHost`|`String`|
-+++
+|[[clusterPublicHost]]`@clusterPublicHost`|`String`|+++
 Set the public facing hostname to be used for clustering.
  Sometimes, e.g. when running on certain clouds, the local address the server listens on for clustering is not the same
  address that other nodes connect to it at, as the OS / cloud infrastructure does some kind of proxying.
  If this is the case you can specify a public hostname which is different from the hostname the server listens at.
  The default value is null which means use the same as the cluster hostname.
 +++
-|[[clusterPublicPort]]`clusterPublicPort`|`Number (int)`|
-+++
+|[[clusterPublicPort]]`@clusterPublicPort`|`Number (int)`|+++
 See link for an explanation.
 +++
-|[[clustered]]`clustered`|`Boolean`|
-+++
-Set whether or not the Vert.x instance will be clustered.
-+++
-|[[eventBusOptions]]`eventBusOptions`|`link:dataobjects.html#EventBusOptions[EventBusOptions]`|
-+++
-Sets the event bus configuration to configure the host, port, ssl...
-+++
-|[[eventLoopPoolSize]]`eventLoopPoolSize`|`Number (int)`|
-+++
+|[[eventLoopPoolSize]]`@eventLoopPoolSize`|`Number (int)`|+++
 Set the number of event loop threads to be used by the Vert.x instance.
 +++
-|[[haEnabled]]`haEnabled`|`Boolean`|
-+++
+|[[haEnabled]]`@haEnabled`|`Boolean`|+++
 Set whether HA will be enabled on the Vert.x instance.
 +++
-|[[haGroup]]`haGroup`|`String`|
-+++
+|[[haGroup]]`@haGroup`|`String`|+++
 Set the HA group to be used when HA is enabled.
 +++
-|[[internalBlockingPoolSize]]`internalBlockingPoolSize`|`Number (int)`|
-+++
+|[[internalBlockingPoolSize]]`@internalBlockingPoolSize`|`Number (int)`|+++
 Set the value of internal blocking pool size
 +++
-|[[maxEventLoopExecuteTime]]`maxEventLoopExecuteTime`|`Number (long)`|
+|[[maxEventLoopExecuteTime]]`@maxEventLoopExecuteTime`|`Number (long)`|+++
+Sets the value of max event loop execute time, in link.
+ <p>
+ The default value of linkis
 +++
-Sets the value of max event loop execute time, in ns.
+|[[maxEventLoopExecuteTimeUnit]]`@maxEventLoopExecuteTimeUnit`|`link:enums.html#TimeUnit[TimeUnit]`|+++
+Set the time unit of <code>maxEventLoopExecuteTime</code>.
 +++
-|[[maxWorkerExecuteTime]]`maxWorkerExecuteTime`|`Number (long)`|
+|[[maxWorkerExecuteTime]]`@maxWorkerExecuteTime`|`Number (long)`|+++
+Sets the value of max worker execute time, in link.
+ <p>
+ The default value of link is
 +++
-Sets the value of max worker execute time, in ns.
+|[[maxWorkerExecuteTimeUnit]]`@maxWorkerExecuteTimeUnit`|`link:enums.html#TimeUnit[TimeUnit]`|+++
+Set the time unit of <code>maxWorkerExecuteTime</code>.
 +++
-|[[metricsOptions]]`metricsOptions`|`link:dataobjects.html#MetricsOptions[MetricsOptions]`|
+|[[preferNativeTransport]]`@preferNativeTransport`|`Boolean`|+++
+Set wether to prefer the native transport to the JDK transport.
 +++
-Set the metrics options
-+++
-|[[quorumSize]]`quorumSize`|`Number (int)`|
-+++
+|[[quorumSize]]`@quorumSize`|`Number (int)`|+++
 Set the quorum size to be used when HA is enabled.
 +++
-|[[warningExceptionTime]]`warningExceptionTime`|`Number (long)`|
+|[[warningExceptionTime]]`@warningExceptionTime`|`Number (long)`|+++
+Set the threshold value above this, the blocked warning contains a stack trace. in link.
+ The default value of link is
 +++
-Set the threshold value above this, the blocked warning contains a stack trace.
+|[[warningExceptionTimeUnit]]`@warningExceptionTimeUnit`|`link:enums.html#TimeUnit[TimeUnit]`|+++
+Set the time unit of <code>warningExceptionTime</code>.
 +++
-|[[workerPoolSize]]`workerPoolSize`|`Number (int)`|
-+++
+|[[workerPoolSize]]`@workerPoolSize`|`Number (int)`|+++
 Set the maximum number of worker threads to be used by the Vert.x instance.
++++
+|===
+
+[[WebSocketConnectOptions]]
+== WebSocketConnectOptions
+
+++++
+ Options describing how an link connect a link.
+++++
+'''
+
+[cols=">25%,25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[absoluteURI]]`@absoluteURI`|`String`|+++
+Parse an absolute URI to use, this will update the <code>ssl</code>, <code>host</code>,
+ <code>port</code> and <code>uri</code> fields.
++++
+|[[followRedirects]]`@followRedirects`|`Boolean`|+++
+Set whether to follow HTTP redirect
++++
+|[[headers]]`@headers`|`String`|+++
+Add a request header.
++++
+|[[host]]`@host`|`String`|+++
+Set the host name to be used by the client request.
++++
+|[[port]]`@port`|`Number (Integer)`|+++
+Set the port to be used by the client request.
++++
+|[[ssl]]`@ssl`|`Boolean`|+++
+Set whether SSL/TLS is enabled
++++
+|[[subProtocols]]`@subProtocols`|`Array of String`|+++
+Set the WebSocket sub protocols to use.
++++
+|[[timeout]]`@timeout`|`Number (long)`|+++
+Sets the amount of time after which if the request does not return any data within the timeout period an
+ link will be passed to the exception handler and
+ the request will be closed.
++++
+|[[uri]]`@uri`|`String`|+++
+Set the request relative URI
++++
+|[[version]]`@version`|`link:enums.html#WebsocketVersion[WebsocketVersion]`|+++
+Set the WebSocket version.
 +++
 |===
 

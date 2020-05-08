@@ -1,41 +1,43 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- *  ------------------------------------------------------
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *      The Eclipse Public License is available at
- *      http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *      The Apache License v2.0 is available at
- *      http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.http.impl;
 
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.http.HttpConnection;
-import io.vertx.core.impl.ContextImpl;
+import io.vertx.core.impl.ContextInternal;
+import io.vertx.core.net.NetSocket;
 
 /**
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */
-interface HttpClientConnection extends HttpConnection {
+public interface HttpClientConnection extends HttpConnection {
 
-  ContextImpl getContext();
+  Channel channel();
 
-  void reportBytesWritten(long numberOfBytes);
+  ChannelHandlerContext channelHandlerContext();
 
-  void reportBytesRead(long s);
+  Future<Void> close();
 
-  /**
-   * Check if the connection is valid for creating streams. The connection might be closed or a {@literal GOAWAY}
-   * frame could have been sent or received.
-   */
+  void createStream(ContextInternal context, HttpClientRequestImpl req, Promise<NetSocket> netSocketPromise, Handler<AsyncResult<HttpClientStream>> handler);
+
+  ContextInternal getContext();
+
   boolean isValid();
 
-  void close();
+  Object metric();
 
 }

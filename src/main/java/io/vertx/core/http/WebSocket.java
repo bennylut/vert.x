@@ -1,22 +1,18 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.http;
 
 import io.vertx.codegen.annotations.VertxGen;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 
@@ -41,10 +37,10 @@ public interface WebSocket extends WebSocketBase {
   WebSocket resume();
 
   @Override
-  WebSocket endHandler(Handler<Void> endHandler);
+  WebSocket fetch(long amount);
 
   @Override
-  WebSocket write(Buffer data);
+  WebSocket endHandler(Handler<Void> endHandler);
 
   @Override
   WebSocket setWriteQueueMaxSize(int maxSize);
@@ -53,19 +49,19 @@ public interface WebSocket extends WebSocketBase {
   WebSocket drainHandler(Handler<Void> handler);
 
   @Override
-  WebSocket writeFrame(WebSocketFrame frame);
+  WebSocket writeFrame(WebSocketFrame frame, Handler<AsyncResult<Void>> handler);
 
   @Override
-  WebSocket writeFinalTextFrame(String text);
+  WebSocket writeFinalTextFrame(String text, Handler<AsyncResult<Void>> handler);
 
   @Override
-  WebSocket writeFinalBinaryFrame(Buffer data);
+  WebSocket writeFinalBinaryFrame(Buffer data, Handler<AsyncResult<Void>> handler);
 
   @Override
-  WebSocket writeBinaryMessage(Buffer data);
+  WebSocket writeBinaryMessage(Buffer data, Handler<AsyncResult<Void>> handler);
 
   @Override
-  WebSocket writeTextMessage(String text);
+  WebSocket writeTextMessage(String text, Handler<AsyncResult<Void>> handler);
 
   @Override
   WebSocket closeHandler(Handler<Void> handler);

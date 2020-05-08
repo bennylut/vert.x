@@ -1,17 +1,12 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core;
@@ -20,11 +15,13 @@ import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.VertxGen;
-import io.vertx.core.http.CaseInsensitiveHeaders;
+import io.vertx.core.http.HttpHeaders;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * This class represents a MultiMap of String keys to a List of String values.
@@ -44,10 +41,10 @@ public interface MultiMap extends Iterable<Map.Entry<String, String>> {
    * @return the multi-map
    */
   static MultiMap caseInsensitiveMultiMap() {
-    return new CaseInsensitiveHeaders();
+    return HttpHeaders.headers();
   }
 
-  @GenIgnore
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   String get(CharSequence name);
 
   /**
@@ -71,7 +68,7 @@ public interface MultiMap extends Iterable<Map.Entry<String, String>> {
   /**
    * Like {@link #getAll(String)} but accepting a {@code CharSequence} as a parameter
    */
-  @GenIgnore
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   List<String> getAll(CharSequence name);
 
   /**
@@ -80,8 +77,12 @@ public interface MultiMap extends Iterable<Map.Entry<String, String>> {
    * @return A immutable {@link java.util.List} of the name-value entries, which will be
    *         empty if no pairs are found
    */
-  @GenIgnore
-  List<Map.Entry<String, String>> entries();
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  default List<Map.Entry<String, String>> entries() {
+    List<Map.Entry<String, String>> entries = new ArrayList<>();
+    forEach(entries::add);
+    return entries;
+  }
 
   /**
    * Checks to see if there is a value with the specified name
@@ -94,8 +95,37 @@ public interface MultiMap extends Iterable<Map.Entry<String, String>> {
   /**
    * Like {@link #contains(String)} but accepting a {@code CharSequence} as a parameter
    */
-  @GenIgnore
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   boolean contains(CharSequence name);
+
+  /**
+   * Check if there is a header with the specified {@code name} and {@code value}.
+   *
+   * If {@code caseInsensitive} is {@code true}, {@code value} is compared in a case-insensitive way.
+   *
+   * @param name the name to search for
+   * @param value the value to search for
+   * @return {@code true} if at least one entry is found
+   */
+  default boolean contains(String name, String value, boolean caseInsensitive) {
+    return getAll(name).stream()
+      .anyMatch(val -> caseInsensitive ? val.equalsIgnoreCase(value) : val.equals(value));
+  }
+
+  /**
+   * Like {@link #contains(String, String, boolean)} but accepting {@code CharSequence} parameters.
+   */
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  default boolean contains(CharSequence name, CharSequence value, boolean caseInsensitive) {
+    Predicate<String> predicate;
+    if (caseInsensitive) {
+      String valueAsString = value.toString();
+      predicate = val -> val.equalsIgnoreCase(valueAsString);
+    } else {
+      predicate = val -> val.contentEquals(value);
+    }
+    return getAll(name).stream().anyMatch(predicate);
+  }
 
   /**
    * Return true if empty
@@ -122,7 +152,8 @@ public interface MultiMap extends Iterable<Map.Entry<String, String>> {
   /**
    * Like {@link #add(String, String)} but accepting {@code CharSequence} as parameters
    */
-  @GenIgnore
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  @Fluent
   MultiMap add(CharSequence name, CharSequence value);
 
   /**
@@ -132,13 +163,15 @@ public interface MultiMap extends Iterable<Map.Entry<String, String>> {
    * @param values The values
    * @return a reference to this, so the API can be used fluently
    */
-  @GenIgnore
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  @Fluent
   MultiMap add(String name, Iterable<String> values);
 
   /**
    * Like {@link #add(String, Iterable)} but accepting {@code CharSequence} as parameters
    */
-  @GenIgnore
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  @Fluent
   MultiMap add(CharSequence name, Iterable<CharSequence> values);
 
   /**
@@ -154,13 +187,14 @@ public interface MultiMap extends Iterable<Map.Entry<String, String>> {
    *
    * @return a reference to this, so the API can be used fluently
    */
-  @GenIgnore
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  @Fluent
   MultiMap addAll(Map<String, String> headers);
 
   /**
-   * Sets a value under the specified name.
+   * Sets a {@code value} under the specified {@code name}.
    * <p>
-   * If there is an existing header with the same name, it is removed.
+   * If there is an existing header with the same name, it is removed. Setting a {@code null} value removes the entry.
    *
    * @param name The name
    * @param value The value
@@ -172,7 +206,8 @@ public interface MultiMap extends Iterable<Map.Entry<String, String>> {
   /**
    * Like {@link #set(String, String)} but accepting {@code CharSequence} as parameters
    */
-  @GenIgnore
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  @Fluent
   MultiMap set(CharSequence name, CharSequence value);
 
   /**
@@ -182,13 +217,15 @@ public interface MultiMap extends Iterable<Map.Entry<String, String>> {
    * @param values The values of the headers being set
    * @return a reference to this, so the API can be used fluently
    */
-  @GenIgnore
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  @Fluent
   MultiMap set(String name, Iterable<String> values);
 
   /**
    * Like {@link #set(String, Iterable)} but accepting {@code CharSequence} as parameters
    */
-  @GenIgnore
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  @Fluent
   MultiMap set(CharSequence name, Iterable<CharSequence> values);
 
   /**
@@ -204,7 +241,8 @@ public interface MultiMap extends Iterable<Map.Entry<String, String>> {
    *
    * @return a reference to this, so the API can be used fluently
    */
-  @GenIgnore
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  @Fluent
   MultiMap setAll(Map<String, String> headers);
 
  /**
@@ -219,7 +257,8 @@ public interface MultiMap extends Iterable<Map.Entry<String, String>> {
   /**
    * Like {@link #remove(String)} but accepting {@code CharSequence} as parameters
    */
-  @GenIgnore
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  @Fluent
   MultiMap remove(CharSequence name);
 
   /**

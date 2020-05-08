@@ -1,17 +1,12 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.net;
@@ -19,6 +14,7 @@ package io.vertx.core.net;
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.VertxGen;
@@ -60,10 +56,9 @@ public interface NetServer extends Measured {
    * <p>
    * The server may not be listening until some time after the call to listen has returned.
    *
-   * @return a reference to this, so the API can be used fluently
+   * @return a future completed with the listen operation result
    */
-  @Fluent
-  NetServer listen();
+  Future<NetServer> listen();
 
   /**
    * Like {@link #listen} but providing a handler that will be notified when the server is listening, or fails.
@@ -75,7 +70,7 @@ public interface NetServer extends Measured {
   NetServer listen(Handler<AsyncResult<NetServer>> listenHandler);
 
   /**
-   * Start listening on the specified port and host, ignoring post and host configured in the {@link io.vertx.core.net.NetServerOptions} used when
+   * Start listening on the specified port and host, ignoring port and host configured in the {@link io.vertx.core.net.NetServerOptions} used when
    * creating the server.
    * <p>
    * Port {@code 0} can be specified meaning "choose an random port".
@@ -84,10 +79,9 @@ public interface NetServer extends Measured {
    * <p>
    * The server may not be listening until some time after the call to listen has returned.
    *
-   * @return a reference to this, so the API can be used fluently
+   * @return a future completed with the listen operation result
    */
-  @Fluent
-  NetServer listen(int port, String host);
+  Future<NetServer> listen(int port, String host);
 
   /**
    * Like {@link #listen(int, String)} but providing a handler that will be notified when the server is listening, or fails.
@@ -101,17 +95,16 @@ public interface NetServer extends Measured {
   NetServer listen(int port, String host, Handler<AsyncResult<NetServer>> listenHandler);
 
   /**
-   * Start listening on the specified port and host "0.0.0.0", ignoring post and host configured in the
+   * Start listening on the specified port and host "0.0.0.0", ignoring port and host configured in the
    * {@link io.vertx.core.net.NetServerOptions} used when creating the server.
    * <p>
    * Port {@code 0} can be specified meaning "choose an random port".
    * <p>
    * The server may not be listening until some time after the call to listen has returned.
    *
-   * @return a reference to this, so the API can be used fluently
+   * @return a future completed with the listen operation result
    */
-  @Fluent
-  NetServer listen(int port);
+  Future<NetServer> listen(int port);
 
   /**
    * Like {@link #listen(int)} but providing a handler that will be notified when the server is listening, or fails.
@@ -124,10 +117,44 @@ public interface NetServer extends Measured {
   NetServer listen(int port, Handler<AsyncResult<NetServer>> listenHandler);
 
   /**
+   * Start listening on the specified local address, ignoring port and host configured in the {@link io.vertx.core.net.NetServerOptions} used when
+   * creating the server.
+   * <p>
+   * The server may not be listening until some time after the call to listen has returned.
+   *
+   * @param localAddress the local address to listen on
+   * @return a future completed with the listen operation result
+   */
+  Future<NetServer> listen(SocketAddress localAddress);
+
+  /**
+   * Like {@link #listen(SocketAddress)} but providing a handler that will be notified when the server is listening, or fails.
+   *
+   * @param localAddress the local address to listen on
+   * @param listenHandler handler that will be notified when listening or failed
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Fluent
+  NetServer listen(SocketAddress localAddress, Handler<AsyncResult<NetServer>> listenHandler);
+
+  /**
+   * Set an exception handler called for socket errors happening before the connection
+   * is passed to the {@link #connectHandler}, e.g during the TLS handshake.
+   *
+   * @param handler the handler to set
+   * @return a reference to this, so the API can be used fluently
+   */
+  @GenIgnore
+  @Fluent
+  NetServer exceptionHandler(Handler<Throwable> handler);
+
+  /**
    * Close the server. This will close any currently open connections. The close may not complete until after this
    * method has returned.
+   *
+   * @return a future completed with the listen operation result
    */
-  void close();
+  Future<Void> close();
 
   /**
    * Like {@link #close} but supplying a handler that will be notified when close is complete.

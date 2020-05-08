@@ -1,17 +1,12 @@
 /*
- *  Copyright (c) 2011-2015 The original author or authors
- *  ------------------------------------------------------
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *       The Eclipse Public License is available at
- *       http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *       The Apache License v2.0 is available at
- *       http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.spi.launcher;
@@ -20,6 +15,8 @@ import io.vertx.core.cli.CLI;
 import io.vertx.core.cli.CommandLine;
 import io.vertx.core.cli.annotations.CLIConfigurator;
 import io.vertx.core.cli.impl.ReflectionUtils;
+
+import java.util.function.Supplier;
 
 /**
  * Default implementation of {@link CommandFactory}. This implementation defines the {@link CLI} from the
@@ -31,14 +28,28 @@ import io.vertx.core.cli.impl.ReflectionUtils;
 public class DefaultCommandFactory<C extends Command> implements CommandFactory<C> {
 
   private final Class<C> clazz;
+  private final Supplier<C> supplier;
 
   /**
    * Creates a new {@link CommandFactory}.
    *
    * @param clazz the {@link Command} implementation
+   * @deprecated Please use {@link #DefaultCommandFactory(Class, Supplier)}
    */
+  @Deprecated
   public DefaultCommandFactory(Class<C> clazz) {
+    this(clazz, () -> ReflectionUtils.newInstance(clazz));
+  }
+
+  /**
+   * Creates a new {@link CommandFactory}.
+   *
+   * @param clazz the {@link Command} implementation
+   * @param supplier the {@link Command} implementation
+   */
+  public DefaultCommandFactory(Class<C> clazz, Supplier<C> supplier) {
     this.clazz = clazz;
+    this.supplier = supplier;
   }
 
   /**
@@ -46,9 +57,7 @@ public class DefaultCommandFactory<C extends Command> implements CommandFactory<
    */
   @Override
   public C create(CommandLine cl) {
-    C c = ReflectionUtils.newInstance(clazz);
-    CLIConfigurator.inject(cl, c);
-    return c;
+    return supplier.get();
   }
 
   /**

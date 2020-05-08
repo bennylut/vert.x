@@ -1,25 +1,20 @@
 /*
- * Copyright (c) 2011-2014 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.spi.metrics;
 
 import io.vertx.core.Verticle;
+import io.vertx.core.Vertx;
 import io.vertx.core.datagram.DatagramSocket;
 import io.vertx.core.datagram.DatagramSocketOptions;
-import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpServer;
@@ -45,7 +40,8 @@ public interface VertxMetrics extends Metrics, Measured {
    *
    * @param verticle the verticle which was deployed
    */
-  void verticleDeployed(Verticle verticle);
+  default void verticleDeployed(Verticle verticle) {
+  }
 
   /**
    * Called when a verticle is undeployed in Vert.x .<p/>
@@ -55,26 +51,8 @@ public interface VertxMetrics extends Metrics, Measured {
    *
    * @param verticle the verticle which was undeployed
    */
-  void verticleUndeployed(Verticle verticle);
-
-  /**
-   * Called when a timer is created
-   * <p>
-   * No specific thread and context can be expected when this method is called.
-   *
-   * @param id the id of the timer
-   */
-  void timerCreated(long id);
-
-  /**
-   * Called when a timer has ended (setTimer) or has been cancelled.<p/>
-   * <p>
-   * No specific thread and context can be expected when this method is called.
-   *
-   * @param id        the id of the timer
-   * @param cancelled if the timer was cancelled by the user
-   */
-  void timerEnded(long id, boolean cancelled);
+  default void verticleUndeployed(Verticle verticle) {
+  }
 
   /**
    * Provides the event bus metrics SPI when the event bus is created.<p/>
@@ -83,10 +61,11 @@ public interface VertxMetrics extends Metrics, Measured {
    * <p>
    * This method should be called only once.
    *
-   * @param eventBus the Vert.x event bus
-   * @return the event bus metrics SPI
+   * @return the event bus metrics SPI or {@code null} when metrics are disabled
    */
-  EventBusMetrics createMetrics(EventBus eventBus);
+  default EventBusMetrics createEventBusMetrics() {
+    return null;
+  }
 
   /**
    * Provides the http server metrics SPI when an http server is created.<p/>
@@ -98,23 +77,25 @@ public interface VertxMetrics extends Metrics, Measured {
    * the provided {@code server} argument can be used to distinguish the different {@code HttpServerMetrics}
    * instances.
    *
-   * @param server       the Vert.x http server
+   * @param options      the options used to create the {@link HttpServer}
    * @param localAddress localAddress the local address the net socket is listening on
-   * @param options      the options used to create the {@link io.vertx.core.http.HttpServer}
-   * @return the http server metrics SPI
+   * @return the http server metrics SPI or {@code null} when metrics are disabled
    */
-  HttpServerMetrics<?, ?, ?> createMetrics(HttpServer server, SocketAddress localAddress, HttpServerOptions options);
+  default HttpServerMetrics<?, ?, ?> createHttpServerMetrics(HttpServerOptions options, SocketAddress localAddress) {
+    return null;
+  }
 
   /**
    * Provides the http client metrics SPI when an http client has been created.<p/>
    * <p>
    * No specific thread and context can be expected when this method is called.
    *
-   * @param client  the Vert.x http client
-   * @param options the options used to create the {@link io.vertx.core.http.HttpClient}
-   * @return the http client metrics SPI
+   * @param options the options used to create the {@link HttpClient}
+   * @return the http client metrics SPI or {@code null} when metrics are disabled
    */
-  HttpClientMetrics<?, ?, ?, ?, ?> createMetrics(HttpClient client, HttpClientOptions options);
+  default HttpClientMetrics<?, ?, ?, ?, ?> createHttpClientMetrics(HttpClientOptions options) {
+    return null;
+  }
 
   /**
    * Provides the net server metrics SPI when a net server is created.<p/>
@@ -126,52 +107,56 @@ public interface VertxMetrics extends Metrics, Measured {
    * the provided {@code server} argument can be used to distinguish the different {@code TCPMetrics}
    * instances.
    *
-   * @param localAddress localAddress the local address the net socket is listening on
    * @param options      the options used to create the {@link NetServer}
-   * @return the net server metrics SPI
+   * @param localAddress localAddress the local address the net socket is listening on
+   * @return the net server metrics SPI or {@code null} when metrics are disabled
    */
-  TCPMetrics<?> createMetrics(SocketAddress localAddress, NetServerOptions options);
+  default TCPMetrics<?> createNetServerMetrics(NetServerOptions options, SocketAddress localAddress) {
+    return null;
+  }
 
   /**
    * Provides the net client metrics SPI when a net client is created.<p/>
    * <p>
    * No specific thread and context can be expected when this method is called.
    *
-   * @param client  the Vert.x net client
-   * @param options the options used to create the {@link io.vertx.core.net.NetClient}
-   * @return the net client metrics SPI
+   * @param options the options used to create the {@link NetClient}
+   * @return the net client metrics SPI or {@code null} when metrics are disabled
    */
-  TCPMetrics<?> createMetrics(NetClient client, NetClientOptions options);
+  default TCPMetrics<?> createNetClientMetrics(NetClientOptions options) {
+    return null;
+  }
 
   /**
    * Provides the datagram/udp metrics SPI when a datagram socket is created.<p/>
    * <p>
    * No specific thread and context can be expected when this method is called.
    *
-   * @param socket  the Vert.x datagram socket
-   * @param options the options used to create the {@link io.vertx.core.datagram.DatagramSocket}
-   * @return the datagram metrics SPI
+   * @param options the options used to create the {@link DatagramSocket}
+   * @return the datagram metrics SPI or {@code null} when metrics are disabled
    */
-  DatagramSocketMetrics createMetrics(DatagramSocket socket, DatagramSocketOptions options);
-
-  /**
-   * Metrics cannot use the event bus in their constructor as the event bus is not yet initialized. When the event
-   * bus is initialized, this method is called with the event bus instance as parameter. By default, this method does
-   * nothing.
-   *
-   * @param bus the event bus
-   */
-  default void eventBusInitialized(EventBus bus) {
-    // Do nothing by default.
+  default DatagramSocketMetrics createDatagramSocketMetrics(DatagramSocketOptions options) {
+    return null;
   }
 
   /**
    * Provides the pool metrics SPI.
    *
-   * @param pool the pool of resource, it can be used by the metrics implementation to gather extra statistics
    * @param poolType the type of the pool e.g worker, datasource, etc..
    * @param poolName the name of the pool
-   * @param maxPoolSize the pool max size, or -1 if the number cannot be determined   @return the thread pool metrics SPI
+   * @param maxPoolSize the pool max size, or -1 if the number cannot be determined
+   * @return the thread pool metrics SPI or {@code null} when metrics are disabled
    */
-  <P> PoolMetrics<?> createMetrics(P pool, String poolType, String poolName, int maxPoolSize);
+  default PoolMetrics<?> createPoolMetrics(String poolType, String poolName, int maxPoolSize) {
+    return null;
+  }
+
+  /**
+   * Callback to signal when the Vertx instance is fully initialized. Other methods can be called before this method
+   * when the instance is being constructed.
+   *
+   * @param vertx the instance of Vertx
+   */
+  default void vertxCreated(Vertx vertx) {
+  }
 }

@@ -1,22 +1,18 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.net;
 
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.VertxGen;
@@ -49,11 +45,73 @@ public interface NetClient extends Measured {
   NetClient connect(int port, String host, Handler<AsyncResult<NetSocket>> connectHandler);
 
   /**
+   * Like {@link #connect(int, String, Handler)} but returns a {@code Future} of the asynchronous result
+   */
+  Future<NetSocket> connect(int port, String host);
+
+  /**
+   * Open a connection to a server at the specific {@code port} and {@code host}.
+   * <p>
+   * {@code host} can be a valid host name or IP address. The connect is done asynchronously and on success, a
+   * {@link NetSocket} instance is supplied via the {@code connectHandler} instance
+   *
+   * @param port the port
+   * @param host the host
+   * @param serverName the SNI server name
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Fluent
+  NetClient connect(int port, String host, String serverName, Handler<AsyncResult<NetSocket>> connectHandler);
+
+  /**
+   * Like {@link #connect(int, String, String, Handler)} but returns a {@code Future} of the asynchronous result
+   */
+  Future<NetSocket> connect(int port, String host, String serverName);
+
+  /**
+   * Open a connection to a server at the specific {@code remoteAddress}.
+   * <p>
+   * The connect is done asynchronously and on success, a {@link NetSocket} instance is supplied via the {@code connectHandler} instance
+   *
+   * @param remoteAddress the remote address
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Fluent
+  NetClient connect(SocketAddress remoteAddress, Handler<AsyncResult<NetSocket>> connectHandler);
+
+  /**
+   * Like {@link #connect(SocketAddress, Handler)} but returns a {@code Future} of the asynchronous result
+   */
+  Future<NetSocket> connect(SocketAddress remoteAddress);
+
+  /**
+   * Open a connection to a server at the specific {@code remoteAddress}.
+   * <p>
+   * The connect is done asynchronously and on success, a {@link NetSocket} instance is supplied via the {@code connectHandler} instance
+   *
+   * @param remoteAddress the remote address
+   * @param serverName the SNI server name
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Fluent
+  NetClient connect(SocketAddress remoteAddress, String serverName, Handler<AsyncResult<NetSocket>> connectHandler);
+
+  /**
+   * Like {@link #connect(SocketAddress, String, Handler)} but returns a {@code Future} of the asynchronous result
+   */
+  Future<NetSocket> connect(SocketAddress remoteAddress, String serverName);
+
+  /**
    * Close the client.
    * <p>
    * Any sockets which have not been closed manually will be closed here. The close is asynchronous and may not
    * complete until some time after the method has returned.
    */
-  void close();
+  void close(Handler<AsyncResult<Void>> handler);
+
+  /**
+   * Like {@link #close(Handler)} but returns a {@code Future} of the asynchronous result
+   */
+  Future<Void> close();
 
 }

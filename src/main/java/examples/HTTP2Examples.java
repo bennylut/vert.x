@@ -1,17 +1,12 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- *  ------------------------------------------------------
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *      The Eclipse Public License is available at
- *      http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *      The Apache License v2.0 is available at
- *      http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package examples;
@@ -165,9 +160,10 @@ public class HTTP2Examples {
 
   public void example13(HttpClient client) {
 
-    HttpClientRequest request = client.get("/index.html", response -> {
-      // Process index.html response
-    });
+    HttpClientRequest request = client.request(HttpMethod.GET, "/index.html")
+      .onComplete(response -> {
+        // Process index.html response
+      });
 
     // Set a push handler to be aware of any resource pushed by the server
     request.pushHandler(pushedRequest -> {
@@ -176,7 +172,7 @@ public class HTTP2Examples {
       System.out.println("Server pushed " + pushedRequest.path());
 
       // Set an handler for the response
-      pushedRequest.handler(pushedResponse -> {
+      pushedRequest.onComplete(pushedResponse -> {
         System.out.println("The response for the pushed request");
       });
     });
@@ -219,8 +215,8 @@ public class HTTP2Examples {
     HttpConnection connection = request.connection();
   }
 
-  public void example19(HttpClientRequest request) {
-    request.connectionHandler(connection -> {
+  public void example19(HttpClient client) {
+    client.connectionHandler(connection -> {
       System.out.println("Connected to the server");
     });
   }

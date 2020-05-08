@@ -1,3 +1,14 @@
+/*
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
+ */
+
 package io.vertx.core.net;
 
 import io.netty.handler.ssl.OpenSsl;
@@ -9,7 +20,7 @@ import io.vertx.core.json.JsonObject;
  *
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */
-@DataObject(generateConverter = true)
+@DataObject(generateConverter = true, publicConverter = false)
 public class OpenSSLEngineOptions extends SSLEngineOptions {
 
   /**
@@ -65,23 +76,6 @@ public class OpenSSLEngineOptions extends SSLEngineOptions {
     return sessionCacheEnabled;
   }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof OpenSSLEngineOptions)) return false;
-
-    OpenSSLEngineOptions that = (OpenSSLEngineOptions) o;
-
-    if (sessionCacheEnabled != that.sessionCacheEnabled) return false;
-
-    return true;
-  }
-
-  @Override
-  public int hashCode() {
-    return sessionCacheEnabled ? 1 : 0;
-  }
-
   public JsonObject toJson() {
     JsonObject json = new JsonObject();
     OpenSSLEngineOptionsConverter.toJson(this, json);
@@ -89,7 +83,7 @@ public class OpenSSLEngineOptions extends SSLEngineOptions {
   }
 
   @Override
-  public OpenSSLEngineOptions clone() {
+  public OpenSSLEngineOptions copy() {
     return new OpenSSLEngineOptions(this);
   }
 }

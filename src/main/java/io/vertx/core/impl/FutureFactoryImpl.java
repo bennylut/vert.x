@@ -1,17 +1,12 @@
 /*
- * Copyright (c) 2011-2014 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.impl;
@@ -24,10 +19,10 @@ import io.vertx.core.spi.FutureFactory;
  */
 public class FutureFactoryImpl implements FutureFactory {
 
-  private static final SucceededFuture EMPTY = new SucceededFuture<>(null);
+  private static final SucceededFuture EMPTY = new SucceededFuture<>(null, null);
 
   @Override
-  public <T> Future<T> future() {
+  public <T> PromiseInternal<T> promise() {
     return new FutureImpl<>();
   }
 
@@ -40,16 +35,41 @@ public class FutureFactoryImpl implements FutureFactory {
 
   @Override
   public <T> Future<T> succeededFuture(T result) {
-    return new SucceededFuture<>(result);
+    return new SucceededFuture<>(null, result);
   }
 
   @Override
   public <T> Future<T> failedFuture(Throwable t) {
-    return new FailedFuture<>(t);
+    return new FailedFuture<>(null, t);
   }
 
   @Override
   public <T> Future<T> failureFuture(String failureMessage) {
-    return new FailedFuture<>(failureMessage);
+    return new FailedFuture<>(null, failureMessage);
+  }
+
+  @Override
+  public <T> PromiseInternal<T> promise(ContextInternal context) {
+    return new FutureImpl<>(context);
+  }
+
+  @Override
+  public <T> Future<T> succeededFuture(ContextInternal context) {
+    return new SucceededFuture<>(context, null);
+  }
+
+  @Override
+  public <T> Future<T> succeededFuture(ContextInternal context, T result) {
+    return new SucceededFuture<>(context, result);
+  }
+
+  @Override
+  public <T> Future<T> failedFuture(ContextInternal context, Throwable t) {
+    return new FailedFuture<>(context, t);
+  }
+
+  @Override
+  public <T> Future<T> failedFuture(ContextInternal context, String failureMessage) {
+    return new FailedFuture<>(context, failureMessage);
   }
 }

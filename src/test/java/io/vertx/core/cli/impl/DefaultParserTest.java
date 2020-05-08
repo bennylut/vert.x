@@ -1,17 +1,12 @@
 /*
- *  Copyright (c) 2011-2015 The original author or authors
- *  ------------------------------------------------------
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *       The Eclipse Public License is available at
- *       http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *       The Apache License v2.0 is available at
- *       http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.cli.impl;
@@ -58,8 +53,8 @@ public class DefaultParserTest {
 
     StringBuilder usage = new StringBuilder();
     cli.usage(usage);
-    assertThat(usage).startsWith("Usage: test [-f <value>]");
-    assertThat(usage).contains("-f,--file <value>");
+    assertThat(usage.toString()).startsWith("Usage: test [-f <value>]");
+    assertThat(usage.toString()).contains("-f,--file <value>");
   }
 
 
@@ -78,7 +73,7 @@ public class DefaultParserTest {
 
     StringBuilder usage = new StringBuilder();
     cli.usage(usage);
-    assertThat(usage).startsWith("Usage: test [-f <value>]");
+    assertThat(usage.toString()).startsWith("Usage: test [-f <value>]");
   }
 
   @Test
@@ -514,7 +509,7 @@ public class DefaultParserTest {
     StringBuilder builder = new StringBuilder();
     cli.usage(builder);
 
-    assertThat(builder).contains("test arg m...");
+    assertThat(builder.toString()).contains("test arg m...");
   }
 
   @Test
@@ -677,7 +672,7 @@ public class DefaultParserTest {
 
     StringBuilder builder = new StringBuilder();
     cli.usage(builder);
-    assertThat(builder)
+    assertThat(builder.toString())
         .contains("[--color {blue, green, red}]") // Usage line
         .contains("  --color {blue, green, red}"); // options
 
@@ -700,7 +695,7 @@ public class DefaultParserTest {
 
     StringBuilder builder = new StringBuilder();
     cli.usage(builder);
-    assertThat(builder)
+    assertThat(builder.toString())
         .contains("[--color {blue, green, red}]") // Usage line
         .contains("  --color {blue, green, red}"); // options
 
@@ -725,7 +720,7 @@ public class DefaultParserTest {
 
     StringBuilder builder = new StringBuilder();
     cli.usage(builder);
-    assertThat(builder)
+    assertThat(builder.toString())
         .contains("[--retention {CLASS, RUNTIME, SOURCE}]") // Usage line
         .contains("  --retention {CLASS, RUNTIME, SOURCE}"); // options
 
@@ -746,7 +741,7 @@ public class DefaultParserTest {
 
     StringBuilder builder = new StringBuilder();
     cli.usage(builder);
-    assertThat(builder)
+    assertThat(builder.toString())
         .contains("[--retention {CLASS, RUNTIME, SOURCE}]") // Usage line
         .contains("  --retention {CLASS, RUNTIME, SOURCE}"); // options
 
@@ -805,6 +800,50 @@ public class DefaultParserTest {
       }
     }
 
+  }
+
+  @Test
+  public void testGetOptionValueWithCaseSensitivityConflict() {
+    final CLI cli = CLI.create("test")
+      .addOption(new Option().setShortName("a").setLongName("longname"))
+      .addOption(new Option().setShortName("A").setLongName("LONGNAME"));
+
+    String lowercaseValue = "someValue";
+    String uppercaseValue = "someOtherValue";
+
+    CommandLine commandLine = cli.parse(Arrays.asList("-a", lowercaseValue, "-A", uppercaseValue));
+    assertThat((String) commandLine.getOptionValue("a")).isEqualTo(lowercaseValue);
+    assertThat((String) commandLine.getOptionValue("A")).isEqualTo(uppercaseValue);
+    assertThat((String) commandLine.getOptionValue("longname")).isEqualTo(lowercaseValue);
+    assertThat((String) commandLine.getOptionValue("LONGNAME")).isEqualTo(uppercaseValue);
+
+    commandLine = cli.parse(Arrays.asList("--longname", lowercaseValue, "--LONGNAME", uppercaseValue));
+    assertThat((String) commandLine.getOptionValue("a")).isEqualTo(lowercaseValue);
+    assertThat((String) commandLine.getOptionValue("A")).isEqualTo(uppercaseValue);
+    assertThat((String) commandLine.getOptionValue("longname")).isEqualTo(lowercaseValue);
+    assertThat((String) commandLine.getOptionValue("LONGNAME")).isEqualTo(uppercaseValue);
+  }
+
+  @Test
+  public void testGetOptionValueWithoutCaseSensitivityConflict() {
+    // If there's no case-sensitivity conflict for a given short name, then using the opposite case when getting that
+    // option value should still work.
+    final CLI cli = CLI.create("test")
+      .addOption(new Option().setShortName("a").setLongName("lowercase"));
+
+    String value = "foo";
+
+    CommandLine commandLine = cli.parse(Arrays.asList("-a", value));
+    assertThat((String) commandLine.getOptionValue("a")).isEqualTo(value);
+    assertThat((String) commandLine.getOptionValue("A")).isEqualTo(value);
+    assertThat((String) commandLine.getOptionValue("lowercase")).isEqualTo(value);
+    assertThat((String) commandLine.getOptionValue("LOWERCASE")).isEqualTo(value);
+
+    commandLine = cli.parse(Arrays.asList("--lowercase", value));
+    assertThat((String) commandLine.getOptionValue("a")).isEqualTo(value);
+    assertThat((String) commandLine.getOptionValue("A")).isEqualTo(value);
+    assertThat((String) commandLine.getOptionValue("lowercase")).isEqualTo(value);
+    assertThat((String) commandLine.getOptionValue("LOWERCASE")).isEqualTo(value);
   }
 
 }

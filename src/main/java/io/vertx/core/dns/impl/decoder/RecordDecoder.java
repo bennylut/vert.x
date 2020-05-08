@@ -1,17 +1,12 @@
 /*
- * Copyright (c) 2013 The Netty Project
- * ------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 package io.vertx.core.dns.impl.decoder;
 
@@ -24,6 +19,8 @@ import io.netty.handler.codec.dns.DnsRecordType;
 import io.netty.util.CharsetUtil;
 import io.vertx.core.dns.impl.MxRecordImpl;
 import io.vertx.core.dns.impl.SrvRecordImpl;
+import io.vertx.core.impl.logging.Logger;
+import io.vertx.core.impl.logging.LoggerFactory;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -39,6 +36,7 @@ import java.util.function.Function;
  */
 public class RecordDecoder {
 
+    private static final Logger log = LoggerFactory.getLogger(RecordDecoder.class);
 
     /**
      * Decodes MX (mail exchanger) resource records.
@@ -123,7 +121,7 @@ public class RecordDecoder {
     static Function<DnsRecord, String> address(int octets) {
         return record -> {
             ByteBuf data = ((DnsRawRecord)record).content();
-            int size = data.writerIndex() - data.readerIndex();
+            int size = data.readableBytes();
             if (size != octets) {
                 throw new DecoderException("Invalid content length, or reader index when decoding address [index: "
                     + data.readerIndex() + ", expected length: " + octets + ", actual: " + size + "].");
@@ -228,7 +226,7 @@ public class RecordDecoder {
         try {
             result = (T) decoder.apply(record);
         } catch (Exception e) {
-            e.printStackTrace();
+          log.error(e.getMessage(), e.getCause());
         }
         return result;
     }

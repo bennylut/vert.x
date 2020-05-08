@@ -1,17 +1,12 @@
 /*
- *  Copyright (c) 2011-2015 The original author or authors
- *  ------------------------------------------------------
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *       The Eclipse Public License is available at
- *       http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *       The Apache License v2.0 is available at
- *       http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.cli.impl;
@@ -22,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -484,7 +480,7 @@ public class DefaultParser {
 
   private boolean hasOptionWithLongName(String name) {
     for (Option option : cli.getOptions()) {
-      if (name.equalsIgnoreCase(option.getLongName())) {
+      if (name.equals(option.getLongName())) {
         return true;
       }
     }
@@ -493,7 +489,7 @@ public class DefaultParser {
 
   private boolean hasOptionWithShortName(String name) {
     for (Option option : cli.getOptions()) {
-      if (name.equalsIgnoreCase(option.getShortName())) {
+      if (name.equals(option.getShortName())) {
         return true;
       }
     }
@@ -534,7 +530,7 @@ public class DefaultParser {
   public Option getOption(String opt) {
     opt = stripLeadingHyphens(opt);
     for (Option option : cli.getOptions()) {
-      if (opt.equalsIgnoreCase(option.getShortName()) || opt.equalsIgnoreCase(option.getLongName())) {
+      if (opt.equals(option.getShortName()) || opt.equalsIgnoreCase(option.getLongName())) {
         return option;
       }
     }
@@ -554,6 +550,7 @@ public class DefaultParser {
    * @return the options matching the partial name specified, or an empty list if none matches
    */
   public List<Option> getMatchingOptions(String opt) {
+    Objects.requireNonNull(opt);
     opt = stripLeadingHyphens(opt);
 
     List<Option> matching = new ArrayList<>();
@@ -563,8 +560,15 @@ public class DefaultParser {
 
     // Exact match first
     for (Option option : options) {
-      if (opt.equalsIgnoreCase(option.getLongName())) {
+      if (opt.equals(option.getLongName())) {
         return Collections.singletonList(option);
+      }
+    }
+
+    // Case-insensitive match second
+    for (Option option : options) {
+      if (opt.equalsIgnoreCase(option.getLongName())) {
+        matching.add(option);
       }
     }
 

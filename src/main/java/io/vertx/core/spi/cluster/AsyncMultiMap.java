@@ -1,17 +1,12 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.spi.cluster;
@@ -45,7 +40,8 @@ public interface AsyncMultiMap<K, V> {
   void add(K k, V v, Handler<AsyncResult<Void>> completionHandler);
 
   /**
-   * Get the values from the map for the key.
+   * Get the values from the map for the key. If the key isn't in the map, an empty {@link ChoosableIterable} must
+   * be returned.
    * @param k The key
    * @param resultHandler This will be called with the list of values for the key. The type of the values returned
    *                      must be {@link ChoosableIterable}

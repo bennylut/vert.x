@@ -1,17 +1,12 @@
 /*
- * Copyright (c) 2011-2014 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.net;
@@ -21,13 +16,15 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Options for configuring a {@link io.vertx.core.net.NetClient}.
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@DataObject(generateConverter = true)
+@DataObject(generateConverter = true, publicConverter = false)
 public class NetClientOptions extends ClientOptionsBase {
 
   /**
@@ -106,6 +103,12 @@ public class NetClientOptions extends ClientOptionsBase {
   }
 
   @Override
+  public NetClientOptions setReusePort(boolean reusePort) {
+    super.setReusePort(reusePort);
+    return this;
+  }
+
+  @Override
   public NetClientOptions setTrafficClass(int trafficClass) {
     super.setTrafficClass(trafficClass);
     return this;
@@ -130,14 +133,14 @@ public class NetClientOptions extends ClientOptionsBase {
   }
 
   @Override
-  public NetClientOptions setUsePooledBuffers(boolean usePooledBuffers) {
-    super.setUsePooledBuffers(usePooledBuffers);
+  public NetClientOptions setIdleTimeout(int idleTimeout) {
+    super.setIdleTimeout(idleTimeout);
     return this;
   }
 
   @Override
-  public NetClientOptions setIdleTimeout(int idleTimeout) {
-    super.setIdleTimeout(idleTimeout);
+  public NetClientOptions setIdleTimeoutUnit(TimeUnit idleTimeoutUnit) {
+    super.setIdleTimeoutUnit(idleTimeoutUnit);
     return this;
   }
 
@@ -201,6 +204,46 @@ public class NetClientOptions extends ClientOptionsBase {
   public NetClientOptions addEnabledSecureTransportProtocol(final String protocol) {
     super.addEnabledSecureTransportProtocol(protocol);
     return this;
+  }
+
+  @Override
+  public NetClientOptions removeEnabledSecureTransportProtocol(String protocol) {
+    return (NetClientOptions) super.removeEnabledSecureTransportProtocol(protocol);
+  }
+
+  @Override
+  public NetClientOptions setUseAlpn(boolean useAlpn) {
+    return (NetClientOptions) super.setUseAlpn(useAlpn);
+  }
+
+  @Override
+  public NetClientOptions setSslEngineOptions(SSLEngineOptions sslEngineOptions) {
+    return (NetClientOptions) super.setSslEngineOptions(sslEngineOptions);
+  }
+
+  @Override
+  public NetClientOptions setJdkSslEngineOptions(JdkSSLEngineOptions sslEngineOptions) {
+    return (NetClientOptions) super.setJdkSslEngineOptions(sslEngineOptions);
+  }
+
+  @Override
+  public NetClientOptions setTcpFastOpen(boolean tcpFastOpen) {
+    return (NetClientOptions) super.setTcpFastOpen(tcpFastOpen);
+  }
+
+  @Override
+  public NetClientOptions setTcpCork(boolean tcpCork) {
+    return (NetClientOptions) super.setTcpCork(tcpCork);
+  }
+
+  @Override
+  public NetClientOptions setTcpQuickAck(boolean tcpQuickAck) {
+    return (NetClientOptions) super.setTcpQuickAck(tcpQuickAck);
+  }
+
+  @Override
+  public ClientOptionsBase setOpenSslEngineOptions(OpenSSLEngineOptions sslEngineOptions) {
+    return super.setOpenSslEngineOptions(sslEngineOptions);
   }
 
   @Override
@@ -309,27 +352,15 @@ public class NetClientOptions extends ClientOptionsBase {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof NetClientOptions)) return false;
-    if (!super.equals(o)) return false;
-
-    NetClientOptions that = (NetClientOptions) o;
-
-    if (reconnectAttempts != that.reconnectAttempts) return false;
-    if (reconnectInterval != that.reconnectInterval) return false;
-    if (!hostnameVerificationAlgorithm.equals(that.hostnameVerificationAlgorithm)) return false;
-
-    return true;
+  public NetClientOptions setEnabledSecureTransportProtocols(Set<String> enabledSecureTransportProtocols) {
+    return (NetClientOptions) super.setEnabledSecureTransportProtocols(enabledSecureTransportProtocols);
   }
 
-  @Override
-  public int hashCode() {
-    int result = super.hashCode();
-    result = 31 * result + reconnectAttempts;
-    result = 31 * result + (int) (reconnectInterval ^ (reconnectInterval >>> 32));
-    result = 31 * result + hostnameVerificationAlgorithm.hashCode();
-    return result;
+  public NetClientOptions setSslHandshakeTimeout(long sslHandshakeTimeout) {
+    return (NetClientOptions) super.setSslHandshakeTimeout(sslHandshakeTimeout);
   }
 
+  public NetClientOptions setSslHandshakeTimeoutUnit(TimeUnit sslHandshakeTimeoutUnit) {
+    return (NetClientOptions) super.setSslHandshakeTimeoutUnit(sslHandshakeTimeoutUnit);
+  }
 }

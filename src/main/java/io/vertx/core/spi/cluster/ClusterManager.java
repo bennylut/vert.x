@@ -1,24 +1,21 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.spi.cluster;
 
 
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.shareddata.AsyncMap;
 import io.vertx.core.shareddata.Counter;
@@ -57,16 +54,16 @@ public interface ClusterManager {
   /**
    * Return an async map for the given name
    */
-  <K, V> void getAsyncMap(String name, Handler<AsyncResult<AsyncMap<K, V>>> resultHandler);
+  <K, V> Future<AsyncMap<K, V>> getAsyncMap(String name);
 
   /**
    * Return a synchronous map for the given name
    */
   <K, V> Map<K, V> getSyncMap(String name);
 
-  void getLockWithTimeout(String name, long timeout, Handler<AsyncResult<Lock>> resultHandler);
+  Future<Lock> getLockWithTimeout(String name, long timeout);
 
-  void getCounter(String name, Handler<AsyncResult<Counter>> resultHandler);
+  Future<Counter> getCounter(String name);
 
   /**
    * Return the unique node ID for this node

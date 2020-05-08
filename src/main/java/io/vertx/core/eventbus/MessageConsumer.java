@@ -1,23 +1,19 @@
 /*
- * Copyright (c) 2011-2014 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.eventbus;
 
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.streams.ReadStream;
 
@@ -50,6 +46,9 @@ public interface MessageConsumer<T> extends ReadStream<Message<T>> {
   MessageConsumer<T> resume();
 
   @Override
+  MessageConsumer<T> fetch(long amount);
+
+  @Override
   MessageConsumer<T> endHandler(Handler<Void> endHandler);
 
   /**
@@ -69,8 +68,10 @@ public interface MessageConsumer<T> extends ReadStream<Message<T>> {
 
   /**
    * Set the number of messages this registration will buffer when this stream is paused. The default
-   * value is <code>0</code>. When a new value is set, buffered messages may be discarded to reach
-   * the new value.
+   * value is <code>1000</code>.
+   * <p>
+   * When a new value is set, buffered messages may be discarded to reach the new value. The most recent
+   * messages will be kept.
    *
    * @param maxBufferedMessages the maximum number of messages that can be buffered
    * @return this registration
@@ -92,7 +93,7 @@ public interface MessageConsumer<T> extends ReadStream<Message<T>> {
   /**
    * Unregisters the handler which created this registration
    */
-  void unregister();
+  Future<Void> unregister();
 
   /**
    * Unregisters the handler which created this registration

@@ -1,30 +1,23 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.http;
 
-import io.vertx.codegen.annotations.Nullable;
+import io.vertx.codegen.annotations.*;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.codegen.annotations.CacheReturn;
-import io.vertx.codegen.annotations.Fluent;
-import io.vertx.codegen.annotations.GenIgnore;
-import io.vertx.codegen.annotations.VertxGen;
-import io.vertx.core.streams.ReadStream;
+import io.vertx.core.net.NetSocket;
 import io.vertx.core.streams.WriteStream;
 
 /**
@@ -57,16 +50,10 @@ import io.vertx.core.streams.WriteStream;
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
 @VertxGen
-public interface HttpClientRequest extends WriteStream<Buffer>, ReadStream<HttpClientResponse> {
+public interface HttpClientRequest extends WriteStream<Buffer>, Future<HttpClientResponse> {
 
   @Override
   HttpClientRequest exceptionHandler(Handler<Throwable> handler);
-
-  /**
-   * @throws java.lang.IllegalStateException when no response handler is set
-   */
-  @Override
-  HttpClientRequest write(Buffer data);
 
   @Override
   HttpClientRequest setWriteQueueMaxSize(int maxSize);
@@ -74,20 +61,24 @@ public interface HttpClientRequest extends WriteStream<Buffer>, ReadStream<HttpC
   @Override
   HttpClientRequest drainHandler(Handler<Void> handler);
 
-  @Override
-  HttpClientRequest handler(Handler<HttpClientResponse> handler);
-
-  @Override
-  HttpClientRequest pause();
-
-  @Override
-  HttpClientRequest resume();
-
-  @Override
-  HttpClientRequest endHandler(Handler<Void> endHandler);
-
+  /**
+   * Set the request to follow HTTP redirects up to {@link HttpClientOptions#getMaxRedirects()}.
+   *
+   * @param followRedirects {@code true} to follow HTTP redirects
+   * @return a reference to this, so the API can be used fluently
+   */
   @Fluent
   HttpClientRequest setFollowRedirects(boolean followRedirects);
+
+  /**
+   * Set the max number of HTTP redirects this request will follow. The default is {@code 0} which means
+   * no redirects.
+   *
+   * @param maxRedirects the number of HTTP redirect to follow
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Fluent
+  HttpClientRequest setMaxRedirects(int maxRedirects);
 
   /**
    * If chunked is true then the request will be set into HTTP chunked mode
@@ -107,20 +98,6 @@ public interface HttpClientRequest extends WriteStream<Buffer>, ReadStream<HttpC
    * The HTTP method for the request.
    */
   HttpMethod method();
-
-  /**
-   * @return the raw value of the method this request sends
-   */
-  String getRawMethod();
-
-  /**
-   * Set the value the method to send when the method {@link HttpMethod#OTHER} is used.
-   *
-   * @param method the raw method
-   * @return a reference to this, so the API can be used fluently
-   */
-  @Fluent
-  HttpClientRequest setRawMethod(String method);
 
   /**
    * @return the absolute URI corresponding to the the HTTP request
@@ -143,17 +120,15 @@ public interface HttpClientRequest extends WriteStream<Buffer>, ReadStream<HttpC
   String query();
 
   /**
-   * Set the request host.<p/>
-   *
    * For HTTP/2 it sets the {@literal :authority} pseudo header otherwise it sets the {@literal Host} header
    */
   @Fluent
-  HttpClientRequest setHost(String host);
+  HttpClientRequest setAuthority(String authority);
 
   /**
    * @return the request host. For HTTP/2 it returns the {@literal :authority} pseudo header otherwise it returns the {@literal Host} header
    */
-  String getHost();
+  String getAuthority();
 
   /**
    * @return The HTTP headers
@@ -174,7 +149,8 @@ public interface HttpClientRequest extends WriteStream<Buffer>, ReadStream<HttpC
   /**
    * Like {@link #putHeader(String, String)} but using CharSequence
    */
-  @GenIgnore
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  @Fluent
   HttpClientRequest putHeader(CharSequence name, CharSequence value);
 
   /**
@@ -184,32 +160,45 @@ public interface HttpClientRequest extends WriteStream<Buffer>, ReadStream<HttpC
    * @param values The header values
    * @return @return a reference to this, so the API can be used fluently
    */
-  @GenIgnore
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  @Fluent
   HttpClientRequest putHeader(String name, Iterable<String> values);
 
   /**
    * Like {@link #putHeader(String, Iterable)} but using CharSequence
    */
-  @GenIgnore
+  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+  @Fluent
   HttpClientRequest putHeader(CharSequence name, Iterable<CharSequence> values);
 
   /**
    * Write a {@link String} to the request body, encoded as UTF-8.
    *
-   * @return @return a reference to this, so the API can be used fluently
+   * @param chunk the data chunk
+   * @return a future completed with the result
    * @throws java.lang.IllegalStateException when no response handler is set
    */
-  @Fluent
-  HttpClientRequest write(String chunk);
+  Future<Void> write(String chunk);
+
+  /**
+   * Same as {@link #write(String)} but with an {@code handler} called when the operation completes
+   */
+  void write(String chunk, Handler<AsyncResult<Void>> handler);
 
   /**
    * Write a {@link String} to the request body, encoded using the encoding {@code enc}.
    *
-   * @return @return a reference to this, so the API can be used fluently
+   * @param chunk the data chunk
+   * @param enc the encoding
+   * @return a future completed with the result
    * @throws java.lang.IllegalStateException when no response handler is set
    */
-  @Fluent
-  HttpClientRequest write(String chunk, String enc);
+  Future<Void> write(String chunk, String enc);
+
+  /**
+   * Same as {@link #write(String,String)} but with an {@code handler} called when the operation completes
+   */
+  void write(String chunk, String enc, Handler<AsyncResult<Void>> handler);
 
   /**
    * If you send an HTTP request with the header {@code Expect} set to the value {@code 100-continue}
@@ -234,37 +223,59 @@ public interface HttpClientRequest extends WriteStream<Buffer>, ReadStream<HttpC
    * @return a reference to this, so the API can be used fluently
    * @throws java.lang.IllegalStateException when no response handler is set
    */
-  @Fluent
-  HttpClientRequest sendHead();
+  Future<HttpVersion> sendHead();
 
   /**
    * Like {@link #sendHead()} but with an handler after headers have been sent. The handler will be called with
    * the {@link HttpVersion} if it can be determined or null otherwise.<p>
    */
   @Fluent
-  HttpClientRequest sendHead(Handler<HttpVersion> completionHandler);
+  HttpClientRequest sendHead(Handler<AsyncResult<HttpVersion>> completionHandler);
 
   /**
    * Same as {@link #end(Buffer)} but writes a String in UTF-8 encoding
    *
+   * @param chunk the data chunk
+   * @return a future completed with the result
    * @throws java.lang.IllegalStateException when no response handler is set
    */
-  void end(String chunk);
+  Future<Void> end(String chunk);
+
+  /**
+   * Same as {@link #end(String)} but with an {@code handler} called when the operation completes
+   */
+  void end(String chunk, Handler<AsyncResult<Void>> handler);
 
   /**
    * Same as {@link #end(Buffer)} but writes a String with the specified encoding
    *
+   * @param chunk the data chunk
+   * @param enc the encoding
+   * @return a future completed with the result
    * @throws java.lang.IllegalStateException when no response handler is set
    */
-  void end(String chunk, String enc);
+  Future<Void> end(String chunk, String enc);
+
+  /**
+   * Same as {@link #end(String,String)} but with an {@code handler} called when the operation completes
+   */
+  void end(String chunk, String enc, Handler<AsyncResult<Void>> handler);
 
   /**
    * Same as {@link #end()} but writes some data to the request body before ending. If the request is not chunked and
    * no other data has been written then the {@code Content-Length} header will be automatically set
    *
+   * @return a future completed with the result
    * @throws java.lang.IllegalStateException when no response handler is set
    */
-  void end(Buffer chunk);
+  @Override
+  Future<Void> end(Buffer chunk);
+
+  /**
+   * Same as {@link #end(String)} but with an {@code handler} called when the operation completes
+   */
+  @Override
+  void end(Buffer chunk, Handler<AsyncResult<Void>> handler);
 
   /**
    * Ends the request. If no data has been written to the request body, and {@link #sendHead()} has not been called then
@@ -272,9 +283,17 @@ public interface HttpClientRequest extends WriteStream<Buffer>, ReadStream<HttpC
    * <p>
    * Once the request has ended, it cannot be used any more,
    *
+   * @return a future completed with the result
    * @throws java.lang.IllegalStateException when no response handler is set
    */
-  void end();
+  @Override
+  Future<Void> end();
+
+  /**
+   * Same as {@link #end()} but with an {@code handler} called when the operation completes
+   */
+  @Override
+  void end(Handler<AsyncResult<Void>> handler);
 
   /**
    * Set's the amount of time after which if the request does not return any data within the timeout period an
@@ -302,10 +321,10 @@ public interface HttpClientRequest extends WriteStream<Buffer>, ReadStream<HttpC
    *   <li>{@link HttpClientRequest#method()}</li>
    *   <li>{@link HttpClientRequest#uri()}</li>
    *   <li>{@link HttpClientRequest#headers()}</li>
-   *   <li>{@link HttpClientRequest#getHost()}</li>
+   *   <li>{@link HttpClientRequest#getAuthority()}</li>
    * </ul>
    *
-   * In addition the handler should call the {@link HttpClientRequest#handler} method to set an handler to
+   * In addition the handler should call the {@link HttpClientRequest#setHandler} method to set an handler to
    * process the response.<p/>
    *
    * @param handler the handler
@@ -313,6 +332,36 @@ public interface HttpClientRequest extends WriteStream<Buffer>, ReadStream<HttpC
    */
   @Fluent
   HttpClientRequest pushHandler(Handler<HttpClientRequest> handler);
+
+  /**
+   * Get a {@link NetSocket} for the underlying connection of this request.
+   * <p>
+   * The {@code handler} is called after the response headers are received.
+   * <p>
+   * This shall be used when using a {@link HttpMethod#CONNECT} method.
+   * <p>
+   * HTTP/1.1 pipe-lined requests cannot support net socket upgrade.
+   * <p>
+   * Pooled connection is removed from the pool.
+   *
+   * @param handler the handler
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Fluent
+  default HttpClientRequest netSocket(Handler<AsyncResult<NetSocket>> handler) {
+    Future<NetSocket> fut = netSocket();
+    if (handler != null) {
+      fut.onComplete(handler);
+    }
+    return this;
+  }
+
+  /**
+   * Like {@link #netSocket(Handler)} but returns a {@code Future} of the asynchronous result
+   */
+  default Future<NetSocket> netSocket() {
+    return Future.failedFuture("Cannot use socket connect");
+  }
 
   /**
    * Reset this stream with the error code {@code 0}.
@@ -328,7 +377,7 @@ public interface HttpClientRequest extends WriteStream<Buffer>, ReadStream<HttpC
    * <p/>
    * <ul>
    *   <li>for HTTP/2, this performs send an HTTP/2 reset frame with the specified error {@code code}</li>
-   *   <li>for HTTP/1.x, this closes the connection after the current in-flight requests are ended</li>
+   *   <li>for HTTP/1.x, this closes the connection when the current request is inflight</li>
    * </ul>
    * <p/>
    * When the request has not yet been sent, the request will be aborted and false is returned as indicator.
@@ -344,15 +393,6 @@ public interface HttpClientRequest extends WriteStream<Buffer>, ReadStream<HttpC
    */
   @CacheReturn
   HttpConnection connection();
-
-  /**
-   * Set a connection handler called when an HTTP connection has been established.
-   *
-   * @param handler the handler
-   * @return a reference to this, so the API can be used fluently
-   */
-  @Fluent
-  HttpClientRequest connectionHandler(@Nullable Handler<HttpConnection> handler);
 
   /**
    * Write an HTTP/2 frame to the request, allowing to extend the HTTP/2 protocol.<p>
@@ -386,5 +426,35 @@ public interface HttpClientRequest extends WriteStream<Buffer>, ReadStream<HttpC
   @Fluent
   default HttpClientRequest writeCustomFrame(HttpFrame frame) {
     return writeCustomFrame(frame.type(), frame.flags(), frame.payload());
+  }
+
+  /**
+   * Sets the priority of the associated stream.
+   * <p/>
+   * This is not implemented for HTTP/1.x.
+   *
+   * @param streamPriority the priority of this request's stream
+   */
+  @Fluent
+  default HttpClientRequest setStreamPriority(StreamPriority streamPriority) {
+      return this;
+  }
+
+  /**
+   * @return the priority of the associated HTTP/2 stream for HTTP/2 otherwise {@code null}
+   */
+  StreamPriority getStreamPriority();
+
+  @Override
+  HttpClientRequest onComplete(Handler<AsyncResult<HttpClientResponse>> handler);
+
+  @Override
+  default HttpClientRequest onSuccess(Handler<HttpClientResponse> handler) {
+    return (HttpClientRequest) Future.super.onSuccess(handler);
+  }
+
+  @Override
+  default HttpClientRequest onFailure(Handler<Throwable> handler) {
+    return (HttpClientRequest) Future.super.onFailure(handler);
   }
 }

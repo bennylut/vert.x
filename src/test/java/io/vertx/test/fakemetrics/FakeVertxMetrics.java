@@ -1,47 +1,35 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- *  ------------------------------------------------------
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *      The Eclipse Public License is available at
- *      http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *      The Apache License v2.0 is available at
- *      http://www.opensource.org/licenses/apache2.0.php
- *
- *  You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.test.fakemetrics;
 
 import io.vertx.core.Verticle;
 import io.vertx.core.Vertx;
-import io.vertx.core.datagram.DatagramSocket;
 import io.vertx.core.datagram.DatagramSocketOptions;
-import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
-import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
-import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.core.spi.metrics.*;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */
 public class FakeVertxMetrics extends FakeMetricsBase implements VertxMetrics {
 
-  public static AtomicReference<EventBus> eventBus = new AtomicReference<>();
+  private volatile Vertx vertx;
 
-  public FakeVertxMetrics(Vertx vertx) {
-    super(vertx);
+  public Vertx vertx() {
+    return vertx;
   }
 
   @Override
@@ -49,101 +37,39 @@ public class FakeVertxMetrics extends FakeMetricsBase implements VertxMetrics {
     return true;
   }
 
-  public void verticleDeployed(Verticle verticle) {
+  public EventBusMetrics createEventBusMetrics() {
+    return new FakeEventBusMetrics();
   }
 
-  public void verticleUndeployed(Verticle verticle) {
+  public HttpServerMetrics<?, ?, ?> createHttpServerMetrics(HttpServerOptions options, SocketAddress localAddress) {
+    return new FakeHttpServerMetrics();
   }
 
-  public void timerCreated(long id) {
+  public HttpClientMetrics<?, ?, ?, ?, Void> createHttpClientMetrics(HttpClientOptions options) {
+    return new FakeHttpClientMetrics(options.getMetricsName());
   }
 
-  public void timerEnded(long id, boolean cancelled) {
-  }
-
-  public EventBusMetrics createMetrics(EventBus eventBus) {
-    return new FakeEventBusMetrics(eventBus);
-  }
-
-  public HttpServerMetrics<?, ?, ?> createMetrics(HttpServer server, SocketAddress localAddress, HttpServerOptions options) {
-    return new FakeHttpServerMetrics(server);
-  }
-
-  public HttpClientMetrics<?, ?, ?, ?, Void> createMetrics(HttpClient client, HttpClientOptions options) {
-    return new FakeHttpClientMetrics(client, options.getMetricsName());
-  }
-
-  public TCPMetrics<?> createMetrics(SocketAddress localAddress, NetServerOptions options) {
+  public TCPMetrics<?> createNetServerMetrics(NetServerOptions options, SocketAddress localAddress) {
     return new TCPMetrics<Object>() {
+   };
+  }
 
-      public Object connected(SocketAddress remoteAddress, String remoteName) {
-        return null;
-      }
-
-      public void disconnected(Object socketMetric, SocketAddress remoteAddress) {
-      }
-
-      public void bytesRead(Object socketMetric, SocketAddress remoteAddress, long numberOfBytes) {
-      }
-
-      public void bytesWritten(Object socketMetric, SocketAddress remoteAddress, long numberOfBytes) {
-      }
-
-      public void exceptionOccurred(Object socketMetric, SocketAddress remoteAddress, Throwable t) {
-      }
-
-      public boolean isEnabled() {
-        return false;
-      }
-
-      public void close() {
-      }
+  public TCPMetrics<?> createNetClientMetrics(NetClientOptions options) {
+    return new TCPMetrics<Object>() {
     };
   }
 
-  public TCPMetrics<?> createMetrics(NetClient client, NetClientOptions options) {
-    return new TCPMetrics<Object>() {
-
-      public Object connected(SocketAddress remoteAddress, String remoteName) {
-        return null;
-      }
-
-      public void disconnected(Object socketMetric, SocketAddress remoteAddress) {
-      }
-
-      public void bytesRead(Object socketMetric, SocketAddress remoteAddress, long numberOfBytes) {
-      }
-
-      public void bytesWritten(Object socketMetric, SocketAddress remoteAddress, long numberOfBytes) {
-      }
-
-      public void exceptionOccurred(Object socketMetric, SocketAddress remoteAddress, Throwable t) {
-      }
-
-      public boolean isEnabled() {
-        return false;
-      }
-
-      public void close() {
-      }
-    };
-  }
-
-  public DatagramSocketMetrics createMetrics(DatagramSocket socket, DatagramSocketOptions options) {
-    return new FakeDatagramSocketMetrics(socket);
+  public DatagramSocketMetrics createDatagramSocketMetrics(DatagramSocketOptions options) {
+    return new FakeDatagramSocketMetrics();
   }
 
   @Override
-  public <P> PoolMetrics<?> createMetrics(P pool, String poolType, String poolName, int maxPoolSize) {
+  public PoolMetrics<?> createPoolMetrics(String poolType, String poolName, int maxPoolSize) {
     return new FakePoolMetrics(poolName, maxPoolSize);
   }
 
-  public boolean isEnabled() {
-    return true;
-  }
-
   @Override
-  public void eventBusInitialized(EventBus bus) {
-    this.eventBus.set(bus);
+  public void vertxCreated(Vertx vertx) {
+    this.vertx = vertx;
   }
 }

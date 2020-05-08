@@ -1,17 +1,12 @@
 /*
- * Copyright 2014 Red Hat, Inc.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- * The Eclipse Public License is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * The Apache License v2.0 is available at
- * http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.streams.impl;
@@ -20,6 +15,8 @@ import io.vertx.core.Handler;
 import io.vertx.core.streams.Pump;
 import io.vertx.core.streams.ReadStream;
 import io.vertx.core.streams.WriteStream;
+
+import java.util.Objects;
 
 /**
  * Pumps data from a {@link io.vertx.core.streams.ReadStream} to a {@link io.vertx.core.streams.WriteStream} and performs flow control where necessary to
@@ -51,12 +48,14 @@ public class PumpImpl<T> implements Pump {
    * Create a new {@code Pump} with the given {@code ReadStream} and {@code WriteStream}. Set the write queue max size
    * of the write stream to {@code maxWriteQueueSize}
    */
-  PumpImpl(ReadStream<T> rs, WriteStream<T> ws, int maxWriteQueueSize) {
+  public PumpImpl(ReadStream<T> rs, WriteStream<T> ws, int maxWriteQueueSize) {
     this(rs, ws);
     this.writeStream.setWriteQueueMaxSize(maxWriteQueueSize);
   }
 
-  PumpImpl(ReadStream<T> rs, WriteStream<T> ws) {
+  public PumpImpl(ReadStream<T> rs, WriteStream<T> ws) {
+    Objects.requireNonNull(rs);
+    Objects.requireNonNull(ws);
     this.readStream = rs;
     this.writeStream = ws;
     drainHandler = v-> readStream.resume();

@@ -1,10 +1,22 @@
+/*
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
+ */
+
 package io.vertx.core.impl;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Closeable;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.logging.Logger;
+import io.vertx.core.Promise;
+import io.vertx.core.impl.logging.Logger;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -41,10 +53,13 @@ class CloseHooks {
    * Remove an existing hook.
    *
    * @param hook the hook to remove
+   * @return {@code} true if the hook was removed
    */
-  synchronized void remove(Closeable hook) {
+  synchronized boolean remove(Closeable hook) {
     if (closeHooks != null) {
-      closeHooks.remove(hook);
+      return closeHooks.remove(hook);
+    } else {
+      return false;
     }
   }
 
@@ -72,8 +87,8 @@ class CloseHooks {
         AtomicInteger count = new AtomicInteger();
         AtomicBoolean failed = new AtomicBoolean();
         for (Closeable hook : copy) {
-          Future<Void> a = Future.future();
-          a.setHandler(ar -> {
+          Promise<Void> promise = Promise.promise();
+          promise.future().onComplete(ar -> {
             if (ar.failed()) {
               if (failed.compareAndSet(false, true)) {
                 // Only report one failure
@@ -87,10 +102,10 @@ class CloseHooks {
             }
           });
           try {
-            hook.close(a);
+            hook.close(promise);
           } catch (Throwable t) {
             log.warn("Failed to run close hooks", t);
-            a.tryFail(t);
+            promise.tryFail(t);
           }
         }
       } else {

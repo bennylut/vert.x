@@ -1,17 +1,12 @@
 /*
- * Copyright (c) 2011-2014 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.net;
@@ -26,7 +21,7 @@ import io.vertx.core.json.JsonObject;
  *
  * @author <a href="http://oss.lehmann.cx/">Alexander Lehmann</a>
  */
-@DataObject(generateConverter = true)
+@DataObject(generateConverter = true, publicConverter = false)
 public class ProxyOptions {
 
   /**
@@ -202,33 +197,5 @@ public class ProxyOptions {
     Objects.requireNonNull(type, "Proxy type may not be null");
     this.type = type;
     return this;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof ClientOptionsBase)) return false;
-    if (!super.equals(o)) return false;
-
-    ProxyOptions that = (ProxyOptions) o;
-
-    if (type != that.type) return false;
-    if (host.equals(that.host)) return false;
-    if (port != that.port) return false;
-    if (!Objects.equals(password, that.password)) return false;
-    if (!Objects.equals(username, that.username)) return false;
-
-    return true;
-  }
-
-  @Override
-  public int hashCode() {
-    int result = super.hashCode();
-    result = 31 * result + type.hashCode();
-    result = 31 * result + host.hashCode();
-    result = 31 * result + port;
-    result = 31 * result + (password != null ? password.hashCode() : 0);
-    result = 31 * result + (username != null ? username.hashCode() : 0);
-    return result;
   }
 }

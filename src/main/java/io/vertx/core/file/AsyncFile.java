@@ -1,17 +1,12 @@
 /*
- * Copyright (c) 2011-2013 The original author or authors
- * ------------------------------------------------------
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Apache License v2.0 which accompanies this distribution.
+ * Copyright (c) 2011-2019 Contributors to the Eclipse Foundation
  *
- *     The Eclipse Public License is available at
- *     http://www.eclipse.org/legal/epl-v10.html
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
+ * which is available at https://www.apache.org/licenses/LICENSE-2.0.
  *
- *     The Apache License v2.0 is available at
- *     http://www.opensource.org/licenses/apache2.0.php
- *
- * You may elect to redistribute this code under either of these licenses.
+ * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
  */
 
 package io.vertx.core.file;
@@ -19,6 +14,7 @@ package io.vertx.core.file;
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.streams.ReadStream;
@@ -50,9 +46,6 @@ public interface AsyncFile extends ReadStream<Buffer>, WriteStream<Buffer> {
   AsyncFile endHandler(Handler<Void> endHandler);
 
   @Override
-  AsyncFile write(Buffer data);
-
-  @Override
   AsyncFile setWriteQueueMaxSize(int maxSize);
 
   @Override
@@ -61,16 +54,15 @@ public interface AsyncFile extends ReadStream<Buffer>, WriteStream<Buffer> {
   @Override
   AsyncFile exceptionHandler(Handler<Throwable> handler);
 
-  /**
-   * Close the file, see {@link #close()}.
-   */
   @Override
-  void end();
+  AsyncFile fetch(long amount);
 
   /**
    * Close the file. The actual close happens asynchronously.
+   *
+   * @return a future completed with the result
    */
-  void close();
+  Future<Void> close();
 
   /**
    * Close the file. The actual close happens asynchronously.
@@ -94,10 +86,13 @@ public interface AsyncFile extends ReadStream<Buffer>, WriteStream<Buffer> {
    * @param buffer  the buffer to write
    * @param position  the position in the file to write it at
    * @param handler  the handler to call when the write is complete
-   * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  AsyncFile write(Buffer buffer, long position, Handler<AsyncResult<Void>> handler);
+  void write(Buffer buffer, long position, Handler<AsyncResult<Void>> handler);
+
+  /**
+   * Like {@link #write(Buffer, long, Handler)} but returns a {@code Future} of the asynchronous result
+   */
+  Future<Void> write(Buffer buffer, long position);
 
   /**
    * Reads {@code length} bytes of data from the file at position {@code position} in the file, asynchronously.
@@ -120,16 +115,20 @@ public interface AsyncFile extends ReadStream<Buffer>, WriteStream<Buffer> {
   AsyncFile read(Buffer buffer, int offset, long position, int length, Handler<AsyncResult<Buffer>> handler);
 
   /**
+   * Like {@link #read(Buffer, int, long, int, Handler)} but returns a {@code Future} of the asynchronous result
+   */
+  Future<Buffer> read(Buffer buffer, int offset, long position, int length);
+
+  /**
    * Flush any writes made to this file to underlying persistent storage.
    * <p>
    * If the file was opened with {@code flush} set to {@code true} then calling this method will have no effect.
    * <p>
    * The actual flush will happen asynchronously.
    *
-   * @return a reference to this, so the API can be used fluently
+   * @return a future completed with the result
    */
-  @Fluent
-  AsyncFile flush();
+  Future<Void> flush();
 
   /**
    * Same as {@link #flush} but the handler will be called when the flush is complete or if an error occurs
@@ -147,6 +146,20 @@ public interface AsyncFile extends ReadStream<Buffer>, WriteStream<Buffer> {
   AsyncFile setReadPos(long readPos);
 
   /**
+   * Sets the number of bytes that will be read when using the file as a {@link io.vertx.core.streams.ReadStream}.
+   *
+   * @param readLength the bytes that will be read from the file
+   * @return a reference to this, so the API can be used fluently
+   */
+  @Fluent
+  AsyncFile setReadLength(long readLength);
+
+  /**
+   * @return the number of bytes that will be read when using the file as a {@link io.vertx.core.streams.ReadStream}
+   */
+  long getReadLength();
+
+  /**
    * Sets the position from which data will be written when using the file as a {@link io.vertx.core.streams.WriteStream}.
    *
    * @param writePos  the position in the file
@@ -154,6 +167,11 @@ public interface AsyncFile extends ReadStream<Buffer>, WriteStream<Buffer> {
    */
   @Fluent
   AsyncFile setWritePos(long writePos);
+
+  /**
+   * @return the current write position the file is at
+   */
+  long getWritePos();
 
   /**
    * Sets the buffer size that will be used to read the data from the file. Changing this value will impact how much
