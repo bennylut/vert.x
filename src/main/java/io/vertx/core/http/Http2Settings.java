@@ -15,7 +15,6 @@ import io.netty.handler.codec.http2.Http2CodecUtil;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.core.impl.Arguments;
-import io.vertx.core.json.JsonObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -85,16 +84,6 @@ public class Http2Settings {
     maxFrameSize = DEFAULT_MAX_FRAME_SIZE;
     maxHeaderListSize = DEFAULT_MAX_HEADER_LIST_SIZE;
     extraSettings = DEFAULT_EXTRA_SETTINGS;
-  }
-
-  /**
-   * Create an settings from JSON
-   *
-   * @param json the JSON
-   */
-  public Http2Settings(JsonObject json) {
-    this();
-    Http2SettingsConverter.fromJson(json, this);
   }
 
   /**
@@ -349,14 +338,4 @@ public class Http2Settings {
     return result;
   }
 
-  @Override
-  public String toString() {
-    return toJson().encode();
-  }
-
-  public JsonObject toJson() {
-    JsonObject json = new JsonObject();
-    Http2SettingsConverter.toJson(this, json);
-    return json;
-  }
 }

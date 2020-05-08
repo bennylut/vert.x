@@ -12,16 +12,16 @@
 package io.vertx.core.parsetools;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 
 import java.time.Instant;
 
 /**
- * A JSON event emited by the {@link JsonParser}.
+ * A JSON event emited by the
  *
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */

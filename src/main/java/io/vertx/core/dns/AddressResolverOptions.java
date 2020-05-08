@@ -11,10 +11,10 @@
 
 package io.vertx.core.dns;
 
+import com.google.gson.JsonObject;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.impl.AddressResolver;
-import io.vertx.core.json.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -126,11 +126,6 @@ public class AddressResolverOptions {
     this.searchDomains = other.searchDomains != null ? new ArrayList<>(other.searchDomains) : null;
     this.ndots = other.ndots;
     this.rotateServers = other.rotateServers;
-  }
-
-  public AddressResolverOptions(JsonObject json) {
-    this();
-    AddressResolverOptionsConverter.fromJson(json, this);
   }
 
   /**
@@ -430,9 +425,4 @@ public class AddressResolverOptions {
     return this;
   }
 
-  public JsonObject toJson() {
-    JsonObject json = new JsonObject();
-    AddressResolverOptionsConverter.toJson(this, json);
-    return json;
-  }
 }

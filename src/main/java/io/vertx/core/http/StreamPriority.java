@@ -11,9 +11,9 @@
 
 package io.vertx.core.http;
 
+import com.google.gson.JsonObject;
 import io.netty.handler.codec.http2.Http2CodecUtil;
 import io.vertx.codegen.annotations.DataObject;
-import io.vertx.core.json.JsonObject;
 
 /**
  * This class represents HTTP/2 stream priority defined in RFC 7540 clause 5.3
@@ -33,12 +33,6 @@ public class StreamPriority {
     weight = DEFAULT_WEIGHT;
     dependency = DEFAULT_DEPENDENCY;
     exclusive = DEFAULT_EXCLUSIVE;
-  }
-
-  public StreamPriority(JsonObject json) {
-    this.weight = json.getInteger("weight", (int)DEFAULT_WEIGHT).shortValue();
-    this.dependency = json.getInteger("dependency", DEFAULT_DEPENDENCY);
-    this.exclusive = json.getBoolean("exclusive", DEFAULT_EXCLUSIVE);
   }
 
   public StreamPriority(StreamPriority other) {
@@ -124,14 +118,6 @@ public class StreamPriority {
     if (weight != other.weight) return false;
 
     return true;
-  }
-
-  public JsonObject toJson() {
-    JsonObject json = new JsonObject();
-    json.put("weight", weight);
-    json.put("dependency", dependency);
-    json.put("exclusive", exclusive);
-    return json;
   }
 
   @Override

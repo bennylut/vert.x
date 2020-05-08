@@ -14,7 +14,6 @@ package io.vertx.core.impl.launcher;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
-import io.vertx.core.json.JsonObject;
 
 /**
  * Interface that let sub-classes of launcher to be notified on different events.
@@ -24,15 +23,7 @@ import io.vertx.core.json.JsonObject;
 public interface VertxLifecycleHooks {
 
   /**
-   * Hook for sub-classes of the {@link io.vertx.core.Launcher} class before the vertx instance is started. Options
-   * can still be updated.
-   *
-   * @param config the json config file passed via -conf on the command line, an empty json object is not set.
-   */
-  void afterConfigParsed(JsonObject config);
-
-  /**
-   * Hook for sub-classes of the {@link io.vertx.core.Launcher} class before the vertx instance is started. Options
+   * Hook for sub-classes of the Removed Launcher class before the vertx instance is started. Options
    * can still be updated.
    *
    * @param options the vert.x options
@@ -40,14 +31,14 @@ public interface VertxLifecycleHooks {
   void beforeStartingVertx(VertxOptions options);
 
   /**
-   * Hook for sub-classes of the {@link io.vertx.core.Launcher} class after the vertx instance is started.
+   * Hook for sub-classes of the Removed Launcher class after the vertx instance is started.
    *
    * @param vertx the vert.x instance
    */
   void afterStartingVertx(Vertx vertx);
 
   /**
-   * Hook for sub classes of the {@link io.vertx.core.Launcher} class before the verticle is deployed. Deployment
+   * Hook for sub classes of the Removed Launcher class before the verticle is deployed. Deployment
    * options can still be updated.
    *
    * @param deploymentOptions the deployment options
@@ -55,7 +46,7 @@ public interface VertxLifecycleHooks {
   void beforeDeployingVerticle(DeploymentOptions deploymentOptions);
 
   /**
-   * Hook for sub classes of the {@link io.vertx.core.Launcher} class called before the {@link Vertx} instance is
+   * Hook for sub classes of the Removed Launcher class called before the {@link Vertx} instance is
    * terminated. The hook is called during the {@link Vertx#close()} method.
    *
    * @param vertx the {@link Vertx} instance, cannot be {@code null}
@@ -63,7 +54,7 @@ public interface VertxLifecycleHooks {
   void beforeStoppingVertx(Vertx vertx);
 
   /**
-   * Hook for sub classes of the {@link io.vertx.core.Launcher} class called after the {@link Vertx} instance has been
+   * Hook for sub classes of the  class called after the {@link Vertx} instance has been
    * terminated. The hook is called after the {@link Vertx#close()} method.
    */
   void afterStoppingVertx();

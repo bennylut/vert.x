@@ -13,10 +13,8 @@ package io.vertx.core;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.dns.AddressResolverOptions;
-import io.vertx.core.eventbus.EventBusOptions;
 import io.vertx.core.file.FileSystemOptions;
 import io.vertx.core.impl.cpu.CpuCoreSensor;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.metrics.MetricsOptions;
 import io.vertx.core.tracing.TracingOptions;
 
@@ -47,54 +45,6 @@ public class VertxOptions {
    * The default number of threads in the internal blocking  pool (used by some internal operations) = 20
    */
   public static final int DEFAULT_INTERNAL_BLOCKING_POOL_SIZE = 20;
-
-  /**
-   * The default hostname to use when clustering = "localhost"
-   *
-   * @deprecated as of 3.7, use {@link EventBusOptions#DEFAULT_CLUSTER_HOST} instead
-   */
-  @Deprecated
-  public static final String DEFAULT_CLUSTER_HOST = "localhost";
-
-  /**
-   * The default port to use when clustering = 0 (meaning assign a random port)
-   *
-   * @deprecated as of 3.7, use {@link EventBusOptions#DEFAULT_CLUSTER_PORT} instead
-   */
-  @Deprecated
-  public static final int DEFAULT_CLUSTER_PORT = 0;
-
-  /**
-   * The default cluster public host to use = null which means use the same as the cluster host
-   *
-   * @deprecated as of 3.7, use {@link EventBusOptions#DEFAULT_CLUSTER_PUBLIC_HOST} instead
-   */
-  @Deprecated
-  public static final String DEFAULT_CLUSTER_PUBLIC_HOST = null;
-
-  /**
-   * The default cluster public port to use = -1 which means use the same as the cluster port
-   *
-   * @deprecated as of 3.7, use {@link EventBusOptions#DEFAULT_CLUSTER_PUBLIC_PORT} instead
-   */
-  @Deprecated
-  public static final int DEFAULT_CLUSTER_PUBLIC_PORT = -1;
-
-  /**
-   * The default value of cluster ping interval = 20000 ms.
-   *
-   * @deprecated as of 3.7, use {@link EventBusOptions#DEFAULT_CLUSTER_PING_INTERVAL} instead
-   */
-  @Deprecated
-  public static final long DEFAULT_CLUSTER_PING_INTERVAL = TimeUnit.SECONDS.toMillis(20);
-
-  /**
-   * The default value of cluster ping reply interval = 20000 ms.
-   *
-   * @deprecated as of 3.7, use {@link EventBusOptions#DEFAULT_CLUSTER_PING_REPLY_INTERVAL} instead
-   */
-  @Deprecated
-  public static final long DEFAULT_CLUSTER_PING_REPLY_INTERVAL = TimeUnit.SECONDS.toMillis(20);
 
   /**
    * The default value of blocked thread check interval = 1000 ms.
@@ -160,7 +110,6 @@ public class VertxOptions {
   private TracingOptions tracingOptions = new TracingOptions();
   private FileSystemOptions fileSystemOptions = new FileSystemOptions();
   private long warningExceptionTime = DEFAULT_WARNING_EXCEPTION_TIME;
-  private EventBusOptions eventBusOptions = new EventBusOptions();
   private AddressResolverOptions addressResolverOptions = new AddressResolverOptions();
   private boolean preferNativeTransport = DEFAULT_PREFER_NATIVE_TRANSPORT;
   private TimeUnit maxEventLoopExecuteTimeUnit = DEFAULT_MAX_EVENT_LOOP_EXECUTE_TIME_UNIT;
@@ -190,23 +139,12 @@ public class VertxOptions {
     this.metricsOptions = other.getMetricsOptions() != null ? new MetricsOptions(other.getMetricsOptions()) : null;
     this.fileSystemOptions = other.getFileSystemOptions() != null ? new FileSystemOptions(other.getFileSystemOptions()) : null;
     this.warningExceptionTime = other.warningExceptionTime;
-    this.eventBusOptions = new EventBusOptions(other.eventBusOptions);
     this.addressResolverOptions = other.addressResolverOptions != null ? new AddressResolverOptions(other.getAddressResolverOptions()) : null;
     this.maxEventLoopExecuteTimeUnit = other.maxEventLoopExecuteTimeUnit;
     this.maxWorkerExecuteTimeUnit = other.maxWorkerExecuteTimeUnit;
     this.warningExceptionTimeUnit = other.warningExceptionTimeUnit;
     this.blockedThreadCheckIntervalUnit = other.blockedThreadCheckIntervalUnit;
     this.tracingOptions = other.tracingOptions != null ? other.tracingOptions.copy() : null;
-  }
-
-  /**
-   * Create an instance from a {@link io.vertx.core.json.JsonObject}
-   *
-   * @param json the JsonObject to create it from
-   */
-  public VertxOptions(JsonObject json) {
-    this();
-    VertxOptionsConverter.fromJson(json, this);
   }
 
   /**
@@ -254,169 +192,6 @@ public class VertxOptions {
       throw new IllegalArgumentException("workerPoolSize must be > 0");
     }
     this.workerPoolSize = workerPoolSize;
-    return this;
-  }
-
-  /**
-   * Get the host name to be used for clustering.
-   *
-   * @return The host name
-   *
-   * @deprecated as of 3.7, use {@link #getEventBusOptions()} and then {@link EventBusOptions#getHost()} instead
-   */
-  @Deprecated
-  public String getClusterHost() {
-    return eventBusOptions.getHost();
-  }
-
-  /**
-   * Set the hostname to be used for clustering.
-   *
-   * @param clusterHost the host name to use
-   * @return a reference to this, so the API can be used fluently
-   *
-   * @deprecated as of 3.7, use {@link #getEventBusOptions()} and then {@link EventBusOptions#setHost(String)} instead
-   */
-  @Deprecated
-  public VertxOptions setClusterHost(String clusterHost) {
-    this.eventBusOptions.setHost(clusterHost);
-    return this;
-  }
-
-  /**
-   * Get the public facing hostname to be used when clustering.
-   *
-   * @return the public facing hostname
-   *
-   * @deprecated as of 3.7, use {@link #getEventBusOptions()} and then {@link EventBusOptions#getClusterPublicHost()} instead
-   */
-  @Deprecated
-  public String getClusterPublicHost() {
-    return getEventBusOptions().getClusterPublicHost();
-  }
-
-  /**
-   * Set the public facing hostname to be used for clustering.
-   * Sometimes, e.g. when running on certain clouds, the local address the server listens on for clustering is not the same
-   * address that other nodes connect to it at, as the OS / cloud infrastructure does some kind of proxying.
-   * If this is the case you can specify a public hostname which is different from the hostname the server listens at.
-   * The default value is null which means use the same as the cluster hostname.
-   *
-   * @param clusterPublicHost the public host name to use
-   * @return a reference to this, so the API can be used fluently
-   *
-   * @deprecated as of 3.7, use {@link #getEventBusOptions()} and then {@link EventBusOptions#setClusterPublicHost(String)} instead
-   */
-  @Deprecated
-  public VertxOptions setClusterPublicHost(String clusterPublicHost) {
-    getEventBusOptions().setClusterPublicHost(clusterPublicHost);
-    return this;
-  }
-
-  /**
-   * Get the port to be used for clustering
-   *
-   * @return the port
-   *
-   * @deprecated as of 3.7, use {@link #getEventBusOptions()} and then {@link EventBusOptions#getPort()} instead
-   */
-  @Deprecated
-  public int getClusterPort() {
-    return eventBusOptions.getPort();
-  }
-
-  /**
-   * Set the port to be used for clustering.
-   *
-   * @param clusterPort the port
-   * @return a reference to this, so the API can be used fluently
-   *
-   * @deprecated as of 3.7, use {@link #getEventBusOptions()} and then {@link EventBusOptions#setPort(int)} instead
-   */
-  @Deprecated
-  public VertxOptions setClusterPort(int clusterPort) {
-    eventBusOptions.setPort(clusterPort);
-    return this;
-  }
-
-  /**
-   * Get the public facing port to be used when clustering.
-   *
-   * @return the public facing port
-   *
-   * @deprecated as of 3.7, use {@link #getEventBusOptions()} and then {@link EventBusOptions#getClusterPublicPort()} instead
-   */
-  @Deprecated
-  public int getClusterPublicPort() {
-    return eventBusOptions.getClusterPublicPort();
-  }
-
-  /**
-   * See {@link #setClusterPublicHost(String)} for an explanation.
-   *
-   * @param clusterPublicPort the public port to use
-   * @return a reference to this, so the API can be used fluently
-   *
-   * @deprecated as of 3.7, use {@link #getEventBusOptions()} and then {@link EventBusOptions#setClusterPublicPort(int)} instead
-   */
-  @Deprecated
-  public VertxOptions setClusterPublicPort(int clusterPublicPort) {
-    getEventBusOptions().setClusterPublicPort(clusterPublicPort);
-    return this;
-  }
-
-  /**
-   * Get the value of cluster ping interval, in ms.
-   * <p>
-   * Nodes in the cluster ping each other at this interval to determine whether they are still running.
-   *
-   * @return The value of cluster ping interval
-   *
-   * @deprecated as of 3.7, use {@link #getEventBusOptions()} and then {@link EventBusOptions#getClusterPingInterval()} instead
-   */
-  @Deprecated
-  public long getClusterPingInterval() {
-    return getEventBusOptions().getClusterPingInterval();
-  }
-
-  /**
-   * Set the value of cluster ping interval, in ms.
-   *
-   * @param clusterPingInterval The value of cluster ping interval, in ms.
-   * @return a reference to this, so the API can be used fluently
-   *
-   * @deprecated as of 3.7, use {@link #getEventBusOptions()} and then {@link EventBusOptions#setClusterPingInterval(long)} instead
-   */
-  @Deprecated
-  public VertxOptions setClusterPingInterval(long clusterPingInterval) {
-    eventBusOptions.setClusterPingInterval(clusterPingInterval);
-    return this;
-  }
-
-  /**
-   * Get the value of cluster ping reply interval, in ms.
-   * <p>
-   * After sending a ping, if a pong is not received in this time, the node will be considered dead.
-   *
-   * @return the value of cluster ping reply interval
-   * @deprecated as of 3.7, use {@link #getEventBusOptions()} and then {@link EventBusOptions#getClusterPingReplyInterval()} instead
-   */
-  @Deprecated
-  public long getClusterPingReplyInterval() {
-    return eventBusOptions.getClusterPingReplyInterval();
-  }
-
-  /**
-   * Set the value of cluster ping reply interval, in ms.
-   *
-   * @param clusterPingReplyInterval The value of cluster ping reply interval, in ms.
-   * @return a reference to this, so the API can be used fluently
-   *
-   * @deprecated as of 3.7, use {@link #getEventBusOptions()} and then {@link EventBusOptions#setClusterPingReplyInterval(long)} instead
-   */
-  @Deprecated
-  public VertxOptions setClusterPingReplyInterval(long clusterPingReplyInterval) {
-    eventBusOptions.setClusterPingReplyInterval(clusterPingReplyInterval);
     return this;
   }
 
@@ -625,25 +400,6 @@ public class VertxOptions {
   }
 
   /**
-   * @return the event bus option to configure the event bus communication (host, port, ssl...)
-   */
-  public EventBusOptions getEventBusOptions() {
-    return eventBusOptions;
-  }
-
-  /**
-   * Sets the event bus configuration to configure the host, port, ssl...
-   *
-   * @param options the event bus options
-   * @return a reference to this, so the API can be used fluently
-   */
-  public VertxOptions setEventBusOptions(EventBusOptions options) {
-    Objects.requireNonNull(options);
-    this.eventBusOptions = options;
-    return this;
-  }
-
-  /**
    * @return the address resolver options to configure resolving DNS servers, cache TTL, etc...
    */
   public AddressResolverOptions getAddressResolverOptions() {
@@ -760,12 +516,6 @@ public class VertxOptions {
     return this;
   }
 
-  public JsonObject toJson() {
-    JsonObject json = new JsonObject();
-    VertxOptionsConverter.toJson(this, json);
-    return json;
-  }
-
   @Override
   public String toString() {
     return "VertxOptions{" +
@@ -782,8 +532,7 @@ public class VertxOptions {
         ", quorumSize=" + quorumSize +
         ", metrics=" + metricsOptions +
         ", fileSystemOptions=" + fileSystemOptions +
-        ", addressResolver=" + addressResolverOptions.toJson() +
-        ", eventbus=" + eventBusOptions.toJson() +
+        ", addressResolver=" + addressResolverOptions +
         ", warningExceptionTimeUnit=" + warningExceptionTimeUnit +
         ", warningExceptionTime=" + warningExceptionTime +
         '}';

@@ -17,7 +17,6 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Verticle;
-import io.vertx.core.json.JsonObject;
 
 import java.util.Set;
 
@@ -42,7 +41,7 @@ public interface Deployment {
 
   Future<Void> doUndeploy(ContextInternal undeployingContext);
 
-  JsonObject config();
+//  JsonObject config();
 
   String deploymentID();
 

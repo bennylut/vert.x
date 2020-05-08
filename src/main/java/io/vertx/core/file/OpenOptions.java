@@ -12,7 +12,6 @@
 package io.vertx.core.file;
 
 import io.vertx.codegen.annotations.DataObject;
-import io.vertx.core.json.JsonObject;
 
 /**
  * Describes how an {@link io.vertx.core.file.AsyncFile} should be opened.
@@ -76,15 +75,6 @@ public class OpenOptions {
     this.append = other.append;
   }
 
-  /**
-   * Constructor to create options from JSON
-   *
-   * @param json  the JSON
-   */
-  public OpenOptions(JsonObject json) {
-    this();
-    OpenOptionsConverter.fromJson(json, this);
-  }
 
   /**
    * Get the permissions string to be used if creating a file

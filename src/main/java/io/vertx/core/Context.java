@@ -11,12 +11,12 @@
 
 package io.vertx.core;
 
+import com.google.gson.JsonObject;
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.impl.VertxThread;
-import io.vertx.core.json.JsonObject;
 
 import java.util.List;
 
@@ -154,13 +154,13 @@ public interface Context {
    */
   String deploymentID();
 
-  /**
-   * If the context is associated with a Verticle deployment, this returns the configuration that was specified when
-   * the verticle was deployed.
-   *
-   * @return the configuration of the deployment or null if not a Verticle deployment
-   */
-  @Nullable JsonObject config();
+//  /**
+//   * If the context is associated with a Verticle deployment, this returns the configuration that was specified when
+//   * the verticle was deployed.
+//   *
+//   * @return the configuration of the deployment or null if not a Verticle deployment
+//   */
+//  @Nullable JsonObject config();
 
 //  /**
 //   * The process args

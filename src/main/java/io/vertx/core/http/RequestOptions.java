@@ -15,7 +15,6 @@ import io.vertx.codegen.annotations.DataObject;
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.core.MultiMap;
 import io.vertx.core.VertxException;
-import io.vertx.core.json.JsonObject;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -104,14 +103,6 @@ public class RequestOptions {
     }
   }
 
-  /**
-   * Create options from JSON
-   *
-   * @param json the JSON
-   */
-  public RequestOptions(JsonObject json) {
-    RequestOptionsConverter.fromJson(json, this);
-  }
 
   /**
    * Get the HTTP method to be used by the client request.
@@ -356,9 +347,4 @@ public class RequestOptions {
     }
   }
 
-  public JsonObject toJson() {
-    JsonObject json = new JsonObject();
-    RequestOptionsConverter.toJson(this, json);
-    return json;
-  }
 }

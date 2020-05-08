@@ -13,7 +13,6 @@ package io.vertx.core.http;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.core.MultiMap;
-import io.vertx.core.json.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,11 +47,6 @@ public class WebSocketConnectOptions extends RequestOptions {
     super(other);
     this.version = other.version;
     this.subProtocols = other.subProtocols;
-  }
-
-  public WebSocketConnectOptions(JsonObject json) {
-    super(json);
-    WebSocketConnectOptionsConverter.fromJson(json, this);
   }
 
   /**
@@ -133,10 +127,4 @@ public class WebSocketConnectOptions extends RequestOptions {
     return (WebSocketConnectOptions) super.setHeaders(headers);
   }
 
-  @Override
-  public JsonObject toJson() {
-    JsonObject json = super.toJson();
-    WebSocketConnectOptionsConverter.toJson(this, json);
-    return json;
-  }
 }

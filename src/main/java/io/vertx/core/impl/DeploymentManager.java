@@ -19,7 +19,6 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.Verticle;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.spi.metrics.VertxMetrics;
@@ -248,7 +247,6 @@ public class DeploymentManager {
 
     private final Deployment parent;
     private final String deploymentID;
-    private final JsonObject conf;
     private final String verticleIdentifier;
     private final List<VerticleHolder> verticles = new CopyOnWriteArrayList<>();
     private final Set<Deployment> children = new ConcurrentHashSet<>();
@@ -260,7 +258,6 @@ public class DeploymentManager {
     private DeploymentImpl(Deployment parent, String deploymentID, String verticleIdentifier, DeploymentOptions options) {
       this.parent = parent;
       this.deploymentID = deploymentID;
-      this.conf = options.getConfig() != null ? options.getConfig().copy() : new JsonObject();
       this.verticleIdentifier = verticleIdentifier;
       this.options = options;
     }
@@ -387,11 +384,6 @@ public class DeploymentManager {
     @Override
     public DeploymentOptions deploymentOptions() {
       return options;
-    }
-
-    @Override
-    public JsonObject config() {
-      return conf;
     }
 
     @Override

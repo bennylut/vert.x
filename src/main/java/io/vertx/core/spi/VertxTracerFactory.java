@@ -11,7 +11,6 @@
 
 package io.vertx.core.spi;
 
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.spi.tracing.VertxTracer;
 import io.vertx.core.tracing.TracingOptions;
 
@@ -35,7 +34,6 @@ public interface VertxTracerFactory {
   /**
    * Create an empty tracing options.
    * Providers can override this method to provide a custom tracing options subclass that exposes custom configuration.
-   * It is used by the {@link io.vertx.core.Launcher} class when creating new options when building a CLI Vert.x.
    *
    * @return new tracing options
    */
@@ -43,15 +41,4 @@ public interface VertxTracerFactory {
     return new TracingOptions();
   }
 
-  /**
-   * Create tracing options from the provided {@code jsonObject}.
-   * Providers can override this method to provide a custom tracing options subclass that exposes custom configuration.
-   * It is used by the {@link io.vertx.core.Launcher} class when creating new options when building a CLI Vert.x.
-   *
-   * @param jsonObject json provided by the user
-   * @return new tracing options
-   */
-  default TracingOptions newOptions(JsonObject jsonObject) {
-    return new TracingOptions(jsonObject);
-  }
 }

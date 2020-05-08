@@ -11,9 +11,9 @@
 
 package io.vertx.core.http;
 
+import com.google.gson.JsonObject;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.json.JsonObject;
 
 /**
  * A {@literal GOAWAY} frame.
@@ -28,10 +28,6 @@ public class GoAway {
   private Buffer debugData;
 
   public GoAway() {
-  }
-
-  public GoAway(JsonObject json) {
-    GoAwayConverter.fromJson(json, this);
   }
 
   public GoAway(GoAway that) {
@@ -87,11 +83,5 @@ public class GoAway {
   public GoAway setDebugData(Buffer debugData) {
     this.debugData = debugData;
     return this;
-  }
-
-  public JsonObject toJson() {
-    JsonObject json = new JsonObject();
-    GoAwayConverter.toJson(this, json);
-    return json;
   }
 }

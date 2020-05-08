@@ -13,7 +13,6 @@ package io.vertx.core.net;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.impl.Arguments;
-import io.vertx.core.json.JsonObject;
 
 
 /**
@@ -83,27 +82,6 @@ public abstract class NetworkOptions {
     this.reusePort = other.isReusePort();
     this.trafficClass = other.getTrafficClass();
     this.logActivity = other.logActivity;
-  }
-
-  /**
-   * Constructor from JSON
-   *
-   * @param json  the JSON
-   */
-  public NetworkOptions(JsonObject json) {
-    this();
-    NetworkOptionsConverter.fromJson(json, this);
-  }
-
-  /**
-   * Convert to JSON
-   *
-   * @return the JSON
-   */
-  public JsonObject toJson() {
-    JsonObject json = new JsonObject();
-    NetworkOptionsConverter.toJson(this, json);
-    return json;
   }
 
   /**

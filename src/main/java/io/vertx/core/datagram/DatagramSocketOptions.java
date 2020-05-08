@@ -13,7 +13,6 @@ package io.vertx.core.datagram;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.impl.Arguments;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetworkOptions;
 
 /**
@@ -83,16 +82,6 @@ public class DatagramSocketOptions extends NetworkOptions {
     this.ipV6 = other.isIpV6();
   }
 
-  /**
-   * Constructor to create options from JSON
-   *
-   * @param json  the JSON
-   */
-  public DatagramSocketOptions(JsonObject json) {
-    super(json);
-    init();
-    DatagramSocketOptionsConverter.fromJson(json, this);
-  }
 
   private void init() {
     broadcast = DEFAULT_BROADCAST;

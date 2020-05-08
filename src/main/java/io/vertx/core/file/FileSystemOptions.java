@@ -13,7 +13,6 @@
 package io.vertx.core.file;
 
 import io.vertx.codegen.annotations.DataObject;
-import io.vertx.core.json.JsonObject;
 
 import java.io.File;
 
@@ -67,29 +66,6 @@ public class FileSystemOptions {
     this.classPathResolvingEnabled = other.isClassPathResolvingEnabled();
     this.fileCachingEnabled = other.isFileCachingEnabled();
     this.fileCacheDir = other.getFileCacheDir();
-  }
-
-  /**
-   * Creates a new instance of {@link FileSystemOptions} from the JSON object. This JSOn object has (generally)
-   * been generated using {@link #toJson()}.
-   *
-   * @param json the json object
-   */
-  public FileSystemOptions(JsonObject json) {
-    this();
-
-    FileSystemOptionsConverter.fromJson(json, this);
-  }
-
-  /**
-   * Builds a JSON object representing the current {@link FileSystemOptions}.
-   *
-   * @return the JSON representation
-   */
-  public JsonObject toJson() {
-    JsonObject json = new JsonObject();
-    FileSystemOptionsConverter.toJson(this, json);
-    return json;
   }
 
   /**

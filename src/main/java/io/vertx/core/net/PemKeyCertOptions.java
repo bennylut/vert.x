@@ -15,7 +15,6 @@ import io.vertx.codegen.annotations.DataObject;
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.impl.Arguments;
-import io.vertx.core.json.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -123,27 +122,6 @@ public class PemKeyCertOptions implements KeyCertOptions {
     this.certValues = other.certValues != null ? new ArrayList<>(other.certValues) : new ArrayList<>();
   }
 
-  /**
-   * Create options from JSON
-   *
-   * @param json  the JSON
-   */
-  public PemKeyCertOptions(JsonObject json) {
-    super();
-    init();
-    PemKeyCertOptionsConverter.fromJson(json, this);
-  }
-
-  /**
-   * Convert to JSON
-   *
-   * @return the JSON
-   */
-  public JsonObject toJson() {
-    JsonObject json = new JsonObject();
-    PemKeyCertOptionsConverter.toJson(this, json);
-    return json;
-  }
 
   /**
    * Get the path to the first key file

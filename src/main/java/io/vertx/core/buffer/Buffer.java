@@ -12,14 +12,15 @@
 package io.vertx.core.buffer;
 
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import io.netty.buffer.ByteBuf;
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.buffer.impl.BufferImpl;
-import io.vertx.core.json.Json;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.shareddata.Shareable;
 import io.vertx.core.shareddata.impl.ClusterSerializable;
 
@@ -130,24 +131,25 @@ public interface Buffer extends ClusterSerializable, Shareable {
    */
   @GenIgnore(GenIgnore.PERMITTED_TYPE)
   String toString(Charset enc);
-
-  /**
-   * Returns a Json object representation of the Buffer.
-   */
-  JsonObject toJsonObject();
-
-  /**
-   * Returns a Json array representation of the Buffer.
-   */
-  JsonArray toJsonArray();
+//
+//  /**
+//   * Returns a Json object representation of the Buffer.
+//   */
+//  JsonObject toJsonObject();
+//
+//  /**
+//   * Returns a Json array representation of the Buffer.
+//   */
+//  JsonArray toJsonArray();
 
   /**
    * Returns a Json representation of the Buffer.
    *
    * @return a JSON element which can be a {@link JsonArray}, {@link JsonObject}, {@link String}, ...etc if the buffer contains an array, object, string, ...etc
    */
-  default Object toJson() {
-    return Json.CODEC.fromBuffer(this, Object.class);
+  default JsonElement toJson() {
+    return JsonParser.parseString(this.toString());
+//    return Json.CODEC.fromBuffer(this, Object.class);
   }
 
   /**

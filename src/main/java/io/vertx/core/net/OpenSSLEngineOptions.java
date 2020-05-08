@@ -11,9 +11,9 @@
 
 package io.vertx.core.net;
 
+import com.google.gson.JsonObject;
 import io.netty.handler.ssl.OpenSsl;
 import io.vertx.codegen.annotations.DataObject;
-import io.vertx.core.json.JsonObject;
 
 /**
  * Configures a {@link TCPSSLOptions} to use OpenSsl.
@@ -48,10 +48,6 @@ public class OpenSSLEngineOptions extends SSLEngineOptions {
     sessionCacheEnabled = DEFAULT_SESSION_CACHE_ENABLED;
   }
 
-  public OpenSSLEngineOptions(JsonObject json) {
-    OpenSSLEngineOptionsConverter.fromJson(json, this);
-  }
-
   public OpenSSLEngineOptions(OpenSSLEngineOptions other) {
     this.sessionCacheEnabled = other.isSessionCacheEnabled();
   }
@@ -74,12 +70,6 @@ public class OpenSSLEngineOptions extends SSLEngineOptions {
    */
   public boolean isSessionCacheEnabled() {
     return sessionCacheEnabled;
-  }
-
-  public JsonObject toJson() {
-    JsonObject json = new JsonObject();
-    OpenSSLEngineOptionsConverter.toJson(this, json);
-    return json;
   }
 
   @Override

@@ -13,7 +13,6 @@ package io.vertx.core.net;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.json.JsonObject;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -67,28 +66,6 @@ public abstract class ClientOptionsBase extends TCPSSLOptions {
     this.metricsName = other.metricsName;
     this.proxyOptions = other.proxyOptions != null ? new ProxyOptions(other.proxyOptions) : null;
     this.localAddress = other.localAddress;
-  }
-
-  /**
-   * Create options from some JSON
-   *
-   * @param json  the JSON
-   */
-  public ClientOptionsBase(JsonObject json) {
-    super(json);
-    init();
-    ClientOptionsBaseConverter.fromJson(json, this);
-  }
-
-  /**
-   * Convert to JSON
-   *
-   * @return the JSON
-   */
-  public JsonObject toJson() {
-    JsonObject json = super.toJson();
-    ClientOptionsBaseConverter.toJson(this, json);
-    return json;
   }
 
   private void init() {

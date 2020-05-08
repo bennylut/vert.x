@@ -16,7 +16,6 @@ import io.netty.channel.EventLoopGroup;
 import io.vertx.core.*;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.spi.metrics.PoolMetrics;
 import io.vertx.core.spi.tracing.VertxTracer;
 
@@ -67,7 +66,6 @@ abstract class ContextImpl extends AbstractContext {
 
   protected final VertxInternal owner;
   protected final VertxTracer<?, ?> tracer;
-  protected final JsonObject config;
   private final Deployment deployment;
   private final CloseHooks closeHooks;
   private final ClassLoader tccl;
@@ -92,7 +90,6 @@ abstract class ContextImpl extends AbstractContext {
     }
     this.tracer = tracer;
     this.deployment = deployment;
-    this.config = deployment != null ? deployment.config() : new JsonObject();
     this.eventLoop = eventLoop;
     this.tccl = tccl;
     this.owner = vertx;
@@ -122,11 +119,6 @@ abstract class ContextImpl extends AbstractContext {
   @Override
   public String deploymentID() {
     return deployment != null ? deployment.deploymentID() : null;
-  }
-
-  @Override
-  public JsonObject config() {
-    return config;
   }
 
   public EventLoop nettyEventLoop() {
@@ -270,11 +262,6 @@ abstract class ContextImpl extends AbstractContext {
     @Override
     public final String deploymentID() {
       return delegate.deploymentID();
-    }
-
-    @Override
-    public final JsonObject config() {
-      return delegate.config();
     }
 
     @Override

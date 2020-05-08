@@ -15,7 +15,6 @@ import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.impl.Arguments;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.*;
 
 import java.util.*;
@@ -187,29 +186,6 @@ public class HttpServerOptions extends NetServerOptions {
     this.webSocketCompressionLevel = other.webSocketCompressionLevel;
     this.webSocketPreferredClientNoContext = other.webSocketPreferredClientNoContext;
     this.webSocketAllowServerNoContext = other.webSocketAllowServerNoContext;
-  }
-
-  /**
-   * Create an options from JSON
-   *
-   * @param json  the JSON
-   */
-  public HttpServerOptions(JsonObject json) {
-    super(json);
-    init();
-    setPort(json.getInteger("port", DEFAULT_PORT));
-    HttpServerOptionsConverter.fromJson(json, this);
-  }
-
-  /**
-   * Convert to JSON
-   *
-   * @return the JSON
-   */
-  public JsonObject toJson() {
-    JsonObject json = super.toJson();
-    HttpServerOptionsConverter.toJson(this, json);
-    return json;
   }
 
   private void init() {

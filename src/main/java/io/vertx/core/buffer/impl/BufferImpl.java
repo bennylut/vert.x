@@ -17,8 +17,6 @@ import io.netty.buffer.Unpooled;
 import io.netty.util.CharsetUtil;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.impl.Arguments;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.impl.PartialPooledByteBufAllocator;
 
 import java.nio.ByteBuffer;
@@ -105,17 +103,6 @@ public class BufferImpl implements Buffer {
 
   public String toString(Charset enc) {
     return buffer.toString(enc);
-  }
-
-
-  @Override
-  public JsonObject toJsonObject() {
-    return new JsonObject(this);
-  }
-
-  @Override
-  public JsonArray toJsonArray() {
-    return new JsonArray(this);
   }
 
   public byte getByte(int pos) {

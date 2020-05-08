@@ -12,7 +12,6 @@
 package io.vertx.core.net;
 
 import io.vertx.codegen.annotations.DataObject;
-import io.vertx.core.json.JsonObject;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -56,14 +55,7 @@ public class JdkSSLEngineOptions extends SSLEngineOptions {
   public JdkSSLEngineOptions() {
   }
 
-  public JdkSSLEngineOptions(JsonObject json) {
-  }
-
   public JdkSSLEngineOptions(JdkSSLEngineOptions that) {
-  }
-
-  public JsonObject toJson() {
-    return new JsonObject();
   }
 
   @Override

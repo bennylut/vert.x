@@ -14,7 +14,6 @@ package io.vertx.core.net;
 import java.util.Objects;
 
 import io.vertx.codegen.annotations.DataObject;
-import io.vertx.core.json.JsonObject;
 
 /**
  * Proxy options for a net client or a net client.
@@ -67,27 +66,6 @@ public class ProxyOptions {
     username = other.getUsername();
     password = other.getPassword();
     type = other.getType();
-  }
-
-  /**
-   * Create options from JSON.
-   *
-   * @param json  the JSON
-   */
-  public ProxyOptions(JsonObject json) {
-    this();
-    ProxyOptionsConverter.fromJson(json, this);
-  }
-
-  /**
-   * Convert to JSON
-   *
-   * @return the JSON
-   */
-  public JsonObject toJson() {
-    JsonObject json = new JsonObject();
-    ProxyOptionsConverter.toJson(this, json);
-    return json;
   }
 
   /**

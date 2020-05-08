@@ -13,7 +13,6 @@ package io.vertx.core.net;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.json.JsonObject;
 
 import java.util.Objects;
 import java.util.Set;
@@ -67,16 +66,6 @@ public class NetClientOptions extends ClientOptionsBase {
     this.hostnameVerificationAlgorithm = other.getHostnameVerificationAlgorithm();
   }
 
-  /**
-   * Create options from JSON
-   *
-   * @param json  the JSON
-   */
-  public NetClientOptions(JsonObject json) {
-    super(json);
-    init();
-    NetClientOptionsConverter.fromJson(json, this);
-  }
 
   private void init() {
     this.reconnectAttempts = DEFAULT_RECONNECT_ATTEMPTS;

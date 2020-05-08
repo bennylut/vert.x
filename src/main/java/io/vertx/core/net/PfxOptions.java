@@ -13,7 +13,6 @@ package io.vertx.core.net;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.json.JsonObject;
 
 /**
  * Key or trust store options configuring private key and/or certificates based on PKCS#12 files.
@@ -63,27 +62,6 @@ public class PfxOptions implements KeyCertOptions, TrustOptions {
     this.password = other.getPassword();
     this.path = other.getPath();
     this.value = other.getValue();
-  }
-
-  /**
-   * Create options from JSON
-   *
-   * @param json  the JSON
-   */
-  public PfxOptions(JsonObject json) {
-    super();
-    PfxOptionsConverter.fromJson(json, this);
-  }
-
-  /**
-   * Convert to JSON
-   *
-   * @return the JSON
-   */
-  public JsonObject toJson() {
-    JsonObject json = new JsonObject();
-    PfxOptionsConverter.toJson(this, json);
-    return json;
   }
 
   /**

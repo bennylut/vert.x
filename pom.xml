@@ -72,6 +72,14 @@
 
   <dependencies>
 
+    <!--JSON-->
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.8.6</version>
+    </dependency>
+
+
     <!-- We depend on the specific Netty dependencies not netty-all to reduce the size of fatjars -->
     <dependency>
       <groupId>io.netty</groupId>

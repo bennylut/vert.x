@@ -14,8 +14,6 @@ package io.vertx.core.net;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.impl.Arguments;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 
 import java.util.ArrayList;
 import java.util.Base64;
@@ -80,27 +78,6 @@ public class PemTrustOptions implements TrustOptions, Cloneable {
     super();
     this.certPaths = new ArrayList<>(other.getCertPaths());
     this.certValues = new ArrayList<>(other.getCertValues());
-  }
-
-  /**
-   * Create options from JSON
-   *
-   * @param json  the JSON
-   */
-  public PemTrustOptions(JsonObject json) {
-    this();
-    PemTrustOptionsConverter.fromJson(json, this);
-  }
-
-  /**
-   * Convert to JSON
-   *
-   * @return the JSON
-   */
-  public JsonObject toJson() {
-    JsonObject json = new JsonObject();
-    PemTrustOptionsConverter.toJson(this, json);
-    return json;
   }
 
   /**

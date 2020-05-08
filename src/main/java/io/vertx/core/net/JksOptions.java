@@ -15,7 +15,6 @@ import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.impl.VertxInternal;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.impl.KeyStoreHelper;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -70,26 +69,6 @@ public class JksOptions implements KeyCertOptions, TrustOptions {
     this.value = other.getValue();
   }
 
-  /**
-   * Create options from JSON
-   *
-   * @param json  the JSON
-   */
-  public JksOptions(JsonObject json) {
-    super();
-    JksOptionsConverter.fromJson(json, this);
-  }
-
-  /**
-   * Convert to JSON
-   *
-   * @return the JSON
-   */
-  public JsonObject toJson() {
-    JsonObject json = new JsonObject();
-    JksOptionsConverter.toJson(this, json);
-    return json;
-  }
 
   /**
    * @return the password for the key store

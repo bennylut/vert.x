@@ -11,8 +11,6 @@
 
 package io.vertx.core;
 
-import io.vertx.core.json.JsonObject;
-
 import java.util.List;
 
 /**
@@ -28,7 +26,6 @@ import java.util.List;
  * <p>
  * This class also maintains references to the {@link io.vertx.core.Vertx} and {@link io.vertx.core.Context}
  * instances of the verticle for easy access.<p>
- * It also provides methods for getting the {@link #config verticle configuration}, {@link #processArgs process arguments},
  * and {@link #deploymentID deployment ID}.
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
@@ -75,15 +72,6 @@ public abstract class AbstractVerticle implements Verticle {
     return context.deploymentID();
   }
 
-  /**
-   * Get the configuration of the verticle.
-   * <p>
-   * This can be specified when the verticle is deployed.
-   * @return the configuration
-   */
-  public JsonObject config() {
-    return context.config();
-  }
 
   /**
    * Start the verticle.<p>

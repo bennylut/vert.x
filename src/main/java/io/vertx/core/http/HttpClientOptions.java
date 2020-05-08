@@ -14,7 +14,6 @@ package io.vertx.core.http;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.impl.Arguments;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.*;
 
 import java.util.ArrayList;
@@ -279,27 +278,6 @@ public class HttpClientOptions extends ClientOptionsBase {
     this.webSocketRequestServerNoContext = other.webSocketRequestServerNoContext;
   }
 
-  /**
-   * Constructor to create an options from JSON
-   *
-   * @param json  the JSON
-   */
-  public HttpClientOptions(JsonObject json) {
-    super(json);
-    init();
-    HttpClientOptionsConverter.fromJson(json, this);
-  }
-
-  /**
-   * Convert to JSON
-   *
-   * @return the JSON
-   */
-  public JsonObject toJson() {
-    JsonObject json = super.toJson();
-    HttpClientOptionsConverter.toJson(this, json);
-    return json;
-  }
 
   private void init() {
     verifyHost = DEFAULT_VERIFY_HOST;

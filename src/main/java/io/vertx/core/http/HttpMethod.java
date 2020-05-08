@@ -12,7 +12,6 @@
 package io.vertx.core.http;
 
 import io.vertx.codegen.annotations.DataObject;
-import io.vertx.core.json.JsonObject;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -436,10 +435,6 @@ public class HttpMethod {
   }
 
   private final io.netty.handler.codec.http.HttpMethod nettyMethod;
-
-  public JsonObject toJson() {
-    throw new UnsupportedOperationException();
-  }
 
   public HttpMethod(String name) {
     Objects.requireNonNull(name, "HTTP method name");

@@ -11,8 +11,8 @@
 
 package io.vertx.core.tracing;
 
+import com.google.gson.JsonObject;
 import io.vertx.codegen.annotations.DataObject;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.spi.VertxTracerFactory;
 
 /**
@@ -30,7 +30,6 @@ public class TracingOptions {
   public static final boolean DEFAULT_TRACING_ENABLED = false;
 
   private boolean enabled;
-  private JsonObject json; // Keep a copy of the original json, so we don't lose info when building options subclasses
   private VertxTracerFactory factory;
 
   /**
@@ -50,16 +49,6 @@ public class TracingOptions {
     factory = other.factory;
   }
 
-  /**
-   * Create an instance from a {@link JsonObject}
-   *
-   * @param json the JsonObject to create it from
-   */
-  public TracingOptions(JsonObject json) {
-    this();
-    TracingOptionsConverter.fromJson(json, this);
-    this.json = json.copy();
-  }
 
   /**
    * Will tracing be enabled on the Vert.x instance?
@@ -115,15 +104,11 @@ public class TracingOptions {
     return new TracingOptions(this);
   }
 
-  public JsonObject toJson() {
-    return json != null ? json.copy() : new JsonObject();
-  }
 
   @Override
   public String toString() {
     return "TracingOptions{" +
       "enabled=" + enabled +
-      ", json=" + json +
       '}';
   }
 }

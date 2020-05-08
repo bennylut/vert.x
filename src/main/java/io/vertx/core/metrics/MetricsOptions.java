@@ -11,8 +11,8 @@
 
 package io.vertx.core.metrics;
 
+import com.google.gson.JsonObject;
 import io.vertx.codegen.annotations.DataObject;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.spi.VertxMetricsFactory;
 
 /**
@@ -30,7 +30,6 @@ public class MetricsOptions {
   public static final boolean DEFAULT_METRICS_ENABLED = false;
 
   private boolean enabled;
-  private JsonObject json; // Keep a copy of the original json, so we don't lose info when building options subclasses
   private VertxMetricsFactory factory;
 
   /**
@@ -50,16 +49,6 @@ public class MetricsOptions {
     factory = other.factory;
   }
 
-  /**
-   * Create an instance from a {@link io.vertx.core.json.JsonObject}
-   *
-   * @param json the JsonObject to create it from
-   */
-  public MetricsOptions(JsonObject json) {
-    this();
-    MetricsOptionsConverter.fromJson(json, this);
-    this.json = json.copy();
-  }
 
   /**
    * Will metrics be enabled on the Vert.x instance?
@@ -111,15 +100,11 @@ public class MetricsOptions {
     return this;
   }
 
-  public JsonObject toJson() {
-    return json != null ? json.copy() : new JsonObject();
-  }
 
   @Override
   public String toString() {
     return "MetricsOptions{" +
       "enabled=" + enabled +
-      ", json=" + json +
       '}';
   }
 }

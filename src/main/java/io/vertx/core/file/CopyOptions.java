@@ -12,7 +12,6 @@
 package io.vertx.core.file;
 
 import io.vertx.codegen.annotations.DataObject;
-import io.vertx.core.json.JsonObject;
 
 /**
  * Describes the copy (and move) options.
@@ -65,16 +64,6 @@ public class CopyOptions {
     this.nofollowLinks = other.nofollowLinks;
   }
 
-
-  /**
-   * Constructor to create options from JSON.
-   *
-   * @param json the JSON
-   */
-  public CopyOptions(JsonObject json) {
-    this();
-    CopyOptionsConverter.fromJson(json, this);
-  }
 
   /**
    * @return true if an existing file, empty directory, or link should be replaced, false otherwise

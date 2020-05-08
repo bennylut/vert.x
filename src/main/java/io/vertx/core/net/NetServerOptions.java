@@ -14,7 +14,6 @@ package io.vertx.core.net;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.ClientAuth;
-import io.vertx.core.json.JsonObject;
 
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -103,28 +102,6 @@ public class NetServerOptions extends TCPSSLOptions {
     this.proxyProtocolTimeoutUnit = other.getProxyProtocolTimeoutUnit() != null ?
       other.getProxyProtocolTimeoutUnit() :
       DEFAULT_PROXY_PROTOCOL_TIMEOUT_TIME_UNIT;
-  }
-
-  /**
-   * Create some options from JSON
-   *
-   * @param json  the JSON
-   */
-  public NetServerOptions(JsonObject json) {
-    super(json);
-    init();
-    NetServerOptionsConverter.fromJson(json, this);
-  }
-
-  /**
-   * Convert to JSON
-   *
-   * @return the JSON
-   */
-  public JsonObject toJson() {
-    JsonObject json = super.toJson();
-    NetServerOptionsConverter.toJson(this, json);
-    return json;
   }
 
   @Override

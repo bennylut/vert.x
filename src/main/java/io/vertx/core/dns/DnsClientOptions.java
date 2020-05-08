@@ -13,7 +13,6 @@ package io.vertx.core.dns;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.VertxOptions;
-import io.vertx.core.json.JsonObject;
 
 /**
  * Configuration options for Vert.x DNS client.
@@ -55,10 +54,6 @@ public class DnsClientOptions {
   private boolean recursionDesired = DEFAULT_RECURSION_DESIRED;
 
   public DnsClientOptions() {
-  }
-
-  public DnsClientOptions(JsonObject json) {
-    DnsClientOptionsConverter.fromJson(json, this);
   }
 
   public DnsClientOptions(DnsClientOptions other) {
@@ -169,9 +164,4 @@ public class DnsClientOptions {
     return this;
   }
 
-  public JsonObject toJson() {
-    JsonObject json = new JsonObject();
-    DnsClientOptionsConverter.toJson(this, json);
-    return json;
-  }
 }

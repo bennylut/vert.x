@@ -11,8 +11,8 @@
 
 package io.vertx.core.spi;
 
+import com.google.gson.JsonObject;
 import io.vertx.core.VertxOptions;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.metrics.MetricsOptions;
 import io.vertx.core.spi.metrics.VertxMetrics;
 
@@ -36,7 +36,6 @@ public interface VertxMetricsFactory {
   /**
    * Create an empty metrics options.
    * Providers can override this method to provide a custom metrics options subclass that exposes custom configuration.
-   * It is used by the {@link io.vertx.core.Launcher} class when creating new options when building a CLI Vert.x.
    *
    * @return new metrics options
    */
@@ -44,15 +43,5 @@ public interface VertxMetricsFactory {
     return new MetricsOptions();
   }
 
-  /**
-   * Create metrics options from the provided {@code jsonObject}.
-   * Providers can override this method to provide a custom metrics options subclass that exposes custom configuration.
-   * It is used by the {@link io.vertx.core.Launcher} class when creating new options when building a CLI Vert.x.
-   *
-   * @param jsonObject json provided by the user
-   * @return new metrics options
-   */
-  default MetricsOptions newOptions(JsonObject jsonObject) {
-    return new MetricsOptions(jsonObject);
-  }
+
 }

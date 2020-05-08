@@ -13,8 +13,6 @@ package io.vertx.core;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.codegen.annotations.GenIgnore;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +32,6 @@ public class DeploymentOptions {
   public static final boolean DEFAULT_HA = false;
   public static final int DEFAULT_INSTANCES = 1;
 
-  private JsonObject config;
   private boolean worker;
   private String isolationGroup;
   private String workerPoolName;
@@ -51,7 +48,6 @@ public class DeploymentOptions {
    */
   public DeploymentOptions() {
     this.worker = DEFAULT_WORKER;
-    this.config = null;
     this.isolationGroup = null;
     this.ha = DEFAULT_HA;
     this.instances = DEFAULT_INSTANCES;
@@ -67,7 +63,6 @@ public class DeploymentOptions {
    * @param other the instance to copy
    */
   public DeploymentOptions(DeploymentOptions other) {
-    this.config = other.getConfig() == null ? null : other.getConfig().copy();
     this.worker = other.isWorker();
     this.isolationGroup = other.getIsolationGroup();
     this.ha = other.isHa();
@@ -78,45 +73,6 @@ public class DeploymentOptions {
     setWorkerPoolSize(other.workerPoolSize);
     setMaxWorkerExecuteTime(other.maxWorkerExecuteTime);
     this.maxWorkerExecuteTimeUnit = other.maxWorkerExecuteTimeUnit;
-  }
-
-  /**
-   * Constructor for creating a instance from JSON
-   *
-   * @param json  the JSON
-   */
-  public DeploymentOptions(JsonObject json) {
-    this();
-    DeploymentOptionsConverter.fromJson(json, this);
-    this.isolationGroup = json.getString("isolationGroup");
-    JsonArray arr = json.getJsonArray("extraClasspath");
-    if (arr != null) {
-      this.extraClasspath = arr.getList();
-    }
-    JsonArray arrIsolated = json.getJsonArray("isolatedClasses");
-    if (arrIsolated != null) {
-      this.isolatedClasses = arrIsolated.getList();
-    }
-  }
-
-  /**
-   * Get the JSON configuration that will be passed to the verticle(s) when deployed.
-   *
-   * @return  the JSON config
-   */
-  public JsonObject getConfig() {
-    return config;
-  }
-
-  /**
-   * Set the JSON configuration that will be passed to the verticle(s) when it's deployed
-   *
-   * @param config  the JSON config
-   * @return a reference to this, so the API can be used fluently
-   */
-  public DeploymentOptions setConfig(JsonObject config) {
-    this.config = config;
-    return this;
   }
 
   /**
@@ -375,23 +331,4 @@ public class DeploymentOptions {
     }
   }
 
-  /**
-   * Convert this to JSON
-   *
-   * @return  the JSON
-   */
-  public JsonObject toJson() {
-    JsonObject json = new JsonObject();
-    if (extraClasspath != null) {
-      json.put("extraClasspath", new JsonArray(extraClasspath));
-    }
-    if (isolatedClasses != null) {
-      json.put("isolatedClasses", new JsonArray(isolatedClasses));
-    }
-    if (isolationGroup != null) {
-      json.put("isolationGroup", isolationGroup);
-    }
-    DeploymentOptionsConverter.toJson(this, json);
-    return json;
-  }
 }

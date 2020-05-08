@@ -15,7 +15,6 @@ import io.vertx.codegen.annotations.DataObject;
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.core.MultiMap;
 import io.vertx.core.impl.Arguments;
-import io.vertx.core.json.JsonObject;
 
 import java.util.Map;
 import java.util.Objects;
@@ -63,46 +62,6 @@ public class DeliveryOptions {
     this.headers = other.getHeaders();
     this.localOnly = other.localOnly;
   }
-
-  /**
-   * Create a delivery options from JSON
-   *
-   * @param json  the JSON
-   */
-  public DeliveryOptions(JsonObject json) {
-    this.timeout = json.getLong("timeout", DEFAULT_TIMEOUT);
-    this.codecName = json.getString("codecName", null);
-    JsonObject hdrs = json.getJsonObject("headers", null);
-    if (hdrs != null) {
-      headers = MultiMap.caseInsensitiveMultiMap();
-      for (Map.Entry<String, Object> entry: hdrs) {
-        if (!(entry.getValue() instanceof String)) {
-          throw new IllegalStateException("Invalid type for message header value " + entry.getValue().getClass());
-        }
-        headers.set(entry.getKey(), (String)entry.getValue());
-      }
-    }
-    this.localOnly = json.getBoolean("localOnly", DEFAULT_LOCAL_ONLY);
-  }
-
-  /**
-   * Convert to JSON.
-   *
-   * @return the JSON
-   */
-  public JsonObject toJson() {
-    JsonObject json = new JsonObject();
-    json.put("timeout", timeout);
-    if (codecName != null) json.put("codecName", codecName);
-    if (headers != null) {
-      JsonObject hJson = new JsonObject();
-      headers.entries().forEach(entry -> hJson.put(entry.getKey(), entry.getValue()));
-      json.put("headers", hJson);
-    }
-    json.put("localOnly", localOnly);
-    return json;
-  }
-
 
   /**
    * Get the send timeout.
