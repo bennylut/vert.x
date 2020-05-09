@@ -66,7 +66,7 @@ interface Vertx : Measured {
    *
    * @return The current context (created if didn't exist)
    */
-  fun getOrCreateContext() : Context
+  fun getOrCreateContext(): Context
 
   /**
    * Create a TCP/SSL server using the specified options
@@ -603,22 +603,7 @@ interface Vertx : Measured {
    */
   fun exceptionHandler(): Handler<Throwable>
 
-  companion object {
-    /**
-     * Creates a non clustered instance using the specified options
-     *
-     * @param options  the options to use
-     * @return the instance
-     */
-    /**
-     * Creates a non clustered instance using default options.
-     *
-     * @return the instance
-     */
-    @JvmOverloads
-    fun vertx(options: VertxOptions = VertxOptions()): Vertx {
-      return VertxFactory(options).vertx()
-    }
+  companion object : Vertx by VertxFactory(VertxOptions()).vertx() {
 
     /**
      * Gets the current context
