@@ -10,19 +10,15 @@
   ~
   ~ SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
   ~
-  --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>io.vertx</groupId>
-    <artifactId>vertx-parent</artifactId>
-    <version>14</version>
-  </parent>
+  <groupId>com.github.bennylut</groupId>
+  <artifactId>vertx-light</artifactId>
 
-  <artifactId>vertx-core</artifactId>
   <version>4.0.0-SNAPSHOT</version>
-
-  <name>Vert.x Core</name>
 
   <licenses>
     <license>
@@ -50,12 +46,17 @@
     <junit.version>4.12</junit.version>
     <assertj.version>3.4.1</assertj.version>
     <apacheds-protocol-dns.version>1.5.7</apacheds-protocol-dns.version>
-    <generated.dir>${project.basedir}/src/main/generated</generated.dir>
     <stack.version>4.0.0-SNAPSHOT</stack.version>
     <jetty.alpnAgent.argLine/>
     <jmh.version>1.19</jmh.version>
     <vertx.testNativeTransport>false</vertx.testNativeTransport>
     <vertx.testDomainSockets>false</vertx.testDomainSockets>
+
+    <!--KOTLIN -->
+    <kotlin.version>1.3.71</kotlin.version>
+    <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
+    <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
+    <kotlin.code.style>official</kotlin.code.style>
   </properties>
 
   <dependencyManagement>
@@ -71,6 +72,13 @@
   </dependencyManagement>
 
   <dependencies>
+
+    <!--KOTLIN-->
+    <dependency>
+      <groupId>org.jetbrains.kotlin</groupId>
+      <artifactId>kotlin-stdlib-jdk8</artifactId>
+      <version>${kotlin.version}</version>
+    </dependency>
 
     <!--JSON-->
     <dependency>
@@ -191,225 +199,82 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- JMH -->
-    <dependency>
-      <groupId>org.openjdk.jmh</groupId>
-      <artifactId>jmh-core</artifactId>
-      <version>${jmh.version}</version>
-      <scope>test</scope>
-    </dependency>
-
   </dependencies>
 
   <build>
+
+    <sourceDirectory>src/main/java</sourceDirectory>
+
     <pluginManagement>
       <plugins>
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>${maven.surefire.plugin.version}</version>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.6.1</version>
           <configuration>
-            <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
-            <additionalClasspathElements>
-              <additionalClasspathElement>${project.build.testSourceDirectory}</additionalClasspathElement>
-              <additionalClasspathElement>${basedir}/src/test/resources/webroot2.jar</additionalClasspathElement>
-              <additionalClasspathElement>${basedir}/src/test/resources/webroot5.zip</additionalClasspathElement>
-            </additionalClasspathElements>
-            <systemPropertyVariables>
-              <!--<javax.net.debug>ssl</javax.net.debug>-->
-              <io.netty.leakDetectionLevel>PARANOID</io.netty.leakDetectionLevel>
-              <buildDirectory>${project.build.directory}</buildDirectory>
-              <vertx.version>${project.version}</vertx.version>
-              <vertx.handle100Continue>true</vertx.handle100Continue>
-              <vertx.useNativeTransport>${vertx.testNativeTransport}</vertx.useNativeTransport>
-              <vertx.useDomainSockets>${vertx.testDomainSockets}</vertx.useDomainSockets>
-              <vertx.threadChecks>true</vertx.threadChecks>
-            </systemPropertyVariables>
-            <!-- Needs to be small enough to run in a EC2 1.7GB small instance -->
-            <!-- IMPORTANT: when modifying this line, don't forge to modify the same line in the`coverage` profile -->
-            <argLine>-Xmx1200M ${jetty.alpnAgent.argLine}</argLine>
-            <forkCount>1</forkCount>
-            <reuseForks>true</reuseForks>
-            <excludes>
-              <exclude>io/vertx/it/**</exclude>
-            </excludes>
+            <source>1.8</source>
+            <target>1.8</target>
           </configuration>
-        </plugin>
-
-        <plugin>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <configuration>
-            <reportOutputDirectory>${project.build.directory}/docs</reportOutputDirectory>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <artifactId>maven-clean-plugin</artifactId>
           <executions>
             <execution>
-              <id>default-clean</id>
-              <configuration>
-                <filesets>
-                  <fileset>
-                    <directory>${generated.dir}</directory>
-                  </fileset>
-                </filesets>
-              </configuration>
+              <phase>compile</phase>
+              <goals>
+                <goal>compile</goal>
+              </goals>
             </execution>
           </executions>
         </plugin>
 
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
+          <groupId>org.jetbrains.kotlin</groupId>
+          <artifactId>kotlin-maven-plugin</artifactId>
+          <version>${kotlin.version}</version>
           <executions>
+
             <execution>
-              <id>default-jar</id>
-              <configuration>
-                <archive>
-                  <manifestEntries>
-                    <Multi-Release>true</Multi-Release>
-                  </manifestEntries>
-                </archive>
-              </configuration>
+              <id>compile</id>
+              <phase>compile</phase>
+              <goals>
+                <goal>compile</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>test-compile</id>
+              <phase>test-compile</phase>
+              <goals>
+                <goal>test-compile</goal>
+              </goals>
             </execution>
           </executions>
+
+          <configuration>
+            <args>
+              <arg>-Xno-call-assertions</arg>
+              <arg>-Xno-receiver-assertions</arg>
+              <arg>-Xno-param-assertions</arg>
+            </args>
+
+          </configuration>
+
         </plugin>
 
       </plugins>
     </pluginManagement>
     <plugins>
 
-      <plugin>
-        <groupId>org.bsc.maven</groupId>
-        <artifactId>maven-processor-plugin</artifactId>
-        <version>3.1.0</version>
-        <configuration>
-          <systemProperties>
-            <java.util.logging.SimpleFormatter.format>%4$s: %3$s - %5$s %6$s%n</java.util.logging.SimpleFormatter.format>
-          </systemProperties>
-        </configuration>
-        <executions>
-          <execution>
-            <id>generate-sources</id>
-            <goals>
-              <goal>process</goal>
-            </goals>
-            <phase>generate-sources</phase>
-            <configuration>
-              <processors>
-                <processor>io.vertx.codegen.CodeGenProcessor</processor>
-                <processor>io.vertx.docgen.JavaDocGenProcessor</processor>
-              </processors>
-              <optionMap>
-                <codegen.output>${project.basedir}/src/main</codegen.output>
-                <codegen.output.data_object_converters>generated</codegen.output.data_object_converters>
-                <docgen.source>${asciidoc.dir}</docgen.source>
-                <docgen.output>${project.build.directory}/asciidoc/java</docgen.output>
-                <maven.groupId>${project.groupId}</maven.groupId>
-                <maven.artifactId>${project.artifactId}</maven.artifactId>
-                <maven.version>${project.version}</maven.version>
-              </optionMap>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <version>3.0.0</version>
-        <executions>
-          <execution>
-            <id>add-source</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>add-source</goal>
-            </goals>
-            <configuration>
-              <sources>
-                <source>${generated.dir}</source>
-                <source>${asciidoc.dir}</source>
-              </sources>
-            </configuration>
-          </execution>
-          <execution>
-            <id>add-test-source</id>
-            <phase>generate-test-sources</phase>
-            <goals>
-              <goal>add-test-source</goal>
-            </goals>
-            <configuration>
-              <sources>
-                <source>${project.basedir}/src/test/benchmarks</source>
-              </sources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>assemble-docs</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <attach>true</attach>
-              <descriptors>
-                <descriptor>src/main/assembly/docs.xml</descriptor>
-              </descriptors>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
-
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-        <includes>
-          <include>**/vertx-version.txt</include>
-        </includes>
-      </resource>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>false</filtering>
-        <excludes>
-          <exclude>**/vertx-version.txt</exclude>
-        </excludes>
-      </resource>
-    </resources>
   </build>
 
   <profiles>
-    <profile>
-      <id>coverage</id>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-surefire-plugin</artifactId>
-              <configuration>
-                <argLine>-Xmx1200M @{surefireArgLine} ${jetty.alpnAgent.argLine}</argLine>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
 
     <profile>
       <id>java-8</id>
       <properties>
         <jetty.alpnAgent.version>2.0.10</jetty.alpnAgent.version>
-        <jetty.alpnAgent.path>${settings.localRepository}/org/mortbay/jetty/alpn/jetty-alpn-agent/${jetty.alpnAgent.version}/jetty-alpn-agent-${jetty.alpnAgent.version}.jar</jetty.alpnAgent.path>
+        <jetty.alpnAgent.path>
+          ${settings.localRepository}/org/mortbay/jetty/alpn/jetty-alpn-agent/${jetty.alpnAgent.version}/jetty-alpn-agent-${jetty.alpnAgent.version}.jar
+        </jetty.alpnAgent.path>
         <jetty.alpnAgent.argLine>-javaagent:"${jetty.alpnAgent.path}"</jetty.alpnAgent.argLine>
       </properties>
       <activation>
@@ -425,51 +290,6 @@
       </dependencies>
     </profile>
 
-    <!-- Run tests with native transport -->
-    <profile>
-      <id>testNativeTransport</id>
-      <properties>
-        <vertx.testNativeTransport>true</vertx.testNativeTransport>
-        <vertx.testDomainSockets>false</vertx.testDomainSockets>
-      </properties>
-      <dependencies>
-        <dependency>
-          <groupId>io.netty</groupId>
-          <artifactId>netty-transport-native-epoll</artifactId>
-          <optional>true</optional>
-          <classifier>linux-x86_64</classifier>
-        </dependency>
-        <dependency>
-          <groupId>io.netty</groupId>
-          <artifactId>netty-transport-native-kqueue</artifactId>
-          <optional>true</optional>
-          <classifier>osx-x86_64</classifier>
-        </dependency>
-      </dependencies>
-    </profile>
-
-    <!-- Run tests with native transport and domain sockets -->
-    <profile>
-      <id>testDomainSockets</id>
-      <properties>
-        <vertx.testNativeTransport>true</vertx.testNativeTransport>
-        <vertx.testDomainSockets>true</vertx.testDomainSockets>
-      </properties>
-      <dependencies>
-        <dependency>
-          <groupId>io.netty</groupId>
-          <artifactId>netty-transport-native-epoll</artifactId>
-          <optional>true</optional>
-          <classifier>linux-x86_64</classifier>
-        </dependency>
-        <dependency>
-          <groupId>io.netty</groupId>
-          <artifactId>netty-transport-native-kqueue</artifactId>
-          <optional>true</optional>
-          <classifier>osx-x86_64</classifier>
-        </dependency>
-      </dependencies>
-    </profile>
 
   </profiles>
 
