@@ -12,7 +12,7 @@
 package io.vertx.core.tracing;
 
 import com.google.gson.JsonObject;
-import io.vertx.codegen.annotations.DataObject;
+
 import io.vertx.core.spi.VertxTracerFactory;
 
 /**
@@ -21,7 +21,7 @@ import io.vertx.core.spi.VertxTracerFactory;
  *
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */
-@DataObject(generateConverter = true, publicConverter = false)
+
 public class TracingOptions {
 
   /**

@@ -11,9 +11,6 @@
 
 package io.vertx.core.net;
 
-import io.vertx.codegen.annotations.CacheReturn;
-import io.vertx.codegen.annotations.GenIgnore;
-import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.net.impl.SocketAddressImpl;
 
 import java.net.InetSocketAddress;
@@ -26,7 +23,6 @@ import java.net.InetSocketAddress;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen
 public interface SocketAddress {
 
   /**
@@ -63,11 +59,10 @@ public interface SocketAddress {
    * @param address the address
    * @return the created socket address
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   static SocketAddress inetSocketAddress(InetSocketAddress address) {
     return new SocketAddressImpl(address);
   }
-  
+
   /**
    * Returns the host name when available or the IP address in string representation.
    * <br/>
@@ -75,7 +70,6 @@ public interface SocketAddress {
    *
    * @return the host address
    */
-  @CacheReturn
   String host();
 
   /**
@@ -85,7 +79,6 @@ public interface SocketAddress {
    *
    * @return the host name
    */
-  @CacheReturn
   String hostName();
 
   /**
@@ -95,31 +88,26 @@ public interface SocketAddress {
    *
    * @return the host address
    */
-  @CacheReturn
   String hostAddress();
 
   /**
    * @return the address port or {@code -1} for a domain socket
    */
-  @CacheReturn
   int port();
 
   /**
    * @return the domain socket path or {@code null} for a inet socket address.
    */
-  @CacheReturn
   String path();
 
   /**
    * @return {@code true} for an inet socket address
    */
-  @CacheReturn
   boolean isInetSocket();
 
   /**
    * @return {@code true} for an domain socket address
    */
-  @CacheReturn
   boolean isDomainSocket();
 
 }

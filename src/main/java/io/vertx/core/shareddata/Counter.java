@@ -11,7 +11,7 @@
 
 package io.vertx.core.shareddata;
 
-import io.vertx.codegen.annotations.VertxGen;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -25,7 +25,7 @@ import java.util.Objects;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen
+
 public interface Counter {
 
   /**

@@ -11,7 +11,7 @@
 
 package io.vertx.core.net;
 
-import io.vertx.codegen.annotations.DataObject;
+
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -21,7 +21,7 @@ import javax.net.ssl.SSLEngine;
  *
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */
-@DataObject
+
 public class JdkSSLEngineOptions extends SSLEngineOptions {
 
   private static Boolean jdkAlpnAvailable;

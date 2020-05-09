@@ -11,7 +11,7 @@
 
 package io.vertx.core.http;
 
-import io.vertx.codegen.annotations.*;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -41,7 +41,7 @@ import io.vertx.core.streams.WriteStream;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen
+
 public interface HttpServerResponse extends WriteStream<Buffer> {
 
   @Override
@@ -64,7 +64,7 @@ public interface HttpServerResponse extends WriteStream<Buffer> {
    *
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   HttpServerResponse setStatusCode(int statusCode);
 
   /**
@@ -78,7 +78,7 @@ public interface HttpServerResponse extends WriteStream<Buffer> {
    *
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   HttpServerResponse setStatusMessage(String statusMessage);
 
   /**
@@ -96,7 +96,7 @@ public interface HttpServerResponse extends WriteStream<Buffer> {
    *
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   HttpServerResponse setChunked(boolean chunked);
 
   /**
@@ -107,7 +107,7 @@ public interface HttpServerResponse extends WriteStream<Buffer> {
   /**
    * @return The HTTP headers
    */
-  @CacheReturn
+
   MultiMap headers();
 
   /**
@@ -117,34 +117,34 @@ public interface HttpServerResponse extends WriteStream<Buffer> {
    * @param value  the header value.
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   HttpServerResponse putHeader(String name, String value);
 
   /**
    * Like {@link #putHeader(String, String)} but using CharSequence
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
-  @Fluent
+
+
   HttpServerResponse putHeader(CharSequence name, CharSequence value);
 
   /**
    * Like {@link #putHeader(String, String)} but providing multiple values via a String Iterable
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
-  @Fluent
+
+
   HttpServerResponse putHeader(String name, Iterable<String> values);
 
   /**
    * Like {@link #putHeader(String, Iterable)} but with CharSequence Iterable
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
-  @Fluent
+
+
   HttpServerResponse putHeader(CharSequence name, Iterable<CharSequence> values);
 
   /**
    * @return The HTTP trailers
    */
-  @CacheReturn
+
   MultiMap trailers();
 
   /**
@@ -154,28 +154,28 @@ public interface HttpServerResponse extends WriteStream<Buffer> {
    * @param value  the trailer value
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   HttpServerResponse putTrailer(String name, String value);
 
   /**
    * Like {@link #putTrailer(String, String)} but using CharSequence
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
-  @Fluent
+
+
   HttpServerResponse putTrailer(CharSequence name, CharSequence value);
 
   /**
    * Like {@link #putTrailer(String, String)} but providing multiple values via a String Iterable
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
-  @Fluent
+
+
   HttpServerResponse putTrailer(String name, Iterable<String> values);
 
   /**
    * Like {@link #putTrailer(String, Iterable)} but with CharSequence Iterable
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
-  @Fluent
+
+
   HttpServerResponse putTrailer(CharSequence name, Iterable<CharSequence> value);
 
   /**
@@ -190,8 +190,8 @@ public interface HttpServerResponse extends WriteStream<Buffer> {
    * @param handler  the handler
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  HttpServerResponse closeHandler(@Nullable Handler<Void> handler);
+
+  HttpServerResponse closeHandler( Handler<Void> handler);
 
   /**
    * Set an end handler for the response. This will be called when the response is disposed to allow consistent cleanup
@@ -200,8 +200,8 @@ public interface HttpServerResponse extends WriteStream<Buffer> {
    * @param handler  the handler
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  HttpServerResponse endHandler(@Nullable Handler<Void> handler);
+
+  HttpServerResponse endHandler( Handler<Void> handler);
 
   /**
    * Write a {@link String} to the response body, encoded using the encoding {@code enc}.
@@ -235,7 +235,7 @@ public interface HttpServerResponse extends WriteStream<Buffer> {
    * Must only be used if the request contains an "Expect:100-Continue" header
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   HttpServerResponse writeContinue();
 
   /**
@@ -336,7 +336,7 @@ public interface HttpServerResponse extends WriteStream<Buffer> {
    * @param resultHandler  handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   default HttpServerResponse sendFile(String filename, Handler<AsyncResult<Void>> resultHandler) {
     return sendFile(filename, 0, resultHandler);
   }
@@ -350,7 +350,7 @@ public interface HttpServerResponse extends WriteStream<Buffer> {
    * @param resultHandler  handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   default HttpServerResponse sendFile(String filename, long offset, Handler<AsyncResult<Void>> resultHandler) {
     return sendFile(filename, offset, Long.MAX_VALUE, resultHandler);
   }
@@ -365,7 +365,7 @@ public interface HttpServerResponse extends WriteStream<Buffer> {
    * @param resultHandler  handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   HttpServerResponse sendFile(String filename, long offset, long length, Handler<AsyncResult<Void>> resultHandler);
 
   /**
@@ -395,8 +395,8 @@ public interface HttpServerResponse extends WriteStream<Buffer> {
    * @param handler  the handler
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  HttpServerResponse headersEndHandler(@Nullable Handler<Void> handler);
+
+  HttpServerResponse headersEndHandler( Handler<Void> handler);
 
   /**
    * Provides a handler that will be called after the last part of the body is written to the wire.
@@ -407,8 +407,8 @@ public interface HttpServerResponse extends WriteStream<Buffer> {
    * @param handler  the handler
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  HttpServerResponse bodyEndHandler(@Nullable Handler<Void> handler);
+
+  HttpServerResponse bodyEndHandler( Handler<Void> handler);
 
   /**
    * @return the total number of bytes written for the body of the response.
@@ -423,7 +423,7 @@ public interface HttpServerResponse extends WriteStream<Buffer> {
   /**
    * Like {@link #push(HttpMethod, String, String, MultiMap, Handler)} with no headers.
    */
-  @Fluent
+
   default HttpServerResponse push(HttpMethod method, String host, String path, Handler<AsyncResult<HttpServerResponse>> handler) {
     return push(method, host, path, null, handler);
   }
@@ -438,7 +438,7 @@ public interface HttpServerResponse extends WriteStream<Buffer> {
   /**
    * Like {@link #push(HttpMethod, String, String, MultiMap, Handler)} with the host copied from the current request.
    */
-  @Fluent
+
   default HttpServerResponse push(HttpMethod method, String path, MultiMap headers, Handler<AsyncResult<HttpServerResponse>> handler) {
     return push(method, null, path, headers, handler);
   }
@@ -453,7 +453,7 @@ public interface HttpServerResponse extends WriteStream<Buffer> {
   /**
    * Like {@link #push(HttpMethod, String, String, MultiMap, Handler)} with the host copied from the current request.
    */
-  @Fluent
+
   default HttpServerResponse push(HttpMethod method, String path, Handler<AsyncResult<HttpServerResponse>> handler) {
     return push(method, null, path, null, handler);
   }
@@ -483,7 +483,7 @@ public interface HttpServerResponse extends WriteStream<Buffer> {
    * @param handler the handler notified when the response can be written
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   default HttpServerResponse push(HttpMethod method, String host, String path, MultiMap headers, Handler<AsyncResult<HttpServerResponse>> handler) {
     Future<HttpServerResponse> fut = push(method, host, path, headers);
     if (handler != null) {
@@ -521,7 +521,7 @@ public interface HttpServerResponse extends WriteStream<Buffer> {
    * @param payload the frame payload
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   HttpServerResponse writeCustomFrame(int type, int flags, Buffer payload);
 
   /**
@@ -529,7 +529,7 @@ public interface HttpServerResponse extends WriteStream<Buffer> {
    *
    * @param frame the frame to write
    */
-  @Fluent
+
   default HttpServerResponse writeCustomFrame(HttpFrame frame) {
     return writeCustomFrame(frame.type(), frame.flags(), frame.payload());
   }
@@ -541,7 +541,7 @@ public interface HttpServerResponse extends WriteStream<Buffer> {
    *
    * @param streamPriority the priority for this request's stream
    */
-  @Fluent
+
   default HttpServerResponse setStreamPriority(StreamPriority streamPriority) {
       return this;
   }
@@ -552,7 +552,7 @@ public interface HttpServerResponse extends WriteStream<Buffer> {
    * @param cookie  the cookie
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   HttpServerResponse addCookie(Cookie cookie);
 
 
@@ -562,7 +562,7 @@ public interface HttpServerResponse extends WriteStream<Buffer> {
    * @param name  the name of the cookie
    * @return the cookie, if it existed, or null
    */
-  default @Nullable Cookie removeCookie(String name) {
+  default  Cookie removeCookie(String name) {
     return removeCookie(name, true);
   }
 
@@ -573,5 +573,5 @@ public interface HttpServerResponse extends WriteStream<Buffer> {
    * @param name  the name of the cookie
    * @return the cookie, if it existed, or null
    */
-  @Nullable Cookie removeCookie(String name, boolean invalidate);
+   Cookie removeCookie(String name, boolean invalidate);
 }

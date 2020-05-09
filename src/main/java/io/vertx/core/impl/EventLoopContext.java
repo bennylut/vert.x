@@ -12,7 +12,7 @@
 package io.vertx.core.impl;
 
 import io.netty.channel.EventLoop;
-import io.vertx.codegen.annotations.Nullable;
+
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
@@ -95,7 +95,7 @@ public class EventLoopContext extends ContextImpl {
     }
 
     @Override
-    public <T> Future<@Nullable T> executeBlocking(Handler<Promise<T>> blockingCodeHandler, boolean ordered) {
+    public <T> Future< T> executeBlocking(Handler<Promise<T>> blockingCodeHandler, boolean ordered) {
       TaskQueue queue;
       if (ordered) {
         queue = null;

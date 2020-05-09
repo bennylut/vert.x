@@ -11,7 +11,7 @@
 
 package io.vertx.core.file.impl;
 
-import io.vertx.codegen.annotations.Nullable;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -190,7 +190,7 @@ public class FileSystemImpl implements FileSystem {
   }
 
   @Override
-  public Future<Void> chown(String path, @Nullable String user, @Nullable String group) {
+  public Future<Void> chown(String path,  String user,  String group) {
     return chownInternal(path, user, group).run();
   }
 

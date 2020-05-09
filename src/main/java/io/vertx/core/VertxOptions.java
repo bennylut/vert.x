@@ -11,7 +11,7 @@
 
 package io.vertx.core;
 
-import io.vertx.codegen.annotations.DataObject;
+
 import io.vertx.core.dns.AddressResolverOptions;
 import io.vertx.core.file.FileSystemOptions;
 import io.vertx.core.impl.cpu.CpuCoreSensor;
@@ -28,7 +28,7 @@ import static io.vertx.core.file.FileSystemOptions.DEFAULT_FILE_CACHING_ENABLED;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@DataObject(generateConverter = true, publicConverter = false)
+
 public class VertxOptions {
 
   /**

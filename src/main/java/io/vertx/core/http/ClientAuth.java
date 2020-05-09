@@ -11,14 +11,12 @@
 
 package io.vertx.core.http;
 
-import io.vertx.codegen.annotations.VertxGen;
 
 /**
  * Configures the engine to require/request client authentication.
  * <p/>
  * Created by manishk on 10/2/2015.
  */
-@VertxGen
 public enum ClientAuth {
 
   /**

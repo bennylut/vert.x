@@ -14,8 +14,8 @@ package io.vertx.core.net;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.codegen.annotations.Fluent;
-import io.vertx.codegen.annotations.VertxGen;
+
+
 import io.vertx.core.metrics.Measured;
 
 /**
@@ -28,7 +28,7 @@ import io.vertx.core.metrics.Measured;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen
+
 public interface NetClient extends Measured {
 
   /**
@@ -41,7 +41,7 @@ public interface NetClient extends Measured {
    * @param host  the host
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   NetClient connect(int port, String host, Handler<AsyncResult<NetSocket>> connectHandler);
 
   /**
@@ -60,7 +60,7 @@ public interface NetClient extends Measured {
    * @param serverName the SNI server name
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   NetClient connect(int port, String host, String serverName, Handler<AsyncResult<NetSocket>> connectHandler);
 
   /**
@@ -76,7 +76,7 @@ public interface NetClient extends Measured {
    * @param remoteAddress the remote address
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   NetClient connect(SocketAddress remoteAddress, Handler<AsyncResult<NetSocket>> connectHandler);
 
   /**
@@ -93,7 +93,7 @@ public interface NetClient extends Measured {
    * @param serverName the SNI server name
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   NetClient connect(SocketAddress remoteAddress, String serverName, Handler<AsyncResult<NetSocket>> connectHandler);
 
   /**

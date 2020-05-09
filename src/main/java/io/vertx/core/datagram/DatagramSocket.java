@@ -11,14 +11,14 @@
 
 package io.vertx.core.datagram;
 
-import io.vertx.codegen.annotations.Nullable;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.codegen.annotations.CacheReturn;
-import io.vertx.codegen.annotations.Fluent;
-import io.vertx.codegen.annotations.VertxGen;
+
+
+
 import io.vertx.core.metrics.Measured;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.core.streams.ReadStream;
@@ -38,7 +38,7 @@ import io.vertx.core.streams.WriteStream;
  *
  * @author <a href="mailto:nmaurer@redhat.com">Norman Maurer</a>
  */
-@VertxGen
+
 public interface DatagramSocket extends ReadStream<DatagramPacket>, Measured {
 
   /**
@@ -51,7 +51,7 @@ public interface DatagramSocket extends ReadStream<DatagramPacket>, Measured {
    * @param handler  the {@link io.vertx.core.Handler} to notify once the write completes.
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   DatagramSocket send(Buffer packet, int port, String host, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -79,7 +79,7 @@ public interface DatagramSocket extends ReadStream<DatagramPacket>, Measured {
    * @param handler  the {@link io.vertx.core.Handler} to notify once the write completes.
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   DatagramSocket send(String str, int port, String host, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -98,7 +98,7 @@ public interface DatagramSocket extends ReadStream<DatagramPacket>, Measured {
    * @param handler  the {@link io.vertx.core.Handler} to notify once the write completes.
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   DatagramSocket send(String str, String enc, int port, String host, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -125,7 +125,7 @@ public interface DatagramSocket extends ReadStream<DatagramPacket>, Measured {
    *
    * @return the socket address
    */
-  @CacheReturn
+
   SocketAddress localAddress();
 
   /**
@@ -136,7 +136,7 @@ public interface DatagramSocket extends ReadStream<DatagramPacket>, Measured {
    * @param  handler  then handler to notify once the operation completes
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   DatagramSocket listenMulticastGroup(String multicastAddress, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -154,14 +154,14 @@ public interface DatagramSocket extends ReadStream<DatagramPacket>, Measured {
    * @param  handler  then handler to notify once the operation completes
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  DatagramSocket listenMulticastGroup(String multicastAddress, String networkInterface, @Nullable String source,
+
+  DatagramSocket listenMulticastGroup(String multicastAddress, String networkInterface,  String source,
                                       Handler<AsyncResult<Void>> handler);
 
   /**
    * Like {@link #listenMulticastGroup(String, String, String, Handler)} but returns a {@code Future} of the asynchronous result
    */
-  Future<Void> listenMulticastGroup(String multicastAddress, String networkInterface, @Nullable String source);
+  Future<Void> listenMulticastGroup(String multicastAddress, String networkInterface,  String source);
 
   /**
    * Leaves a multicast group and stops listening for packets send to it.
@@ -171,7 +171,7 @@ public interface DatagramSocket extends ReadStream<DatagramPacket>, Measured {
    * @param handler  then handler to notify once the operation completes
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   DatagramSocket unlistenMulticastGroup(String multicastAddress, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -189,14 +189,14 @@ public interface DatagramSocket extends ReadStream<DatagramPacket>, Measured {
    * @param  handler the handler to notify once the operation completes
    * @return  a reference to this, so the API can be used fluently
    */
-  @Fluent
-  DatagramSocket unlistenMulticastGroup(String multicastAddress, String networkInterface, @Nullable String source,
+
+  DatagramSocket unlistenMulticastGroup(String multicastAddress, String networkInterface,  String source,
                                         Handler<AsyncResult<Void>> handler);
 
   /**
    * Like {@link #unlistenMulticastGroup(String, String, String, Handler)} but returns a {@code Future} of the asynchronous result
    */
-  Future<Void> unlistenMulticastGroup(String multicastAddress, String networkInterface, @Nullable String source);
+  Future<Void> unlistenMulticastGroup(String multicastAddress, String networkInterface,  String source);
 
   /**
    * Block the given address for the given multicast address and notifies the {@link Handler} once
@@ -208,7 +208,7 @@ public interface DatagramSocket extends ReadStream<DatagramPacket>, Measured {
    * @param handler  the handler to notify once the operation completes
    * @return  a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   DatagramSocket blockMulticastGroup(String multicastAddress, String sourceToBlock,
                                      Handler<AsyncResult<Void>> handler);
 
@@ -228,7 +228,7 @@ public interface DatagramSocket extends ReadStream<DatagramPacket>, Measured {
    * @param  handler  the handler to notify once the operation completes
    * @return  a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   DatagramSocket blockMulticastGroup(String multicastAddress, String networkInterface, String sourceToBlock,
                                      Handler<AsyncResult<Void>> handler);
 
@@ -245,7 +245,7 @@ public interface DatagramSocket extends ReadStream<DatagramPacket>, Measured {
    * @param handler  the handler will be called when listening
    * @return  a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   DatagramSocket listen(int port, String host, Handler<AsyncResult<DatagramSocket>> handler);
 
   /**

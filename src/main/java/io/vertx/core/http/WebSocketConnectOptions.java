@@ -10,8 +10,6 @@
  */
 package io.vertx.core.http;
 
-import io.vertx.codegen.annotations.DataObject;
-import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.core.MultiMap;
 
 import java.util.ArrayList;
@@ -22,7 +20,6 @@ import java.util.List;
  *
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */
-@DataObject(generateConverter = true)
 public class WebSocketConnectOptions extends RequestOptions {
 
   /**
@@ -121,7 +118,6 @@ public class WebSocketConnectOptions extends RequestOptions {
     return (WebSocketConnectOptions) super.addHeader(key, value);
   }
 
-  @GenIgnore
   @Override
   public WebSocketConnectOptions setHeaders(MultiMap headers) {
     return (WebSocketConnectOptions) super.setHeaders(headers);

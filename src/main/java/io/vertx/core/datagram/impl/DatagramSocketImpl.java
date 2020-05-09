@@ -21,7 +21,7 @@ import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.InternetProtocolFamily;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.concurrent.GenericFutureListener;
-import io.vertx.codegen.annotations.Nullable;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -122,7 +122,7 @@ public class DatagramSocketImpl implements DatagramSocket, MetricsProvider {
   }
 
   @Override
-  public Future<Void> listenMulticastGroup(String multicastAddress, String networkInterface, @Nullable String source) {
+  public Future<Void> listenMulticastGroup(String multicastAddress, String networkInterface,  String source) {
     ChannelFuture fut;
     try {
       InetAddress sourceAddress;
@@ -172,7 +172,7 @@ public class DatagramSocketImpl implements DatagramSocket, MetricsProvider {
   }
 
   @Override
-  public Future<Void> unlistenMulticastGroup(String multicastAddress, String networkInterface, @Nullable String source) {
+  public Future<Void> unlistenMulticastGroup(String multicastAddress, String networkInterface,  String source) {
     ChannelFuture fut;
     try {
       InetAddress sourceAddress;

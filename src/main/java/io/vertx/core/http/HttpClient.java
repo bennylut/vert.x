@@ -11,9 +11,6 @@
 
 package io.vertx.core.http;
 
-import io.vertx.codegen.annotations.Fluent;
-import io.vertx.codegen.annotations.GenIgnore;
-import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -54,7 +51,6 @@ import java.util.function.Function;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen
 public interface HttpClient extends Measured {
 
   /**
@@ -1345,7 +1341,6 @@ public interface HttpClient extends Measured {
    *
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
   HttpClient connectionHandler(Handler<HttpConnection> handler);
 
   /**
@@ -1367,13 +1362,11 @@ public interface HttpClient extends Measured {
    * @param handler the new redirect handler
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
   HttpClient redirectHandler(Function<HttpClientResponse, Future<HttpClientRequest>> handler);
 
   /**
    * @return the current redirect handler.
    */
-  @GenIgnore
   Function<HttpClientResponse, Future<HttpClientRequest>> redirectHandler();
 
   /**

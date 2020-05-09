@@ -11,9 +11,9 @@
 
 package io.vertx.core.file;
 
-import io.vertx.codegen.annotations.Fluent;
-import io.vertx.codegen.annotations.Nullable;
-import io.vertx.codegen.annotations.VertxGen;
+
+
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -38,7 +38,7 @@ import java.util.List;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen
+
 public interface FileSystem {
 
   /**
@@ -51,7 +51,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem copy(String from, String to, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -68,7 +68,7 @@ public interface FileSystem {
    * @param handler the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem copy(String from, String to, CopyOptions options, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -79,7 +79,7 @@ public interface FileSystem {
   /**
    * Blocking version of {@link #copy(String, String, Handler)}
    */
-  @Fluent
+
   FileSystem copyBlocking(String from, String to) ;
 
   /**
@@ -96,7 +96,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem copyRecursive(String from, String to, boolean recursive, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -107,7 +107,7 @@ public interface FileSystem {
   /**
    * Blocking version of {@link #copyRecursive(String, String, boolean, Handler)}
    */
-  @Fluent
+
   FileSystem copyRecursiveBlocking(String from, String to, boolean recursive) ;
 
   /**
@@ -120,7 +120,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem move(String from, String to, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -137,7 +137,7 @@ public interface FileSystem {
    * @param handler the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem move(String from, String to, CopyOptions options, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -148,7 +148,7 @@ public interface FileSystem {
   /**
    * Blocking version of {@link #move(String, String, Handler)}
    */
-  @Fluent
+
   FileSystem moveBlocking(String from, String to) ;
 
   /**
@@ -161,7 +161,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem truncate(String path, long len, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -172,7 +172,7 @@ public interface FileSystem {
   /**
    * Blocking version of {@link #truncate(String, long, Handler)}
    */
-  @Fluent
+
   FileSystem truncateBlocking(String path, long len) ;
 
   /**
@@ -186,7 +186,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem chmod(String path, String perms, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -197,7 +197,7 @@ public interface FileSystem {
   /**
    * Blocking version of {@link #chmod(String, String, Handler) }
    */
-  @Fluent
+
   FileSystem chmodBlocking(String path, String perms) ;
 
   /**
@@ -214,7 +214,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem chmodRecursive(String path, String perms, String dirPerms, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -225,7 +225,7 @@ public interface FileSystem {
   /**
    * Blocking version of {@link #chmodRecursive(String, String, String, Handler)}
    */
-  @Fluent
+
   FileSystem chmodRecursiveBlocking(String path, String perms, String dirPerms) ;
 
 
@@ -238,20 +238,20 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  FileSystem chown(String path, @Nullable String user, @Nullable String group, Handler<AsyncResult<Void>> handler);
+
+  FileSystem chown(String path,  String user,  String group, Handler<AsyncResult<Void>> handler);
 
   /**
    * Like {@link #chown(String, String, String, Handler)} but returns a {@code Future} of the asynchronous result
    */
-  Future<Void> chown(String path, @Nullable String user, @Nullable String group);
+  Future<Void> chown(String path,  String user,  String group);
 
   /**
    * Blocking version of {@link #chown(String, String, String, Handler)}
    *
    */
-  @Fluent
-  FileSystem chownBlocking(String path, @Nullable String user, @Nullable String group) ;
+
+  FileSystem chownBlocking(String path,  String user,  String group) ;
 
   /**
    * Obtain properties for the file represented by {@code path}, asynchronously.
@@ -262,7 +262,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem props(String path, Handler<AsyncResult<FileProps>> handler);
 
   /**
@@ -284,7 +284,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem lprops(String path, Handler<AsyncResult<FileProps>> handler);
 
   /**
@@ -305,7 +305,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem link(String link, String existing, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -316,7 +316,7 @@ public interface FileSystem {
   /**
    * Blocking version of {@link #link(String, String, Handler)}
    */
-  @Fluent
+
   FileSystem linkBlocking(String link, String existing) ;
 
   /**
@@ -327,7 +327,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem symlink(String link, String existing, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -338,7 +338,7 @@ public interface FileSystem {
   /**
    * Blocking version of {@link #link(String, String, Handler)}
    */
-  @Fluent
+
   FileSystem symlinkBlocking(String link, String existing) ;
 
   /**
@@ -348,7 +348,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem unlink(String link, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -359,7 +359,7 @@ public interface FileSystem {
   /**
    * Blocking version of {@link #unlink(String, Handler)}
    */
-  @Fluent
+
   FileSystem unlinkBlocking(String link) ;
 
   /**
@@ -369,7 +369,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem readSymlink(String link, Handler<AsyncResult<String>> handler);
 
   /**
@@ -389,7 +389,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem delete(String path, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -400,7 +400,7 @@ public interface FileSystem {
   /**
    * Blocking version of {@link #delete(String, Handler)}
    */
-  @Fluent
+
   FileSystem deleteBlocking(String path) ;
 
   /**
@@ -414,7 +414,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem deleteRecursive(String path, boolean recursive, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -425,7 +425,7 @@ public interface FileSystem {
   /**
    * Blocking version of {@link #deleteRecursive(String, boolean, Handler)}
    */
-  @Fluent
+
   FileSystem deleteRecursiveBlocking(String path, boolean recursive) ;
 
   /**
@@ -437,7 +437,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem mkdir(String path, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -448,7 +448,7 @@ public interface FileSystem {
   /**
    * Blocking version of {@link #mkdir(String, Handler)}
    */
-  @Fluent
+
   FileSystem mkdirBlocking(String path) ;
 
   /**
@@ -466,7 +466,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem mkdir(String path, String perms, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -477,7 +477,7 @@ public interface FileSystem {
   /**
    * Blocking version of {@link #mkdir(String, String, Handler)}
    */
-  @Fluent
+
   FileSystem mkdirBlocking(String path, String perms) ;
 
   /**
@@ -489,7 +489,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem mkdirs(String path, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -500,7 +500,7 @@ public interface FileSystem {
   /**
    * Blocking version of {@link #mkdirs(String, Handler)}
    */
-  @Fluent
+
   FileSystem mkdirsBlocking(String path) ;
 
   /**
@@ -518,7 +518,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem mkdirs(String path, String perms, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -529,7 +529,7 @@ public interface FileSystem {
   /**
    * Blocking version of {@link #mkdirs(String, String, Handler)}
    */
-  @Fluent
+
   FileSystem mkdirsBlocking(String path, String perms) ;
 
   /**
@@ -541,7 +541,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem readDir(String path, Handler<AsyncResult<List<String>>> handler);
 
   /**
@@ -567,7 +567,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem readDir(String path, String filter, Handler<AsyncResult<List<String>>> handler);
 
   /**
@@ -589,7 +589,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem readFile(String path, Handler<AsyncResult<Buffer>> handler);
 
   /**
@@ -610,7 +610,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem writeFile(String path, Buffer data, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -621,7 +621,7 @@ public interface FileSystem {
   /**
    * Blocking version of {@link #writeFile(String, Buffer, Handler)}
    */
-  @Fluent
+
   FileSystem writeFileBlocking(String path, Buffer data) ;
 
   /**
@@ -634,7 +634,7 @@ public interface FileSystem {
    * @return a reference to this, so the API can be used fluently
    *
    */
-  @Fluent
+
   FileSystem open(String path, OpenOptions options, Handler<AsyncResult<AsyncFile>> handler);
 
   /**
@@ -654,7 +654,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem createFile(String path, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -665,7 +665,7 @@ public interface FileSystem {
   /**
    * Blocking version of {@link #createFile(String, Handler)}
    */
-  @Fluent
+
   FileSystem createFileBlocking(String path) ;
 
   /**
@@ -676,7 +676,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem createFile(String path, String perms, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -687,7 +687,7 @@ public interface FileSystem {
   /**
    * Blocking version of {@link #createFile(String, String, Handler)}
    */
-  @Fluent
+
   FileSystem createFileBlocking(String path, String perms) ;
 
   /**
@@ -697,7 +697,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem exists(String path, Handler<AsyncResult<Boolean>> handler);
 
   /**
@@ -717,7 +717,7 @@ public interface FileSystem {
    * @param handler  the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem fsProps(String path, Handler<AsyncResult<FileSystemProps>> handler);
 
   /**
@@ -745,7 +745,7 @@ public interface FileSystem {
    * @param handler the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem createTempDirectory(String prefix, Handler<AsyncResult<String>> handler);
 
   /**
@@ -779,7 +779,7 @@ public interface FileSystem {
    * @param handler the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem createTempDirectory(String prefix, String perms, Handler<AsyncResult<String>> handler);
 
   /**
@@ -814,7 +814,7 @@ public interface FileSystem {
    * @param handler the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem createTempDirectory(String dir, String prefix, String perms, Handler<AsyncResult<String>> handler);
 
   /**
@@ -845,7 +845,7 @@ public interface FileSystem {
    * @param handler the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem createTempFile(String prefix, String suffix, Handler<AsyncResult<String>> handler);
 
   /**
@@ -875,7 +875,7 @@ public interface FileSystem {
    * @param handler the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem createTempFile(String prefix, String suffix, String perms, Handler<AsyncResult<String>> handler);
 
   /**
@@ -912,7 +912,7 @@ public interface FileSystem {
    * @param handler the handler that will be called on completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   FileSystem createTempFile(String dir, String prefix, String suffix, String perms, Handler<AsyncResult<String>> handler);
 
   /**

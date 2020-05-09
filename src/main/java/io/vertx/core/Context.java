@@ -12,10 +12,6 @@
 package io.vertx.core;
 
 import com.google.gson.JsonObject;
-import io.vertx.codegen.annotations.Fluent;
-import io.vertx.codegen.annotations.GenIgnore;
-import io.vertx.codegen.annotations.Nullable;
-import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.impl.VertxThread;
 
 import java.util.List;
@@ -54,7 +50,6 @@ import java.util.List;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen
 public interface Context {
 
   /**
@@ -127,7 +122,7 @@ public interface Context {
    *                 guarantees
    * @param <T> the type of the result
    */
-  <T> void executeBlocking(Handler<Promise<T>> blockingCodeHandler, boolean ordered, Handler<AsyncResult<@Nullable T>> resultHandler);
+  <T> void executeBlocking(Handler<Promise<T>> blockingCodeHandler, boolean ordered, Handler<AsyncResult< T>> resultHandler);
 
   /**
    * Invoke {@link #executeBlocking(Handler, boolean, Handler)} with order = true.
@@ -135,12 +130,12 @@ public interface Context {
    * @param resultHandler  handler that will be called when the blocking code is complete
    * @param <T> the type of the result
    */
-  <T> void executeBlocking(Handler<Promise<T>> blockingCodeHandler, Handler<AsyncResult<@Nullable T>> resultHandler);
+  <T> void executeBlocking(Handler<Promise<T>> blockingCodeHandler, Handler<AsyncResult< T>> resultHandler);
 
   /**
    * Same as {@link #executeBlocking(Handler, boolean, Handler)} but with an {@code handler} called when the operation completes
    */
-  <T> Future<@Nullable T> executeBlocking(Handler<Promise<T>> blockingCodeHandler, boolean ordered);
+  <T> Future< T> executeBlocking(Handler<Promise<T>> blockingCodeHandler, boolean ordered);
 
   /**
    * Same as {@link #executeBlocking(Handler, Handler)} but with an {@code handler} called when the operation completes
@@ -160,7 +155,7 @@ public interface Context {
 //   *
 //   * @return the configuration of the deployment or null if not a Verticle deployment
 //   */
-//  @Nullable JsonObject config();
+//   JsonObject config();
 
 //  /**
 //   * The process args
@@ -262,20 +257,16 @@ public interface Context {
    * @param handler the exception handler
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  Context exceptionHandler(@Nullable Handler<Throwable> handler);
+  Context exceptionHandler( Handler<Throwable> handler);
 
   /**
    * @return the current exception handler of this context
    */
-  @GenIgnore
-  @Nullable
+
   Handler<Throwable> exceptionHandler();
 
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   void addCloseHook(Closeable hook);
 
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   boolean removeCloseHook(Closeable hook);
 
 }

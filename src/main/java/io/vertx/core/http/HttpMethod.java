@@ -11,7 +11,6 @@
 
 package io.vertx.core.http;
 
-import io.vertx.codegen.annotations.DataObject;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -24,7 +23,6 @@ import java.util.Objects;
  * @author <a href="http://tfox.org">Tim Fox</a>
  * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
  */
-@DataObject
 public class HttpMethod {
 
   /**

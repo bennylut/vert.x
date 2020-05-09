@@ -11,7 +11,6 @@
 
 package io.vertx.core.http;
 
-import io.vertx.codegen.annotations.*;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -32,7 +31,6 @@ import java.util.List;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen
 public interface HttpClientResponse extends ReadStream<Buffer> {
 
   @Override
@@ -71,7 +69,6 @@ public interface HttpClientResponse extends ReadStream<Buffer> {
   /**
    * @return the headers
    */
-  @CacheReturn
   MultiMap headers();
 
   /**
@@ -80,7 +77,7 @@ public interface HttpClientResponse extends ReadStream<Buffer> {
    * @param headerName  the header name
    * @return the header value
    */
-  @Nullable String getHeader(String headerName);
+  String getHeader(String headerName);
 
   /**
    * Return the first header value with the specified name
@@ -88,7 +85,6 @@ public interface HttpClientResponse extends ReadStream<Buffer> {
    * @param headerName  the header name
    * @return the header value
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   String getHeader(CharSequence headerName);
 
   /**
@@ -97,18 +93,16 @@ public interface HttpClientResponse extends ReadStream<Buffer> {
    * @param trailerName  the trailer name
    * @return the trailer value
    */
-  @Nullable String getTrailer(String trailerName);
+   String getTrailer(String trailerName);
 
   /**
    * @return the trailers
    */
-  @CacheReturn
   MultiMap trailers();
 
   /**
    * @return the Set-Cookie headers (including trailers)
    */
-  @CacheReturn
   List<String> cookies();
 
   /**
@@ -119,13 +113,11 @@ public interface HttpClientResponse extends ReadStream<Buffer> {
    *
    * @param bodyHandler This handler will be called after all the body has been received
    */
-  @Fluent
   HttpClientResponse bodyHandler(Handler<Buffer> bodyHandler);
 
   /**
    * Same as {@link #body()} but with an {@code handler} called when the operation completes
    */
-  @Fluent
   default HttpClientResponse body(Handler<AsyncResult<Buffer>> handler) {
     Future<Buffer> fut = body();
     fut.onComplete(handler);
@@ -148,13 +140,11 @@ public interface HttpClientResponse extends ReadStream<Buffer> {
    *
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
   HttpClientResponse customFrameHandler(Handler<HttpFrame> handler);
 
   /**
    * @return the corresponding request
    */
-  @CacheReturn
   HttpClientRequest request();
 
   /**
@@ -164,6 +154,5 @@ public interface HttpClientResponse extends ReadStream<Buffer> {
    *
    * @param handler the handler to be called when the stream priority changes
    */
-  @Fluent
   HttpClientResponse streamPriorityHandler(Handler<StreamPriority> handler);
 }

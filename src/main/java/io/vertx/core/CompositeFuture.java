@@ -11,8 +11,8 @@
 
 package io.vertx.core;
 
-import io.vertx.codegen.annotations.GenIgnore;
-import io.vertx.codegen.annotations.VertxGen;
+
+
 import io.vertx.core.impl.CompositeFutureImpl;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ import java.util.List;
  *
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */
-@VertxGen
+
 public interface CompositeFuture extends Future<CompositeFuture> {
 
   /**
@@ -237,7 +237,7 @@ public interface CompositeFuture extends Future<CompositeFuture> {
    * @return a list of the current completed values. If one future is not yet resolved or is failed, {@code} null
    *         will be used
    */
-  @GenIgnore
+
   default <T> List<T> list() {
     int size = size();
     ArrayList<T> list = new ArrayList<>(size);

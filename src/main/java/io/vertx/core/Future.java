@@ -11,9 +11,6 @@
 
 package io.vertx.core;
 
-import io.vertx.codegen.annotations.Fluent;
-import io.vertx.codegen.annotations.GenIgnore;
-import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.impl.ContextInternal;
 import io.vertx.core.spi.FutureFactory;
 
@@ -27,7 +24,6 @@ import java.util.function.Function;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen
 public interface Future<T> extends AsyncResult<T> {
 
   /**
@@ -109,7 +105,6 @@ public interface Future<T> extends AsyncResult<T> {
    * @param handler the handler that will be called with the result
    * @return a reference to this, so it can be used fluently
    */
-  @Fluent
   Future<T> onComplete(Handler<AsyncResult<T>> handler);
 
   /**
@@ -118,7 +113,6 @@ public interface Future<T> extends AsyncResult<T> {
    * @param handler the handler that will be called with the succeeded result
    * @return a reference to this, so it can be used fluently
    */
-  @Fluent
   default Future<T> onSuccess(Handler<T> handler) {
     return onComplete(ar -> {
       if (ar.succeeded()) {
@@ -133,7 +127,6 @@ public interface Future<T> extends AsyncResult<T> {
    * @param handler the handler that will be called with the failed result
    * @return a reference to this, so it can be used fluently
    */
-  @Fluent
   default Future<T> onFailure(Handler<Throwable> handler) {
     return onComplete(ar -> {
       if (ar.failed()) {
@@ -475,7 +468,6 @@ public interface Future<T> extends AsyncResult<T> {
    *
    * @return a {@link CompletionStage} that completes when this future resolves
    */
-  @GenIgnore
   default CompletionStage<T> toCompletionStage() {
     CompletableFuture<T> completableFuture = new CompletableFuture<>();
     onComplete(ar -> {
@@ -497,7 +489,6 @@ public interface Future<T> extends AsyncResult<T> {
    * @param <T>             the result type
    * @return a Vert.x future that resolves when {@code completionStage} resolves
    */
-  @GenIgnore
   static <T> Future<T> fromCompletionStage(CompletionStage<T> completionStage) {
     Promise<T> promise = Promise.promise();
     completionStage.whenComplete((value, err) -> {
@@ -520,7 +511,6 @@ public interface Future<T> extends AsyncResult<T> {
    * @param <T>             the result type
    * @return a Vert.x future that resolves when {@code completionStage} resolves
    */
-  @GenIgnore
   static <T> Future<T> fromCompletionStage(CompletionStage<T> completionStage, Context context) {
     Promise<T> promise = ((ContextInternal) context).promise();
     completionStage.whenComplete((value, err) -> {
@@ -533,7 +523,6 @@ public interface Future<T> extends AsyncResult<T> {
     return promise.future();
   }
 
-  @GenIgnore
   FutureFactory factory = ServiceHelper.loadFactory(FutureFactory.class);
 
 }

@@ -17,9 +17,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.netty.buffer.ByteBuf;
-import io.vertx.codegen.annotations.Fluent;
-import io.vertx.codegen.annotations.GenIgnore;
-import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.buffer.impl.BufferImpl;
 import io.vertx.core.shareddata.Shareable;
 import io.vertx.core.shareddata.impl.ClusterSerializable;
@@ -37,7 +34,6 @@ import java.nio.charset.Charset;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen
 public interface Buffer extends ClusterSerializable, Shareable {
 
   /**
@@ -89,7 +85,6 @@ public interface Buffer extends ClusterSerializable, Shareable {
    * @param bytes the byte array
    * @return the buffer
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   static Buffer buffer(byte[] bytes) {
     return BufferImpl.buffer(bytes);
   }
@@ -111,7 +106,6 @@ public interface Buffer extends ClusterSerializable, Shareable {
    * @param byteBuf the Netty ByteBuf
    * @return the buffer
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   static Buffer buffer(ByteBuf byteBuf) {
     return BufferImpl.buffer(byteBuf);
   }
@@ -129,7 +123,6 @@ public interface Buffer extends ClusterSerializable, Shareable {
   /**
    * Returns a {@code String} representation of the Buffer with the encoding specified by {@code enc}
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   String toString(Charset enc);
 //
 //  /**
@@ -281,14 +274,12 @@ public interface Buffer extends ClusterSerializable, Shareable {
   /**
    * Returns a copy of the entire Buffer as a {@code byte[]}
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   byte[] getBytes();
 
   /**
    * Returns a copy of a sub-sequence the Buffer as a {@code byte[]} starting at position {@code start}
    * and ending at position {@code end - 1}
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   byte[] getBytes(int start, int end);
 
   /**
@@ -297,8 +288,6 @@ public interface Buffer extends ClusterSerializable, Shareable {
    * @param dst the destination byte array
    * @throws IndexOutOfBoundsException if the content of the Buffer cannot fit into the destination byte array
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
-  @Fluent
   Buffer getBytes(byte[] dst);
 
   /**
@@ -307,8 +296,6 @@ public interface Buffer extends ClusterSerializable, Shareable {
    * @param dst the destination byte array
    * @throws IndexOutOfBoundsException if the content of the Buffer cannot fit into the destination byte array
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
-  @Fluent
   Buffer getBytes(byte[] dst, int dstIndex);
 
   /**
@@ -318,8 +305,6 @@ public interface Buffer extends ClusterSerializable, Shareable {
    * @param dst the destination byte array
    * @throws IndexOutOfBoundsException if the content of the Buffer cannot fit into the destination byte array
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
-  @Fluent
   Buffer getBytes(int start, int end, byte[] dst);
 
   /**
@@ -329,8 +314,6 @@ public interface Buffer extends ClusterSerializable, Shareable {
    * @param dst the destination byte array
    * @throws IndexOutOfBoundsException if the content of the Buffer cannot fit into the destination byte array
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
-  @Fluent
   Buffer getBytes(int start, int end, byte[] dst, int dstIndex);
 
   /**
@@ -356,7 +339,6 @@ public interface Buffer extends ClusterSerializable, Shareable {
    * any bytes written.<p>
    * Returns a reference to {@code this} so multiple operations can be appended together.
    */
-  @Fluent
   Buffer appendBuffer(Buffer buff);
 
   /**
@@ -364,15 +346,12 @@ public interface Buffer extends ClusterSerializable, Shareable {
    * any bytes written.<p>
    * Returns a reference to {@code this} so multiple operations can be appended together.
    */
-  @Fluent
   Buffer appendBuffer(Buffer buff, int offset, int len);
 
   /**
    * Appends the specified {@code byte[]} to the end of the Buffer. The buffer will expand as necessary to accommodate any bytes written.<p>
    * Returns a reference to {@code this} so multiple operations can be appended together.
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
-  @Fluent
   Buffer appendBytes(byte[] bytes);
 
   /**
@@ -380,120 +359,102 @@ public interface Buffer extends ClusterSerializable, Shareable {
    * The buffer will expand as necessary to accommodate any bytes written.<p>
    * Returns a reference to {@code this} so multiple operations can be appended together.
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
-  @Fluent
   Buffer appendBytes(byte[] bytes, int offset, int len);
 
   /**
    * Appends the specified {@code byte} to the end of the Buffer. The buffer will expand as necessary to accommodate any bytes written.<p>
    * Returns a reference to {@code this} so multiple operations can be appended together.
    */
-  @Fluent
   Buffer appendByte(byte b);
 
   /**
    * Appends the specified unsigned {@code byte} to the end of the Buffer. The buffer will expand as necessary to accommodate any bytes written.<p>
    * Returns a reference to {@code this} so multiple operations can be appended together.
    */
-  @Fluent
   Buffer appendUnsignedByte(short b);
 
   /**
    * Appends the specified {@code int} to the end of the Buffer. The buffer will expand as necessary to accommodate any bytes written.<p>
    * Returns a reference to {@code this} so multiple operations can be appended together.
    */
-  @Fluent
   Buffer appendInt(int i);
 
   /**
    * Appends the specified {@code int} to the end of the Buffer in the Little Endian Byte Order. The buffer will expand as necessary to accommodate any bytes written.<p>
    * Returns a reference to {@code this} so multiple operations can be appended together.
    */
-  @Fluent
   Buffer appendIntLE(int i);
 
   /**
    * Appends the specified unsigned {@code int} to the end of the Buffer. The buffer will expand as necessary to accommodate any bytes written.<p>
    * Returns a reference to {@code this} so multiple operations can be appended together.
    */
-  @Fluent
   Buffer appendUnsignedInt(long i);
 
   /**
    * Appends the specified unsigned {@code int} to the end of the Buffer in the Little Endian Byte Order. The buffer will expand as necessary to accommodate any bytes written.<p>
    * Returns a reference to {@code this} so multiple operations can be appended together.
    */
-  @Fluent
   Buffer appendUnsignedIntLE(long i);
 
   /**
    * Appends the specified 24bit {@code int} to the end of the Buffer. The buffer will expand as necessary to accommodate any bytes written.<p>
    * Returns a reference to {@code this} so multiple operations can be appended together.
    */
-  @Fluent
   Buffer appendMedium(int i);
 
   /**
    * Appends the specified 24bit {@code int} to the end of the Buffer in the Little Endian Byte Order. The buffer will expand as necessary to accommodate any bytes written.<p>
    * Returns a reference to {@code this} so multiple operations can be appended together.
    */
-  @Fluent
   Buffer appendMediumLE(int i);
 
   /**
    * Appends the specified {@code long} to the end of the Buffer. The buffer will expand as necessary to accommodate any bytes written.<p>
    * Returns a reference to {@code this} so multiple operations can be appended together.
    */
-  @Fluent
   Buffer appendLong(long l);
 
   /**
    * Appends the specified {@code long} to the end of the Buffer in the Little Endian Byte Order. The buffer will expand as necessary to accommodate any bytes written.<p>
    * Returns a reference to {@code this} so multiple operations can be appended together.
    */
-  @Fluent
   Buffer appendLongLE(long l);
 
   /**
    * Appends the specified {@code short} to the end of the Buffer.The buffer will expand as necessary to accommodate any bytes written.<p>
    * Returns a reference to {@code this} so multiple operations can be appended together.
    */
-  @Fluent
   Buffer appendShort(short s);
 
   /**
    * Appends the specified {@code short} to the end of the Buffer in the Little Endian Byte Order.The buffer will expand as necessary to accommodate any bytes written.<p>
    * Returns a reference to {@code this} so multiple operations can be appended together.
    */
-  @Fluent
   Buffer appendShortLE(short s);
 
   /**
    * Appends the specified unsigned {@code short} to the end of the Buffer.The buffer will expand as necessary to accommodate any bytes written.<p>
    * Returns a reference to {@code this} so multiple operations can be appended together.
    */
-  @Fluent
   Buffer appendUnsignedShort(int s);
 
   /**
    * Appends the specified unsigned {@code short} to the end of the Buffer in the Little Endian Byte Order.The buffer will expand as necessary to accommodate any bytes written.<p>
    * Returns a reference to {@code this} so multiple operations can be appended together.
    */
-  @Fluent
   Buffer appendUnsignedShortLE(int s);
 
   /**
    * Appends the specified {@code float} to the end of the Buffer. The buffer will expand as necessary to accommodate any bytes written.<p>
    * Returns a reference to {@code this} so multiple operations can be appended together.
    */
-  @Fluent
   Buffer appendFloat(float f);
 
   /**
    * Appends the specified {@code double} to the end of the Buffer. The buffer will expand as necessary to accommodate any bytes written.<p>
    * Returns a reference to {@code this} so multiple operations can be appended together.
    */
-  @Fluent
   Buffer appendDouble(double d);
 
   /**
@@ -501,7 +462,6 @@ public interface Buffer extends ClusterSerializable, Shareable {
    * The buffer will expand as necessary to accommodate any bytes written.<p>
    * Returns a reference to {@code this} so multiple operations can be appended together.<p>
    */
-  @Fluent
   Buffer appendString(String str, String enc);
 
   /**
@@ -509,171 +469,144 @@ public interface Buffer extends ClusterSerializable, Shareable {
    * The buffer will expand as necessary to accommodate any bytes written.<p>
    * Returns a reference to {@code this} so multiple operations can be appended together<p>
    */
-  @Fluent
   Buffer appendString(String str);
 
   /**
    * Sets the {@code byte} at position {@code pos} in the Buffer to the value {@code b}.<p>
    * The buffer will expand as necessary to accommodate any value written.
    */
-  @Fluent
   Buffer setByte(int pos, byte b);
 
   /**
    * Sets the unsigned {@code byte} at position {@code pos} in the Buffer to the value {@code b}.<p>
    * The buffer will expand as necessary to accommodate any value written.
    */
-  @Fluent
   Buffer setUnsignedByte(int pos, short b);
 
   /**
    * Sets the {@code int} at position {@code pos} in the Buffer to the value {@code i}.<p>
    * The buffer will expand as necessary to accommodate any value written.
    */
-  @Fluent
   Buffer setInt(int pos, int i);
 
   /**
    * Sets the {@code int} at position {@code pos} in the Buffer to the value {@code i} in the Little Endian Byte Order.<p>
    * The buffer will expand as necessary to accommodate any value written.
    */
-  @Fluent
   Buffer setIntLE(int pos, int i);
 
   /**
    * Sets the unsigned {@code int} at position {@code pos} in the Buffer to the value {@code i}.<p>
    * The buffer will expand as necessary to accommodate any value written.
    */
-  @Fluent
   Buffer setUnsignedInt(int pos, long i);
 
   /**
    * Sets the unsigned {@code int} at position {@code pos} in the Buffer to the value {@code i} in the Little Endian Byte Order.<p>
    * The buffer will expand as necessary to accommodate any value written.
    */
-  @Fluent
   Buffer setUnsignedIntLE(int pos, long i);
 
   /**
    * Sets the 24bit {@code int} at position {@code pos} in the Buffer to the value {@code i}.<p>
    * The buffer will expand as necessary to accommodate any value written.
    */
-  @Fluent
   Buffer setMedium(int pos, int i);
 
   /**
    * Sets the 24bit {@code int} at position {@code pos} in the Buffer to the value {@code i}. in the Little Endian Byte Order<p>
    * The buffer will expand as necessary to accommodate any value written.
    */
-  @Fluent
   Buffer setMediumLE(int pos, int i);
 
   /**
    * Sets the {@code long} at position {@code pos} in the Buffer to the value {@code l}.<p>
    * The buffer will expand as necessary to accommodate any value written.
    */
-  @Fluent
   Buffer setLong(int pos, long l);
 
   /**
    * Sets the {@code long} at position {@code pos} in the Buffer to the value {@code l} in the Little Endian Byte Order.<p>
    * The buffer will expand as necessary to accommodate any value written.
    */
-  @Fluent
   Buffer setLongLE(int pos, long l);
 
   /**
    * Sets the {@code double} at position {@code pos} in the Buffer to the value {@code d}.<p>
    * The buffer will expand as necessary to accommodate any value written.
    */
-  @Fluent
   Buffer setDouble(int pos, double d);
 
   /**
    * Sets the {@code float} at position {@code pos} in the Buffer to the value {@code f}.<p>
    * The buffer will expand as necessary to accommodate any value written.
    */
-  @Fluent
   Buffer setFloat(int pos, float f);
 
   /**
    * Sets the {@code short} at position {@code pos} in the Buffer to the value {@code s}.<p>
    * The buffer will expand as necessary to accommodate any value written.
    */
-  @Fluent
   Buffer setShort(int pos, short s);
 
   /**
    * Sets the {@code short} at position {@code pos} in the Buffer to the value {@code s} in the Little Endian Byte Order.<p>
    * The buffer will expand as necessary to accommodate any value written.
    */
-  @Fluent
   Buffer setShortLE(int pos, short s);
 
   /**
    * Sets the unsigned {@code short} at position {@code pos} in the Buffer to the value {@code s}.<p>
    * The buffer will expand as necessary to accommodate any value written.
    */
-  @Fluent
   Buffer setUnsignedShort(int pos, int s);
 
   /**
    * Sets the unsigned {@code short} at position {@code pos} in the Buffer to the value {@code s} in the Little Endian Byte Order.<p>
    * The buffer will expand as necessary to accommodate any value written.
    */
-  @Fluent
   Buffer setUnsignedShortLE(int pos, int s);
 
   /**
    * Sets the bytes at position {@code pos} in the Buffer to the bytes represented by the {@code Buffer b}.<p>
    * The buffer will expand as necessary to accommodate any value written.
    */
-  @Fluent
   Buffer setBuffer(int pos, Buffer b);
 
   /**
    * Sets the bytes at position {@code pos} in the Buffer to the bytes represented by the {@code Buffer b} on the given {@code offset} and {@code len}.<p>
    * The buffer will expand as necessary to accommodate any value written.
    */
-  @Fluent
   Buffer setBuffer(int pos, Buffer b, int offset, int len);
 
   /**
    * Sets the bytes at position {@code pos} in the Buffer to the bytes represented by the {@code ByteBuffer b}.<p>
    * The buffer will expand as necessary to accommodate any value written.
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
-  @Fluent
   Buffer setBytes(int pos, ByteBuffer b);
 
   /**
    * Sets the bytes at position {@code pos} in the Buffer to the bytes represented by the {@code byte[] b}.<p>
    * The buffer will expand as necessary to accommodate any value written.
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
-  @Fluent
   Buffer setBytes(int pos, byte[] b);
 
   /**
    * Sets the given number of bytes at position {@code pos} in the Buffer to the bytes represented by the {@code byte[] b}.<p></p>
    * The buffer will expand as necessary to accommodate any value written.
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
-  @Fluent
   Buffer setBytes(int pos, byte[] b, int offset, int len);
 
   /**
    * Sets the bytes at position {@code pos} in the Buffer to the value of {@code str} encoded in UTF-8.<p>
    * The buffer will expand as necessary to accommodate any value written.
    */
-  @Fluent
   Buffer setString(int pos, String str);
 
   /**
    * Sets the bytes at position {@code pos} in the Buffer to the value of {@code str} encoded in encoding {@code enc}.<p>
    * The buffer will expand as necessary to accommodate any value written.
    */
-  @Fluent
   Buffer setString(int pos, String str, String enc);
 
   /**
@@ -707,7 +640,6 @@ public interface Buffer extends ClusterSerializable, Shareable {
    * The returned {@code ByteBuf} might have its {@code readerIndex > 0}
    * This method is meant for internal use only.<p>
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   ByteBuf getByteBuf();
 
 }

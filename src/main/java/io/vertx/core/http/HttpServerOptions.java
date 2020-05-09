@@ -11,7 +11,7 @@
 
 package io.vertx.core.http;
 
-import io.vertx.codegen.annotations.DataObject;
+
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.impl.Arguments;
@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@DataObject(generateConverter = true, publicConverter = false)
+
 public class HttpServerOptions extends NetServerOptions {
 
   /**

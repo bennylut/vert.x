@@ -11,14 +11,12 @@
 
 package io.vertx.core.net;
 
-import io.vertx.codegen.annotations.VertxGen;
 
 /**
  * The type of a TCP proxy server.
  *
  * @author <a href="http://oss.lehmann.cx/">Alexander Lehmann</a>
  */
-@VertxGen
 public enum ProxyType {
   /**
    * HTTP CONNECT ssl proxy

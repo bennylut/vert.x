@@ -11,7 +11,7 @@
 
 package io.vertx.core.http.impl;
 
-import io.vertx.codegen.annotations.Nullable;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -167,7 +167,7 @@ class HttpClientRequestPushPromise extends HttpClientRequestBase {
   }
 
   @Override
-  public HttpClientRequest continueHandler(@Nullable Handler<Void> handler) {
+  public HttpClientRequest continueHandler( Handler<Void> handler) {
     throw new IllegalStateException();
   }
 

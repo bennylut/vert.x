@@ -11,9 +11,9 @@
 
 package io.vertx.core.http;
 
-import io.vertx.codegen.annotations.GenIgnore;
-import io.vertx.codegen.annotations.Nullable;
-import io.vertx.codegen.annotations.VertxGen;
+
+
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -32,7 +32,7 @@ import javax.security.cert.X509Certificate;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen
+
 public interface ServerWebSocket extends WebSocketBase {
 
   @Override
@@ -83,13 +83,13 @@ public interface ServerWebSocket extends WebSocketBase {
   /**
    * @return the WebSocket handshake scheme
    */
-  @Nullable
+
   String scheme();
 
   /**
    * @return the WebSocket handshake host
    */
-  @Nullable
+
   String host();
 
   /*
@@ -105,7 +105,7 @@ public interface ServerWebSocket extends WebSocketBase {
   /**
    * @return the WebSocket handshake query string.
    */
-  @Nullable
+
   String query();
 
   /**
@@ -180,7 +180,7 @@ public interface ServerWebSocket extends WebSocketBase {
    *         not SSL.
    * @see javax.net.ssl.SSLSession
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+
   SSLSession sslSession();
 
   /**
@@ -194,6 +194,6 @@ public interface ServerWebSocket extends WebSocketBase {
    * @see javax.net.ssl.SSLSession#getPeerCertificateChain()
    * @see #sslSession()
    */
-  @GenIgnore
+
   X509Certificate[] peerCertificateChain() throws SSLPeerUnverifiedException;
 }

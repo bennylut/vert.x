@@ -11,7 +11,7 @@
 
 package io.vertx.core.file;
 
-import io.vertx.codegen.annotations.VertxGen;
+
 
 /**
  * Represents properties of the file system.
@@ -19,7 +19,7 @@ import io.vertx.codegen.annotations.VertxGen;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen
+
 public interface FileSystemProps {
 
   /**

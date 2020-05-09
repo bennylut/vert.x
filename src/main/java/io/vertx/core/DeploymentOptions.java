@@ -11,8 +11,8 @@
 
 package io.vertx.core;
 
-import io.vertx.codegen.annotations.DataObject;
-import io.vertx.codegen.annotations.GenIgnore;
+
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@DataObject(generateConverter = true, publicConverter = false)
+
 public class DeploymentOptions {
 
   public static final boolean DEFAULT_WORKER = false;
@@ -102,7 +102,7 @@ public class DeploymentOptions {
    *
    * @return the isolation group
    */
-  @GenIgnore
+
   @Deprecated
   public String getIsolationGroup() {
     return isolationGroup;
@@ -116,7 +116,7 @@ public class DeploymentOptions {
    * @param isolationGroup - the isolation group
    * @return a reference to this, so the API can be used fluently
    */
-  @GenIgnore
+
   @Deprecated
   public DeploymentOptions setIsolationGroup(String isolationGroup) {
     this.isolationGroup = isolationGroup;
@@ -152,7 +152,7 @@ public class DeploymentOptions {
    *
    * @return  any extra classpath
    */
-  @GenIgnore
+
   @Deprecated
   public List<String> getExtraClasspath() {
     return extraClasspath;
@@ -167,7 +167,7 @@ public class DeploymentOptions {
    *
    * @return a reference to this, so the API can be used fluently
    */
-  @GenIgnore
+
   @Deprecated
   public DeploymentOptions setExtraClasspath(List<String> extraClasspath) {
     this.extraClasspath = extraClasspath;
@@ -202,7 +202,7 @@ public class DeploymentOptions {
    *
    * @return the list of isolated classes
    */
-  @GenIgnore
+
   @Deprecated
   public List<String> getIsolatedClasses() {
     return isolatedClasses;
@@ -216,7 +216,7 @@ public class DeploymentOptions {
    * @param isolatedClasses the list of isolated class names
    * @return a reference to this, so the API can be used fluently
    */
-  @GenIgnore
+
   @Deprecated
   public DeploymentOptions setIsolatedClasses(List<String> isolatedClasses) {
     this.isolatedClasses = isolatedClasses;

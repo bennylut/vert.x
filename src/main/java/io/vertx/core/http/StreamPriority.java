@@ -13,12 +13,12 @@ package io.vertx.core.http;
 
 import com.google.gson.JsonObject;
 import io.netty.handler.codec.http2.Http2CodecUtil;
-import io.vertx.codegen.annotations.DataObject;
+
 
 /**
  * This class represents HTTP/2 stream priority defined in RFC 7540 clause 5.3
  */
-@DataObject
+
 public class StreamPriority {
 
   public static final int DEFAULT_DEPENDENCY = 0;

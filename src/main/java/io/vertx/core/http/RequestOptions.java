@@ -11,8 +11,6 @@
 
 package io.vertx.core.http;
 
-import io.vertx.codegen.annotations.DataObject;
-import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.core.MultiMap;
 import io.vertx.core.VertxException;
 
@@ -25,7 +23,6 @@ import java.util.Objects;
  *
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */
-@DataObject(generateConverter = true)
 public class RequestOptions {
 
   /**
@@ -301,7 +298,6 @@ public class RequestOptions {
    * @param value  the header value
    * @return a reference to this, so the API can be used fluently
    */
-  @GenIgnore
   public RequestOptions addHeader(CharSequence key, CharSequence value) {
     checkHeaders();
     Objects.requireNonNull(key, "no null key accepted");
@@ -310,7 +306,6 @@ public class RequestOptions {
     return this;
   }
 
-  @GenIgnore
   public RequestOptions addHeader(CharSequence key, Iterable<CharSequence> values) {
     checkHeaders();
     Objects.requireNonNull(key, "no null key accepted");
@@ -325,7 +320,6 @@ public class RequestOptions {
    * @param headers  the headers
    * @return  a reference to this, so the API can be used fluently
    */
-  @GenIgnore
   public RequestOptions setHeaders(MultiMap headers) {
     this.headers = headers;
     return this;
@@ -336,7 +330,6 @@ public class RequestOptions {
    *
    * @return  the headers
    */
-  @GenIgnore
   public MultiMap getHeaders() {
     return headers;
   }

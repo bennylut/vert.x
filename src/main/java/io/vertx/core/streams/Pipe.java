@@ -10,8 +10,8 @@
  */
 package io.vertx.core.streams;
 
-import io.vertx.codegen.annotations.Fluent;
-import io.vertx.codegen.annotations.VertxGen;
+
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -38,7 +38,7 @@ import io.vertx.core.Promise;
  * <p>
  * Please see the documentation for more information.
  */
-@VertxGen
+
 public interface Pipe<T> {
 
   /**
@@ -47,7 +47,7 @@ public interface Pipe<T> {
    * @param end {@code true} to end the stream on a source {@code ReadStream} failure
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   Pipe<T> endOnFailure(boolean end);
 
   /**
@@ -56,7 +56,7 @@ public interface Pipe<T> {
    * @param end {@code true} to end the stream on a source {@code ReadStream} success
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   Pipe<T> endOnSuccess(boolean end);
 
   /**
@@ -67,7 +67,7 @@ public interface Pipe<T> {
    * @param end {@code true} to end the stream on a source {@code ReadStream} completion
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   Pipe<T> endOnComplete(boolean end);
 
   /**

@@ -11,7 +11,7 @@
 
 package io.vertx.core.http;
 
-import io.vertx.codegen.annotations.*;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -49,7 +49,6 @@ import io.vertx.core.streams.WriteStream;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen
 public interface HttpClientRequest extends WriteStream<Buffer>, Future<HttpClientResponse> {
 
   @Override
@@ -67,7 +66,6 @@ public interface HttpClientRequest extends WriteStream<Buffer>, Future<HttpClien
    * @param followRedirects {@code true} to follow HTTP redirects
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
   HttpClientRequest setFollowRedirects(boolean followRedirects);
 
   /**
@@ -77,7 +75,6 @@ public interface HttpClientRequest extends WriteStream<Buffer>, Future<HttpClien
    * @param maxRedirects the number of HTTP redirect to follow
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
   HttpClientRequest setMaxRedirects(int maxRedirects);
 
   /**
@@ -86,7 +83,6 @@ public interface HttpClientRequest extends WriteStream<Buffer>, Future<HttpClien
    * @param chunked true if chunked encoding
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
   HttpClientRequest setChunked(boolean chunked);
 
   /**
@@ -122,7 +118,6 @@ public interface HttpClientRequest extends WriteStream<Buffer>, Future<HttpClien
   /**
    * For HTTP/2 it sets the {@literal :authority} pseudo header otherwise it sets the {@literal Host} header
    */
-  @Fluent
   HttpClientRequest setAuthority(String authority);
 
   /**
@@ -133,7 +128,6 @@ public interface HttpClientRequest extends WriteStream<Buffer>, Future<HttpClien
   /**
    * @return The HTTP headers
    */
-  @CacheReturn
   MultiMap headers();
 
   /**
@@ -143,14 +137,11 @@ public interface HttpClientRequest extends WriteStream<Buffer>, Future<HttpClien
    * @param value The header value
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
   HttpClientRequest putHeader(String name, String value);
 
   /**
    * Like {@link #putHeader(String, String)} but using CharSequence
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
-  @Fluent
   HttpClientRequest putHeader(CharSequence name, CharSequence value);
 
   /**
@@ -160,15 +151,11 @@ public interface HttpClientRequest extends WriteStream<Buffer>, Future<HttpClien
    * @param values The header values
    * @return @return a reference to this, so the API can be used fluently
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
-  @Fluent
   HttpClientRequest putHeader(String name, Iterable<String> values);
 
   /**
    * Like {@link #putHeader(String, Iterable)} but using CharSequence
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
-  @Fluent
   HttpClientRequest putHeader(CharSequence name, Iterable<CharSequence> values);
 
   /**
@@ -210,8 +197,7 @@ public interface HttpClientRequest extends WriteStream<Buffer>, Future<HttpClien
    *
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  HttpClientRequest continueHandler(@Nullable Handler<Void> handler);
+  HttpClientRequest continueHandler(Handler<Void> handler);
 
   /**
    * Forces the head of the request to be written before {@link #end()} is called on the request or any data is
@@ -229,7 +215,6 @@ public interface HttpClientRequest extends WriteStream<Buffer>, Future<HttpClien
    * Like {@link #sendHead()} but with an handler after headers have been sent. The handler will be called with
    * the {@link HttpVersion} if it can be determined or null otherwise.<p>
    */
-  @Fluent
   HttpClientRequest sendHead(Handler<AsyncResult<HttpVersion>> completionHandler);
 
   /**
@@ -306,7 +291,6 @@ public interface HttpClientRequest extends WriteStream<Buffer>, Future<HttpClien
    * @param timeoutMs The quantity of time in milliseconds.
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
   HttpClientRequest setTimeout(long timeoutMs);
 
   /**
@@ -330,7 +314,6 @@ public interface HttpClientRequest extends WriteStream<Buffer>, Future<HttpClien
    * @param handler the handler
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
   HttpClientRequest pushHandler(Handler<HttpClientRequest> handler);
 
   /**
@@ -347,7 +330,6 @@ public interface HttpClientRequest extends WriteStream<Buffer>, Future<HttpClien
    * @param handler the handler
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
   default HttpClientRequest netSocket(Handler<AsyncResult<NetSocket>> handler) {
     Future<NetSocket> fut = netSocket();
     if (handler != null) {
@@ -391,7 +373,6 @@ public interface HttpClientRequest extends WriteStream<Buffer>, Future<HttpClien
   /**
    * @return the {@link HttpConnection} associated with this request
    */
-  @CacheReturn
   HttpConnection connection();
 
   /**
@@ -407,7 +388,6 @@ public interface HttpClientRequest extends WriteStream<Buffer>, Future<HttpClien
    * @param payload the frame payload
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
   HttpClientRequest writeCustomFrame(int type, int flags, Buffer payload);
 
   /**
@@ -423,7 +403,6 @@ public interface HttpClientRequest extends WriteStream<Buffer>, Future<HttpClien
    *
    * @param frame the frame to write
    */
-  @Fluent
   default HttpClientRequest writeCustomFrame(HttpFrame frame) {
     return writeCustomFrame(frame.type(), frame.flags(), frame.payload());
   }
@@ -435,7 +414,6 @@ public interface HttpClientRequest extends WriteStream<Buffer>, Future<HttpClien
    *
    * @param streamPriority the priority of this request's stream
    */
-  @Fluent
   default HttpClientRequest setStreamPriority(StreamPriority streamPriority) {
       return this;
   }

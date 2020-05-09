@@ -11,7 +11,7 @@
 
 package io.vertx.core.dns;
 
-import io.vertx.codegen.annotations.DataObject;
+
 import io.vertx.core.VertxOptions;
 
 /**
@@ -19,7 +19,7 @@ import io.vertx.core.VertxOptions;
  *
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */
-@DataObject(generateConverter = true)
+
 public class DnsClientOptions {
 
   /**

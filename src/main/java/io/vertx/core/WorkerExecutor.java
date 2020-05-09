@@ -11,8 +11,8 @@
 
 package io.vertx.core;
 
-import io.vertx.codegen.annotations.Nullable;
-import io.vertx.codegen.annotations.VertxGen;
+
+
 import io.vertx.core.metrics.Measured;
 
 /**
@@ -23,7 +23,7 @@ import io.vertx.core.metrics.Measured;
  *
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */
-@VertxGen
+
 public interface WorkerExecutor extends Measured {
 
   /**
@@ -48,19 +48,19 @@ public interface WorkerExecutor extends Measured {
    *                 guarantees
    * @param <T> the type of the result
    */
-  <T> void executeBlocking(Handler<Promise<T>> blockingCodeHandler, boolean ordered, Handler<AsyncResult<@Nullable T>> resultHandler);
+  <T> void executeBlocking(Handler<Promise<T>> blockingCodeHandler, boolean ordered, Handler<AsyncResult< T>> resultHandler);
 
   /**
    * Like {@link #executeBlocking(Handler, boolean, Handler)} called with ordered = true.
    */
-  default <T> void executeBlocking(Handler<Promise<T>> blockingCodeHandler, Handler<AsyncResult<@Nullable T>> resultHandler) {
+  default <T> void executeBlocking(Handler<Promise<T>> blockingCodeHandler, Handler<AsyncResult< T>> resultHandler) {
     executeBlocking(blockingCodeHandler, true, resultHandler);
   }
 
   /**
    * Same as {@link #executeBlocking(Handler, boolean, Handler)} but with an {@code handler} called when the operation completes
    */
-  <T> Future<@Nullable T> executeBlocking(Handler<Promise<T>> blockingCodeHandler, boolean ordered);
+  <T> Future< T> executeBlocking(Handler<Promise<T>> blockingCodeHandler, boolean ordered);
 
   /**
    * Like {@link #executeBlocking(Handler, boolean, Handler)} called with ordered = true.

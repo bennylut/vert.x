@@ -13,14 +13,14 @@ package io.vertx.core.net;
 
 import com.google.gson.JsonObject;
 import io.netty.handler.ssl.OpenSsl;
-import io.vertx.codegen.annotations.DataObject;
+
 
 /**
  * Configures a {@link TCPSSLOptions} to use OpenSsl.
  *
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */
-@DataObject(generateConverter = true, publicConverter = false)
+
 public class OpenSSLEngineOptions extends SSLEngineOptions {
 
   /**

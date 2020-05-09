@@ -11,8 +11,8 @@
 
 package io.vertx.core.eventbus;
 
-import io.vertx.codegen.annotations.DataObject;
-import io.vertx.codegen.annotations.GenIgnore;
+
+
 import io.vertx.core.MultiMap;
 import io.vertx.core.impl.Arguments;
 
@@ -27,7 +27,7 @@ import java.util.Objects;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@DataObject
+
 public class DeliveryOptions {
 
   /**
@@ -134,7 +134,7 @@ public class DeliveryOptions {
    * @param headers  the headers
    * @return  a reference to this, so the API can be used fluently
    */
-  @GenIgnore
+
   public DeliveryOptions setHeaders(MultiMap headers) {
     this.headers = headers;
     return this;
@@ -145,7 +145,7 @@ public class DeliveryOptions {
    *
    * @return  the headers
    */
-  @GenIgnore
+
   public MultiMap getHeaders() {
     return headers;
   }

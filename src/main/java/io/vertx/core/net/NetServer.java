@@ -11,13 +11,13 @@
 
 package io.vertx.core.net;
 
-import io.vertx.codegen.annotations.GenIgnore;
-import io.vertx.codegen.annotations.Nullable;
+
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.codegen.annotations.Fluent;
-import io.vertx.codegen.annotations.VertxGen;
+
+
 import io.vertx.core.metrics.Measured;
 import io.vertx.core.streams.ReadStream;
 
@@ -26,7 +26,7 @@ import io.vertx.core.streams.ReadStream;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen
+
 public interface NetServer extends Measured {
 
   /**
@@ -45,9 +45,9 @@ public interface NetServer extends Measured {
    *
    * @return a reference to this, so the API can be used fluently
    */
-  NetServer connectHandler(@Nullable Handler<NetSocket> handler);
+  NetServer connectHandler( Handler<NetSocket> handler);
 
-  @GenIgnore
+
   Handler<NetSocket> connectHandler();
 
   /**
@@ -66,7 +66,7 @@ public interface NetServer extends Measured {
    * @param listenHandler  handler that will be notified when listening or failed
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   NetServer listen(Handler<AsyncResult<NetServer>> listenHandler);
 
   /**
@@ -91,7 +91,7 @@ public interface NetServer extends Measured {
    * @param listenHandler handler that will be notified when listening or failed
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   NetServer listen(int port, String host, Handler<AsyncResult<NetServer>> listenHandler);
 
   /**
@@ -113,7 +113,7 @@ public interface NetServer extends Measured {
    * @param listenHandler handler that will be notified when listening or failed
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   NetServer listen(int port, Handler<AsyncResult<NetServer>> listenHandler);
 
   /**
@@ -134,7 +134,7 @@ public interface NetServer extends Measured {
    * @param listenHandler handler that will be notified when listening or failed
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   NetServer listen(SocketAddress localAddress, Handler<AsyncResult<NetServer>> listenHandler);
 
   /**
@@ -144,8 +144,8 @@ public interface NetServer extends Measured {
    * @param handler the handler to set
    * @return a reference to this, so the API can be used fluently
    */
-  @GenIgnore
-  @Fluent
+
+
   NetServer exceptionHandler(Handler<Throwable> handler);
 
   /**

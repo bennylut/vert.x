@@ -11,8 +11,8 @@
 
 package io.vertx.core.streams;
 
-import io.vertx.codegen.annotations.Fluent;
-import io.vertx.codegen.annotations.VertxGen;
+
+
 import io.vertx.core.streams.impl.PumpImpl;
 
 /**
@@ -38,7 +38,7 @@ import io.vertx.core.streams.impl.PumpImpl;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen
+
 public interface Pump {
 
   /**
@@ -71,7 +71,7 @@ public interface Pump {
    * @param maxSize  the max size
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   Pump setWriteQueueMaxSize(int maxSize);
 
   /**
@@ -79,7 +79,7 @@ public interface Pump {
    *
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   Pump start();
 
   /**
@@ -87,7 +87,7 @@ public interface Pump {
    *
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   Pump stop();
 
   /**

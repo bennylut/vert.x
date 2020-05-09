@@ -12,8 +12,8 @@
 package io.vertx.core.http;
 
 import io.netty.handler.codec.http2.Http2CodecUtil;
-import io.vertx.codegen.annotations.DataObject;
-import io.vertx.codegen.annotations.GenIgnore;
+
+
 import io.vertx.core.impl.Arguments;
 
 import java.util.HashMap;
@@ -27,7 +27,7 @@ import java.util.Map;
  *
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */
-@DataObject(generateConverter = true, publicConverter = false)
+
 public class Http2Settings {
 
   /**
@@ -229,7 +229,7 @@ public class Http2Settings {
   /**
    * @return the extra settings used for extending HTTP/2
    */
-  @GenIgnore
+
   public Map<Integer, Long> getExtraSettings() {
     return extraSettings;
   }
@@ -240,7 +240,7 @@ public class Http2Settings {
    * @param settings the new extra settings
    * @return a reference to this, so the API can be used fluently
    */
-  @GenIgnore
+
   public Http2Settings setExtraSettings(Map<Integer, Long> settings) {
     extraSettings = settings;
     return this;

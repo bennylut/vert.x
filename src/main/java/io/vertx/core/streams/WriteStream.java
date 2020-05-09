@@ -11,9 +11,6 @@
 
 package io.vertx.core.streams;
 
-import io.vertx.codegen.annotations.Fluent;
-import io.vertx.codegen.annotations.Nullable;
-import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -28,7 +25,6 @@ import io.vertx.core.Promise;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen(concrete = false)
 public interface WriteStream<T> extends StreamBase {
 
   /**
@@ -116,7 +112,6 @@ public interface WriteStream<T> extends StreamBase {
    * @param maxSize  the max size of the write stream
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
   WriteStream<T> setWriteQueueMaxSize(int maxSize);
 
   /**
@@ -137,7 +132,6 @@ public interface WriteStream<T> extends StreamBase {
    * @param handler the handler
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  WriteStream<T> drainHandler(@Nullable Handler<Void> handler);
+  WriteStream<T> drainHandler(Handler<Void> handler);
 
 }

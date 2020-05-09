@@ -11,9 +11,9 @@
 
 package io.vertx.core.shareddata;
 
-import io.vertx.codegen.annotations.GenIgnore;
-import io.vertx.codegen.annotations.Nullable;
-import io.vertx.codegen.annotations.VertxGen;
+
+
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -33,7 +33,7 @@ import java.util.Set;
  * implementing objects.
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen
+
 public interface AsyncMap<K, V> {
 
   /**
@@ -42,14 +42,14 @@ public interface AsyncMap<K, V> {
    * @param k  the key
    * @param resultHandler - this will be called some time later with the async result.
    */
-  default void get(K k, Handler<AsyncResult<@Nullable V>> resultHandler) {
+  default void get(K k, Handler<AsyncResult< V>> resultHandler) {
     get(k).onComplete(resultHandler);
   }
 
   /**
    * Same as {@link #get(K, Handler)} but returns a {@code Future} of the asynchronous result
    */
-  Future<@Nullable V> get(K k);
+  Future< V> get(K k);
 
   /**
    * Put a value in the map, asynchronously.
@@ -93,14 +93,14 @@ public interface AsyncMap<K, V> {
    * @param v  the value
    * @param completionHandler  the handler
    */
-  default void putIfAbsent(K k, V v, Handler<AsyncResult<@Nullable V>> completionHandler) {
+  default void putIfAbsent(K k, V v, Handler<AsyncResult< V>> completionHandler) {
     putIfAbsent(k, v).onComplete(completionHandler);
   }
 
   /**
    * Same as {@link #putIfAbsent(K, V, Handler)} but returns a {@code Future} of the asynchronous result
    */
-  Future<@Nullable V> putIfAbsent(K k, V v);
+  Future< V> putIfAbsent(K k, V v);
 
   /**
    * Link {@link #putIfAbsent} but specifying a time to live for the entry. Entry will expire and get evicted
@@ -111,14 +111,14 @@ public interface AsyncMap<K, V> {
    * @param ttl  The time to live (in ms) for the entry
    * @param completionHandler  the handler
    */
-  default void putIfAbsent(K k, V v, long ttl, Handler<AsyncResult<@Nullable V>> completionHandler) {
+  default void putIfAbsent(K k, V v, long ttl, Handler<AsyncResult< V>> completionHandler) {
     putIfAbsent(k, v, ttl).onComplete(completionHandler);
   }
 
   /**
    * Same as {@link #putIfAbsent(K, V, long, Handler)} but returns a {@code Future} of the asynchronous result
    */
-  Future<@Nullable V> putIfAbsent(K k, V v, long ttl);
+  Future< V> putIfAbsent(K k, V v, long ttl);
 
   /**
    * Remove a value from the map, asynchronously.
@@ -126,14 +126,14 @@ public interface AsyncMap<K, V> {
    * @param k  the key
    * @param resultHandler - this will be called some time later to signify the value has been removed
    */
-  default void remove(K k, Handler<AsyncResult<@Nullable V>> resultHandler) {
+  default void remove(K k, Handler<AsyncResult< V>> resultHandler) {
     remove(k).onComplete(resultHandler);
   }
 
   /**
    * Same as {@link #remove(K, Handler)} but returns a {@code Future} of the asynchronous result
    */
-  Future<@Nullable V> remove(K k);
+  Future< V> remove(K k);
 
   /**
    * Remove a value from the map, only if entry already exists with same value.
@@ -158,14 +158,14 @@ public interface AsyncMap<K, V> {
    * @param v  the new value
    * @param resultHandler  the result handler will be passed the previous value
    */
-  default void replace(K k, V v, Handler<AsyncResult<@Nullable V>> resultHandler) {
+  default void replace(K k, V v, Handler<AsyncResult< V>> resultHandler) {
     replace(k, v).onComplete(resultHandler);
   }
 
   /**
    * Same as {@link #replace(K, V, Handler)} but returns a {@code Future} of the asynchronous result
    */
-  Future<@Nullable V> replace(K k, V v);
+  Future< V> replace(K k, V v);
 
   /**
    * Replace the entry only if it is currently mapped to a specific value
@@ -221,7 +221,7 @@ public interface AsyncMap<K, V> {
    *
    * @param resultHandler invoked when the operation completes
    */
-  @GenIgnore
+
   default void keys(Handler<AsyncResult<Set<K>>> resultHandler) {
     keys().onComplete(resultHandler);
   }
@@ -229,7 +229,7 @@ public interface AsyncMap<K, V> {
   /**
    * Same as {@link #keys(Handler)} but returns a {@code Future} of the asynchronous result
    */
-  @GenIgnore
+
   Future<Set<K>> keys();
 
   /**
@@ -241,7 +241,7 @@ public interface AsyncMap<K, V> {
    *
    * @param resultHandler invoked when the operation completes
    */
-  @GenIgnore
+
   default void values(Handler<AsyncResult<List<V>>> resultHandler) {
     values().onComplete(resultHandler);
   }
@@ -249,7 +249,7 @@ public interface AsyncMap<K, V> {
   /**
    * Same as {@link #values(Handler)} but returns a {@code Future} of the asynchronous result
    */
-  @GenIgnore
+
   Future<List<V>> values();
 
   /**
@@ -261,7 +261,7 @@ public interface AsyncMap<K, V> {
    *
    * @param resultHandler invoked when the operation completes
    */
-  @GenIgnore
+
   default void entries(Handler<AsyncResult<Map<K, V>>> resultHandler) {
     entries().onComplete(resultHandler);
   }
@@ -269,6 +269,6 @@ public interface AsyncMap<K, V> {
   /**
    * Same as {@link #entries(Handler)} but returns a {@code Future} of the asynchronous result
    */
-  @GenIgnore
+
   Future<Map<K, V>> entries();
 }

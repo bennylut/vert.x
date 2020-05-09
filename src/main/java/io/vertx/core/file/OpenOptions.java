@@ -11,14 +11,14 @@
 
 package io.vertx.core.file;
 
-import io.vertx.codegen.annotations.DataObject;
+
 
 /**
  * Describes how an {@link io.vertx.core.file.AsyncFile} should be opened.
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@DataObject(generateConverter = true, publicConverter = false)
+
 public class OpenOptions {
 
   public static final String DEFAULT_PERMS = null;

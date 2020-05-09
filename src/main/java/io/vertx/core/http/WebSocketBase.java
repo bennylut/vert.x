@@ -11,7 +11,6 @@
 
 package io.vertx.core.http;
 
-import io.vertx.codegen.annotations.*;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -33,7 +32,6 @@ import javax.security.cert.X509Certificate;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen(concrete = false)
 public interface WebSocketBase extends ReadStream<Buffer>, WriteStream<Buffer> {
 
   @Override
@@ -120,7 +118,6 @@ public interface WebSocketBase extends ReadStream<Buffer>, WriteStream<Buffer> {
   /**
    * Same as {@link #writeFrame(WebSocketFrame)} but with an {@code handler} called when the operation completes
    */
-  @Fluent
   WebSocketBase writeFrame(WebSocketFrame frame, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -134,7 +131,6 @@ public interface WebSocketBase extends ReadStream<Buffer>, WriteStream<Buffer> {
   /**
    * Same as {@link #writeFinalTextFrame(String, Handler)} but with an {@code handler} called when the operation completes
    */
-  @Fluent
   WebSocketBase writeFinalTextFrame(String text, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -148,7 +144,6 @@ public interface WebSocketBase extends ReadStream<Buffer>, WriteStream<Buffer> {
   /**
    * Same as {@link #writeFinalBinaryFrame(Buffer, Handler)} but with an {@code handler} called when the operation completes
    */
-  @Fluent
   WebSocketBase writeFinalBinaryFrame(Buffer data, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -163,7 +158,6 @@ public interface WebSocketBase extends ReadStream<Buffer>, WriteStream<Buffer> {
   /**
    * Same as {@link #writeBinaryMessage(Buffer)} but with an {@code handler} called when the operation completes
    */
-  @Fluent
   WebSocketBase writeBinaryMessage(Buffer data, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -178,7 +172,6 @@ public interface WebSocketBase extends ReadStream<Buffer>, WriteStream<Buffer> {
   /**
    * Same as {@link #writeTextMessage(String)} but with an {@code handler} called when the operation completes
    */
-  @Fluent
   WebSocketBase writeTextMessage(String text, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -194,7 +187,6 @@ public interface WebSocketBase extends ReadStream<Buffer>, WriteStream<Buffer> {
    * @param handler called when the ping frame has been successfully written
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
   WebSocketBase writePing(Buffer data, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -217,7 +209,6 @@ public interface WebSocketBase extends ReadStream<Buffer>, WriteStream<Buffer> {
    * @param handler called when the pong frame has been successfully written
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
   WebSocketBase writePong(Buffer data, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -235,8 +226,7 @@ public interface WebSocketBase extends ReadStream<Buffer>, WriteStream<Buffer> {
    * @param handler  the handler
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  WebSocketBase closeHandler(@Nullable Handler<Void> handler);
+  WebSocketBase closeHandler( Handler<Void> handler);
 
   /**
    * Set a frame handler on the connection. This handler will be called when frames are read on the connection.
@@ -244,8 +234,7 @@ public interface WebSocketBase extends ReadStream<Buffer>, WriteStream<Buffer> {
    * @param handler  the handler
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  WebSocketBase frameHandler(@Nullable Handler<WebSocketFrame> handler);
+  WebSocketBase frameHandler( Handler<WebSocketFrame> handler);
 
   /**
    * Set a text message handler on the connection. This handler will be called similar to the
@@ -254,8 +243,7 @@ public interface WebSocketBase extends ReadStream<Buffer>, WriteStream<Buffer> {
    * @param handler the handler
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  WebSocketBase textMessageHandler(@Nullable Handler<String> handler);
+  WebSocketBase textMessageHandler( Handler<String> handler);
 
   /**
    * Set a binary message handler on the connection. This handler serves a similar purpose to {@link #handler(Handler)}
@@ -265,8 +253,7 @@ public interface WebSocketBase extends ReadStream<Buffer>, WriteStream<Buffer> {
    * @param handler the handler
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  WebSocketBase binaryMessageHandler(@Nullable Handler<Buffer> handler);
+  WebSocketBase binaryMessageHandler( Handler<Buffer> handler);
 
   /**
    * Set a pong frame handler on the connection.  This handler will be invoked every time a pong frame is received
@@ -282,8 +269,7 @@ public interface WebSocketBase extends ReadStream<Buffer>, WriteStream<Buffer> {
    * @param handler the handler
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  WebSocketBase pongHandler(@Nullable Handler<Buffer> handler);
+  WebSocketBase pongHandler( Handler<Buffer> handler);
 
   /**
    * {@inheritDoc}
@@ -341,25 +327,23 @@ public interface WebSocketBase extends ReadStream<Buffer>, WriteStream<Buffer> {
    * @param reason reason of closure
    * @return a future completed with the result
    */
-  Future<Void> close(short statusCode, @Nullable String reason);
+  Future<Void> close(short statusCode,  String reason);
 
   /**
    * Same as {@link #close(short, String)} but with an {@code handler} called when the operation completes
    */
-  void close(short statusCode, @Nullable String reason, Handler<AsyncResult<Void>> handler);
+  void close(short statusCode,  String reason, Handler<AsyncResult<Void>> handler);
 
   /**
    * @return the remote address for this connection, possibly {@code null} (e.g a server bound on a domain socket).
    * If {@code useProxyProtocol} is set to {@code true}, the address returned will be of the actual connecting client.
    */
-  @CacheReturn
   SocketAddress remoteAddress();
 
   /**
    * @return the local address for this connection, possibly {@code null} (e.g a server bound on a domain socket)
    * If {@code useProxyProtocol} is set to {@code true}, the address returned will be of the proxy.
    */
-  @CacheReturn
   SocketAddress localAddress();
 
   /**
@@ -377,7 +361,6 @@ public interface WebSocketBase extends ReadStream<Buffer>, WriteStream<Buffer> {
    *         not SSL.
    * @see javax.net.ssl.SSLSession
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   SSLSession sslSession();
 
   /**
@@ -391,6 +374,5 @@ public interface WebSocketBase extends ReadStream<Buffer>, WriteStream<Buffer> {
    * @see javax.net.ssl.SSLSession#getPeerCertificateChain()
    * @see #sslSession()
    */
-  @GenIgnore
   X509Certificate[] peerCertificateChain() throws SSLPeerUnverifiedException;
 }

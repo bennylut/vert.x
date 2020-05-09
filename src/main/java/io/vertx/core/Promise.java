@@ -10,9 +10,6 @@
  */
 package io.vertx.core;
 
-import io.vertx.codegen.annotations.CacheReturn;
-import io.vertx.codegen.annotations.GenIgnore;
-import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.impl.NoStackTraceThrowable;
 
 import static io.vertx.core.Future.factory;
@@ -27,7 +24,6 @@ import static io.vertx.core.Future.factory;
  *
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */
-@VertxGen
 public interface Promise<T> extends Handler<AsyncResult<T>> {
 
   /**
@@ -45,7 +41,6 @@ public interface Promise<T> extends Handler<AsyncResult<T>> {
    *
    * @param asyncResult the async result to handle
    */
-  @GenIgnore
   @Override
   default void handle(AsyncResult<T> asyncResult) {
     if (asyncResult.succeeded()) {
@@ -144,7 +139,6 @@ public interface Promise<T> extends Handler<AsyncResult<T>> {
   /**
    * @return the {@link Future} associated with this promise, it can be used to be aware of the promise completion
    */
-  @CacheReturn
   Future<T> future();
 
 }

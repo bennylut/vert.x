@@ -11,13 +11,13 @@
 
 package io.vertx.core.http;
 
-import io.vertx.codegen.annotations.CacheReturn;
-import io.vertx.codegen.annotations.GenIgnore;
+
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.codegen.annotations.Fluent;
-import io.vertx.codegen.annotations.VertxGen;
+
+
 import io.vertx.core.metrics.Measured;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.core.streams.ReadStream;
@@ -33,7 +33,7 @@ import io.vertx.core.streams.ReadStream;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen
+
 public interface HttpServer extends Measured {
 
   /**
@@ -42,7 +42,7 @@ public interface HttpServer extends Measured {
    *
    * @return the request stream
    */
-  @CacheReturn
+
   ReadStream<HttpServerRequest> requestStream();
 
   /**
@@ -51,13 +51,13 @@ public interface HttpServer extends Measured {
    *
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   HttpServer requestHandler(Handler<HttpServerRequest> handler);
 
   /**
    * @return  the request handler
    */
-  @GenIgnore
+
   Handler<HttpServerRequest> requestHandler();
 
   /**
@@ -67,7 +67,7 @@ public interface HttpServer extends Measured {
    *
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   HttpServer connectionHandler(Handler<HttpConnection> handler);
 
   /**
@@ -77,7 +77,7 @@ public interface HttpServer extends Measured {
    * @param handler the handler to set
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   HttpServer exceptionHandler(Handler<Throwable> handler);
 
   /**
@@ -86,7 +86,7 @@ public interface HttpServer extends Measured {
    *
    * @return the WebSocket stream
    */
-  @CacheReturn
+
   ReadStream<ServerWebSocket> webSocketStream();
 
   /**
@@ -95,13 +95,13 @@ public interface HttpServer extends Measured {
    *
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   HttpServer webSocketHandler(Handler<ServerWebSocket> handler);
 
   /**
    * @return the WebSocket handler
    */
-  @GenIgnore
+
   Handler<ServerWebSocket> webSocketHandler();
 
   /**
@@ -135,7 +135,7 @@ public interface HttpServer extends Measured {
    * @param host  the host to listen on
    * @param listenHandler  the listen handler
    */
-  @Fluent
+
   HttpServer listen(int port, String host, Handler<AsyncResult<HttpServer>> listenHandler);
 
   /**
@@ -146,7 +146,7 @@ public interface HttpServer extends Measured {
    * @param address the address to listen on
    * @param listenHandler  the listen handler
    */
-  @Fluent
+
   HttpServer listen(SocketAddress address, Handler<AsyncResult<HttpServer>> listenHandler);
 
   /**
@@ -170,7 +170,7 @@ public interface HttpServer extends Measured {
    * @param port  the port to listen on
    * @param listenHandler  the listen handler
    */
-  @Fluent
+
   HttpServer listen(int port, Handler<AsyncResult<HttpServer>> listenHandler);
 
   /**
@@ -178,7 +178,7 @@ public interface HttpServer extends Measured {
    *
    * @param listenHandler  the listen handler
    */
-  @Fluent
+
   HttpServer listen(Handler<AsyncResult<HttpServer>> listenHandler);
 
   /**

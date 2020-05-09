@@ -12,7 +12,7 @@
 package io.vertx.core.http;
 
 import io.netty.handler.codec.http2.Http2CodecUtil;
-import io.vertx.codegen.annotations.*;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -41,7 +41,7 @@ import java.util.Set;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen
+
 public interface HttpServerRequest extends ReadStream<Buffer> {
 
   @Override
@@ -82,7 +82,7 @@ public interface HttpServerRequest extends ReadStream<Buffer> {
   /**
    * @return the scheme of the request
    */
-  @Nullable
+
   String scheme();
 
   /**
@@ -93,19 +93,19 @@ public interface HttpServerRequest extends ReadStream<Buffer> {
   /**
    * @return The path part of the uri. For example /somepath/somemorepath/someresource.foo
    */
-  @Nullable
+
   String path();
 
   /**
    * @return the query part of the uri. For example someparam=32&amp;someotherparam=x
    */
-  @Nullable
+
   String query();
 
   /**
    * @return the request host. For HTTP2 it returns the {@literal :authority} pseudo header otherwise it returns the {@literal Host} header
    */
-  @Nullable
+
   String host();
 
   /**
@@ -117,13 +117,13 @@ public interface HttpServerRequest extends ReadStream<Buffer> {
    * @return the response. Each instance of this class has an {@link HttpServerResponse} instance attached to it. This is used
    * to send the response back to the client.
    */
-  @CacheReturn
+
   HttpServerResponse response();
 
   /**
    * @return the headers in the request.
    */
-  @CacheReturn
+
   MultiMap headers();
 
   /**
@@ -132,7 +132,7 @@ public interface HttpServerRequest extends ReadStream<Buffer> {
    * @param headerName  the header name
    * @return the header value
    */
-  @Nullable
+
   default String getHeader(String headerName) {
     return headers().get(headerName);
   }
@@ -143,7 +143,7 @@ public interface HttpServerRequest extends ReadStream<Buffer> {
    * @param headerName  the header name
    * @return the header value
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+
   default String getHeader(CharSequence headerName) {
     return headers().get(headerName);
   }
@@ -151,7 +151,7 @@ public interface HttpServerRequest extends ReadStream<Buffer> {
   /**
    * @return the query parameters in the request
    */
-  @CacheReturn
+
   MultiMap params();
 
   /**
@@ -160,7 +160,7 @@ public interface HttpServerRequest extends ReadStream<Buffer> {
    * @param paramName  the param name
    * @return the param value
    */
-  @Nullable
+
   default String getParam(String paramName) {
     return params().get(paramName);
   }
@@ -169,7 +169,7 @@ public interface HttpServerRequest extends ReadStream<Buffer> {
    * @return the remote address for this connection, possibly {@code null} (e.g a server bound on a domain socket).
    * If {@code useProxyProtocol} is set to {@code true}, the address returned will be of the actual connecting client.
    */
-  @CacheReturn
+
   default SocketAddress remoteAddress() {
     return connection().remoteAddress();
   }
@@ -178,7 +178,7 @@ public interface HttpServerRequest extends ReadStream<Buffer> {
    * @return the local address for this connection, possibly {@code null} (e.g a server bound on a domain socket)
    * If {@code useProxyProtocol} is set to {@code true}, the address returned will be of the proxy.
    */
-  @CacheReturn
+
   default SocketAddress localAddress() {
     return connection().localAddress();
   }
@@ -188,7 +188,7 @@ public interface HttpServerRequest extends ReadStream<Buffer> {
    *         not SSL.
    * @see javax.net.ssl.SSLSession
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+
   default SSLSession sslSession() {
     return connection().sslSession();
   }
@@ -204,7 +204,7 @@ public interface HttpServerRequest extends ReadStream<Buffer> {
    * @see javax.net.ssl.SSLSession#getPeerCertificateChain()
    * @see #sslSession()
    */
-  @GenIgnore
+
   X509Certificate[] peerCertificateChain() throws SSLPeerUnverifiedException;
 
   /**
@@ -220,8 +220,8 @@ public interface HttpServerRequest extends ReadStream<Buffer> {
    *
    * @param bodyHandler This handler will be called after all the body has been received
    */
-  @Fluent
-  default HttpServerRequest bodyHandler(@Nullable Handler<Buffer> bodyHandler) {
+
+  default HttpServerRequest bodyHandler( Handler<Buffer> bodyHandler) {
     if (bodyHandler != null) {
       Buffer body = Buffer.buffer();
       handler(body::appendBuffer);
@@ -280,7 +280,7 @@ public interface HttpServerRequest extends ReadStream<Buffer> {
    * @return the net socket
    * @throws IllegalStateException when the socket can't be created
    */
-  @CacheReturn
+
   NetSocket netSocket();
 
   /**
@@ -290,7 +290,7 @@ public interface HttpServerRequest extends ReadStream<Buffer> {
    * @param expect  true - if you are expecting a multi-part body
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   HttpServerRequest setExpectMultipart(boolean expect);
 
   /**
@@ -304,8 +304,8 @@ public interface HttpServerRequest extends ReadStream<Buffer> {
    *
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  HttpServerRequest uploadHandler(@Nullable Handler<HttpServerFileUpload> uploadHandler);
+
+  HttpServerRequest uploadHandler( Handler<HttpServerFileUpload> uploadHandler);
 
   /**
    * Returns a map of all form attributes in the request.
@@ -317,7 +317,7 @@ public interface HttpServerRequest extends ReadStream<Buffer> {
    *
    * @return the form attributes
    */
-  @CacheReturn
+
   MultiMap formAttributes();
 
   /**
@@ -326,7 +326,7 @@ public interface HttpServerRequest extends ReadStream<Buffer> {
    * @param attributeName  the attribute name
    * @return the attribute value
    */
-  @Nullable
+
   String getFormAttribute(String attributeName);
 
   /**
@@ -354,13 +354,13 @@ public interface HttpServerRequest extends ReadStream<Buffer> {
    *
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   HttpServerRequest customFrameHandler(Handler<HttpFrame> handler);
 
   /**
    * @return the {@link HttpConnection} associated with this request
    */
-  @CacheReturn
+
   HttpConnection connection();
 
   /**
@@ -377,7 +377,7 @@ public interface HttpServerRequest extends ReadStream<Buffer> {
    *
    * @param handler the handler to be called when stream priority changes
    */
-  @Fluent
+
   HttpServerRequest streamPriorityHandler(Handler<StreamPriority> handler);
 
   /**
@@ -386,7 +386,7 @@ public interface HttpServerRequest extends ReadStream<Buffer> {
    * @param name  the cookie name
    * @return the cookie
    */
-  default @Nullable Cookie getCookie(String name) {
+  default  Cookie getCookie(String name) {
     return cookieMap().get(name);
   }
 

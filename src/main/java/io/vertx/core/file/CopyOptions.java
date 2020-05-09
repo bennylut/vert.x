@@ -11,14 +11,14 @@
 
 package io.vertx.core.file;
 
-import io.vertx.codegen.annotations.DataObject;
+
 
 /**
  * Describes the copy (and move) options.
  *
  * @author Thomas Segismont
  */
-@DataObject(generateConverter = true, publicConverter = false)
+
 public class CopyOptions {
 
   /**

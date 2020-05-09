@@ -11,8 +11,8 @@
 
 package io.vertx.core.http;
 
-import io.vertx.codegen.annotations.Fluent;
-import io.vertx.codegen.annotations.VertxGen;
+
+
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.AsyncFile;
@@ -23,7 +23,7 @@ import io.vertx.core.streams.ReadStream;
  *
  * @author <a href="mailto:nmaurer@redhat.com">Norman Maurer</a>
  */
-@VertxGen
+
 public interface HttpServerFileUpload extends ReadStream<Buffer> {
 
   @Override
@@ -49,7 +49,7 @@ public interface HttpServerFileUpload extends ReadStream<Buffer> {
    *
    * @param filename  the name of the file
    */
-  @Fluent
+
   HttpServerFileUpload streamToFileSystem(String filename);
 
   /**

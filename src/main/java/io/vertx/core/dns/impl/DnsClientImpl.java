@@ -18,7 +18,7 @@ import io.netty.handler.codec.dns.*;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
-import io.vertx.codegen.annotations.Nullable;
+
 import io.vertx.core.*;
 import io.vertx.core.dns.*;
 import io.vertx.core.dns.DnsResponseCode;
@@ -99,7 +99,7 @@ public final class DnsClientImpl implements DnsClient {
   }
 
   @Override
-  public Future<@Nullable String> lookup4(String name) {
+  public Future< String> lookup4(String name) {
     return lookupSingle(name, DnsRecordType.A);
   }
 
@@ -110,7 +110,7 @@ public final class DnsClientImpl implements DnsClient {
   }
 
   @Override
-  public Future<@Nullable String> lookup6(String name) {
+  public Future< String> lookup6(String name) {
     return lookupSingle(name, DnsRecordType.AAAA);
   }
 
@@ -121,7 +121,7 @@ public final class DnsClientImpl implements DnsClient {
   }
 
   @Override
-  public Future<@Nullable String> lookup(String name) {
+  public Future< String> lookup(String name) {
     return lookupSingle(name, DnsRecordType.A, DnsRecordType.AAAA);
   }
 
@@ -176,7 +176,7 @@ public final class DnsClientImpl implements DnsClient {
   }
 
   @Override
-  public Future<@Nullable String> resolvePTR(String name) {
+  public Future< String> resolvePTR(String name) {
     return lookupSingle(name, DnsRecordType.PTR);
   }
 
@@ -220,7 +220,7 @@ public final class DnsClientImpl implements DnsClient {
   }
 
   @Override
-  public Future<@Nullable String> reverseLookup(String address) {
+  public Future< String> reverseLookup(String address) {
     try {
       InetAddress inetAddress = InetAddress.getByName(address);
       byte[] addr = inetAddress.getAddress();

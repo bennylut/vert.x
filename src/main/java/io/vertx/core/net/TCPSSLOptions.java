@@ -11,8 +11,6 @@
 
 package io.vertx.core.net;
 
-import io.vertx.codegen.annotations.DataObject;
-import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.core.buffer.Buffer;
 
 import java.util.*;
@@ -23,7 +21,6 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@DataObject(generateConverter = true, publicConverter = false)
 public abstract class TCPSSLOptions extends NetworkOptions {
 
   /**
@@ -298,7 +295,6 @@ public abstract class TCPSSLOptions extends NetworkOptions {
   /**
    * @return the key/cert options
    */
-  @GenIgnore
   public KeyCertOptions getKeyCertOptions() {
     return keyCertOptions;
   }
@@ -309,7 +305,6 @@ public abstract class TCPSSLOptions extends NetworkOptions {
    * @param options the key store options
    * @return a reference to this, so the API can be used fluently
    */
-  @GenIgnore
   public TCPSSLOptions setKeyCertOptions(KeyCertOptions options) {
     this.keyCertOptions = options;
     return this;

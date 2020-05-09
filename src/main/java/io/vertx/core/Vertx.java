@@ -12,7 +12,6 @@
 package io.vertx.core;
 
 import io.netty.channel.EventLoopGroup;
-import io.vertx.codegen.annotations.*;
 import io.vertx.core.datagram.DatagramSocket;
 import io.vertx.core.datagram.DatagramSocketOptions;
 import io.vertx.core.dns.DnsClient;
@@ -62,7 +61,6 @@ import java.util.function.Supplier;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen
 public interface Vertx extends Measured {
 
   /**
@@ -89,7 +87,7 @@ public interface Vertx extends Measured {
    *
    * @return The current context or null if no current context
    */
-  static @Nullable Context currentContext() {
+  static Context currentContext() {
     return ContextInternal.current();
   }
 
@@ -180,7 +178,6 @@ public interface Vertx extends Measured {
    *
    * @return the filesystem object
    */
-  @CacheReturn
   FileSystem fileSystem();
 
   /**
@@ -293,7 +290,6 @@ public interface Vertx extends Measured {
    * @param verticle  the verticle instance to deploy.
    * @return a future completed with the result
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   Future<String> deployVerticle(Verticle verticle);
 
   /**
@@ -307,7 +303,6 @@ public interface Vertx extends Measured {
    * @param verticle  the verticle instance to deploy
    * @param completionHandler  a handler which will be notified when the deployment is complete
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   void deployVerticle(Verticle verticle, Handler<AsyncResult<String>> completionHandler);
 
   /**
@@ -318,7 +313,6 @@ public interface Vertx extends Measured {
    * @param options  the deployment options.
    * @return a future completed with the result
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   Future<String> deployVerticle(Verticle verticle, DeploymentOptions options);
 
   /**
@@ -326,7 +320,6 @@ public interface Vertx extends Measured {
    * default constructor of {@code verticleClass}.
    * @return a future completed with the result
    */
-  @GenIgnore
   Future<String> deployVerticle(Class<? extends Verticle> verticleClass, DeploymentOptions options);
 
   /**
@@ -340,7 +333,6 @@ public interface Vertx extends Measured {
    *
    * @return a future completed with the result
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   Future<String> deployVerticle(Supplier<Verticle> verticleSupplier, DeploymentOptions options);
 
   /**
@@ -351,14 +343,12 @@ public interface Vertx extends Measured {
    * @param options  the deployment options.
    * @param completionHandler  a handler which will be notified when the deployment is complete
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   void deployVerticle(Verticle verticle, DeploymentOptions options, Handler<AsyncResult<String>> completionHandler);
 
   /**
    * Like {@link #deployVerticle(Verticle, DeploymentOptions, Handler)} but {@link Verticle} instance is created by
    * invoking the default constructor of {@code verticleClass}.
    */
-  @GenIgnore
   void deployVerticle(Class<? extends Verticle> verticleClass, DeploymentOptions options, Handler<AsyncResult<String>> completionHandler);
 
   /**
@@ -370,7 +360,6 @@ public interface Vertx extends Measured {
    * <p>
    * Note that the supplier will be invoked on the caller thread.
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   void deployVerticle(Supplier<Verticle> verticleSupplier, DeploymentOptions options, Handler<AsyncResult<String>> completionHandler);
 
   /**
@@ -449,7 +438,6 @@ public interface Vertx extends Measured {
    *
    * @param factory the factory to register
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   void registerVerticleFactory(VerticleFactory factory);
 
   /**
@@ -457,7 +445,6 @@ public interface Vertx extends Measured {
    *
    * @param factory the factory to unregister
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   void unregisterVerticleFactory(VerticleFactory factory);
 
   /**
@@ -465,7 +452,6 @@ public interface Vertx extends Measured {
    *
    * @return the set of verticle factories
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   Set<VerticleFactory> verticleFactories();
 
   /**
@@ -499,17 +485,17 @@ public interface Vertx extends Measured {
    *                 guarantees
    * @param <T> the type of the result
    */
-  <T> void executeBlocking(Handler<Promise<T>> blockingCodeHandler, boolean ordered, Handler<AsyncResult<@Nullable T>> resultHandler);
+  <T> void executeBlocking(Handler<Promise<T>> blockingCodeHandler, boolean ordered, Handler<AsyncResult< T>> resultHandler);
 
   /**
    * Like {@link #executeBlocking(Handler, boolean, Handler)} called with ordered = true.
    */
-  <T> void executeBlocking(Handler<Promise<T>> blockingCodeHandler, Handler<AsyncResult<@Nullable T>> resultHandler);
+  <T> void executeBlocking(Handler<Promise<T>> blockingCodeHandler, Handler<AsyncResult< T>> resultHandler);
 
   /**
    * Same as {@link #executeBlocking(Handler, boolean, Handler)} but with an {@code handler} called when the operation completes
    */
-  <T> Future<@Nullable T> executeBlocking(Handler<Promise<T>> blockingCodeHandler, boolean ordered);
+  <T> Future< T> executeBlocking(Handler<Promise<T>> blockingCodeHandler, boolean ordered);
 
   /**
    * Same as {@link #executeBlocking(Handler, Handler)} but with an {@code handler} called when the operation completes
@@ -521,7 +507,6 @@ public interface Vertx extends Measured {
    *
    * @return the EventLoopGroup
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   EventLoopGroup nettyEventLoopGroup();
 
   /**
@@ -560,7 +545,6 @@ public interface Vertx extends Measured {
   /**
    * @return whether the native transport is used
    */
-  @CacheReturn
   boolean isNativeTransportEnabled();
 
   /**
@@ -569,12 +553,10 @@ public interface Vertx extends Measured {
    * @param handler the exception handler
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  Vertx exceptionHandler(@Nullable Handler<Throwable> handler);
+  Vertx exceptionHandler( Handler<Throwable> handler);
 
   /**
    * @return the current default exception handler
    */
-  @GenIgnore
-  @Nullable Handler<Throwable> exceptionHandler();
+   Handler<Throwable> exceptionHandler();
 }

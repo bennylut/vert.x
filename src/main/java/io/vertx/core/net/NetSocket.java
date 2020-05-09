@@ -11,7 +11,7 @@
 
 package io.vertx.core.net;
 
-import io.vertx.codegen.annotations.*;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -36,7 +36,7 @@ import javax.security.cert.X509Certificate;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen
+
 public interface NetSocket extends ReadStream<Buffer>, WriteStream<Buffer> {
 
   @Override
@@ -156,7 +156,7 @@ public interface NetSocket extends ReadStream<Buffer>, WriteStream<Buffer> {
    * @param resultHandler  handler
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   default NetSocket sendFile(String filename, Handler<AsyncResult<Void>> resultHandler) {
     return sendFile(filename, 0, Long.MAX_VALUE, resultHandler);
   }
@@ -170,7 +170,7 @@ public interface NetSocket extends ReadStream<Buffer>, WriteStream<Buffer> {
    * @param resultHandler  handler
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   default NetSocket sendFile(String filename, long offset, Handler<AsyncResult<Void>> resultHandler) {
     return sendFile(filename, offset, Long.MAX_VALUE, resultHandler);
   }
@@ -185,21 +185,21 @@ public interface NetSocket extends ReadStream<Buffer>, WriteStream<Buffer> {
    * @param resultHandler  handler
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   NetSocket sendFile(String filename, long offset, long length, Handler<AsyncResult<Void>> resultHandler);
 
   /**
    * @return the remote address for this connection, possibly {@code null} (e.g a server bound on a domain socket).
    * If {@code useProxyProtocol} is set to {@code true}, the address returned will be of the actual connecting client.
    */
-  @CacheReturn
+
   SocketAddress remoteAddress();
 
   /**
    * @return the local address for this connection, possibly {@code null} (e.g a server bound on a domain socket)
    * If {@code useProxyProtocol} is set to {@code true}, the address returned will be of the proxy.
    */
-  @CacheReturn
+
   SocketAddress localAddress();
 
   /**
@@ -234,8 +234,8 @@ public interface NetSocket extends ReadStream<Buffer>, WriteStream<Buffer> {
    * @param handler  the handler
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  NetSocket closeHandler(@Nullable Handler<Void> handler);
+
+  NetSocket closeHandler( Handler<Void> handler);
 
   /**
    * Upgrade channel to use SSL/TLS. Be aware that for this to work SSL must be configured.
@@ -243,7 +243,7 @@ public interface NetSocket extends ReadStream<Buffer>, WriteStream<Buffer> {
    * @param handler  the handler will be notified when it's upgraded
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   NetSocket upgradeToSsl(Handler<AsyncResult<Void>> handler);
 
   /**
@@ -258,7 +258,7 @@ public interface NetSocket extends ReadStream<Buffer>, WriteStream<Buffer> {
    * @param handler  the handler will be notified when it's upgraded
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   NetSocket upgradeToSsl(String serverName, Handler<AsyncResult<Void>> handler);
 
   /**
@@ -276,7 +276,7 @@ public interface NetSocket extends ReadStream<Buffer>, WriteStream<Buffer> {
    *         not SSL.
    * @see javax.net.ssl.SSLSession
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
+
   SSLSession sslSession();
 
   /**
@@ -290,7 +290,7 @@ public interface NetSocket extends ReadStream<Buffer>, WriteStream<Buffer> {
    * @see javax.net.ssl.SSLSession#getPeerCertificateChain()
    * @see #sslSession()
    */
-  @GenIgnore
+
   X509Certificate[] peerCertificateChain() throws SSLPeerUnverifiedException;
 
   /**

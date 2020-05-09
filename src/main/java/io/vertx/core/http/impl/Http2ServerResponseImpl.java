@@ -19,7 +19,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpStatusClass;
 import io.netty.handler.codec.http2.DefaultHttp2Headers;
 import io.netty.handler.codec.http2.Http2Headers;
-import io.vertx.codegen.annotations.Nullable;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
@@ -300,7 +300,7 @@ public class Http2ServerResponseImpl implements HttpServerResponse {
   }
 
   @Override
-  public HttpServerResponse endHandler(@Nullable Handler<Void> handler) {
+  public HttpServerResponse endHandler( Handler<Void> handler) {
     synchronized (conn) {
       if (handler != null) {
         checkValid();
@@ -636,7 +636,7 @@ public class Http2ServerResponseImpl implements HttpServerResponse {
   }
 
   @Override
-  public HttpServerResponse headersEndHandler(@Nullable Handler<Void> handler) {
+  public HttpServerResponse headersEndHandler( Handler<Void> handler) {
     synchronized (conn) {
       headersEndHandler = handler;
       return this;
@@ -644,7 +644,7 @@ public class Http2ServerResponseImpl implements HttpServerResponse {
   }
 
   @Override
-  public HttpServerResponse bodyEndHandler(@Nullable Handler<Void> handler) {
+  public HttpServerResponse bodyEndHandler( Handler<Void> handler) {
     synchronized (conn) {
       bodyEndHandler = handler;
       return this;
@@ -709,7 +709,7 @@ public class Http2ServerResponseImpl implements HttpServerResponse {
   }
 
   @Override
-  public @Nullable Cookie removeCookie(String name, boolean invalidate) {
+  public  Cookie removeCookie(String name, boolean invalidate) {
     return CookieImpl.removeCookie(cookies(), name, invalidate);
   }
 }

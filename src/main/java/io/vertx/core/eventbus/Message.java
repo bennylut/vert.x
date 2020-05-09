@@ -11,9 +11,9 @@
 
 package io.vertx.core.eventbus;
 
-import io.vertx.codegen.annotations.CacheReturn;
-import io.vertx.codegen.annotations.Nullable;
-import io.vertx.codegen.annotations.VertxGen;
+
+
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -30,7 +30,7 @@ import io.vertx.core.MultiMap;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen
+
 public interface Message<T> {
 
   /**
@@ -50,7 +50,7 @@ public interface Message<T> {
    *
    * @return  the body, or null.
    */
-  @CacheReturn
+
   T body();
 
   /**
@@ -58,7 +58,7 @@ public interface Message<T> {
    *
    * @return the reply address, or null, if message was sent without a reply handler.
    */
-  @Nullable
+
   String replyAddress();
 
   /**
@@ -77,7 +77,7 @@ public interface Message<T> {
    *
    * @param message  the message to reply with.
    */
-  default void reply(@Nullable Object message) {
+  default void reply( Object message) {
     reply(message, new DeliveryOptions());
   }
 
@@ -87,7 +87,7 @@ public interface Message<T> {
    * @param message  the reply message
    * @param options  the delivery options
    */
-  void reply(@Nullable Object message, DeliveryOptions options);
+  void reply( Object message, DeliveryOptions options);
 
   /**
    * Reply to this message, specifying a {@code replyHandler} for the reply - i.e.
@@ -100,14 +100,14 @@ public interface Message<T> {
    * @param message  the message to reply with.
    * @param replyHandler  the reply handler for the reply.
    */
-  default <R> void replyAndRequest(@Nullable Object message, Handler<AsyncResult<Message<R>>> replyHandler) {
+  default <R> void replyAndRequest( Object message, Handler<AsyncResult<Message<R>>> replyHandler) {
     replyAndRequest(message, new DeliveryOptions(), replyHandler);
   }
 
   /**
    * Like {@link #replyAndRequest(Object, Handler)} but returns a {@code Future} of the asynchronous result
    */
-  default <R> Future<Message<R>> replyAndRequest(@Nullable Object message) {
+  default <R> Future<Message<R>> replyAndRequest( Object message) {
     return replyAndRequest(message, new DeliveryOptions());
   }
 
@@ -119,14 +119,14 @@ public interface Message<T> {
    * @param options  delivery options
    * @param replyHandler  reply handler will be called when any reply from the recipient is received
    */
-  default <R> void replyAndRequest(@Nullable Object message, DeliveryOptions options, Handler<AsyncResult<Message<R>>> replyHandler) {
+  default <R> void replyAndRequest( Object message, DeliveryOptions options, Handler<AsyncResult<Message<R>>> replyHandler) {
     this.<R>replyAndRequest(message, options).onComplete(replyHandler);
   }
 
   /**
    * Like {@link #replyAndRequest(Object, DeliveryOptions, Handler)} but returns a {@code Future} of the asynchronous result
    */
-  <R> Future<Message<R>> replyAndRequest(@Nullable Object message, DeliveryOptions options);
+  <R> Future<Message<R>> replyAndRequest( Object message, DeliveryOptions options);
 
   /**
    * Signal to the sender that processing of this message failed.

@@ -11,9 +11,6 @@
 
 package io.vertx.core.streams;
 
-import io.vertx.codegen.annotations.Fluent;
-import io.vertx.codegen.annotations.Nullable;
-import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -42,7 +39,6 @@ import io.vertx.core.streams.impl.PipeImpl;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen(concrete = false)
 public interface ReadStream<T> extends StreamBase {
 
   /**
@@ -58,8 +54,7 @@ public interface ReadStream<T> extends StreamBase {
    *
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  ReadStream<T> handler(@Nullable Handler<T> handler);
+  ReadStream<T> handler(Handler<T> handler);
 
   /**
    * Pause the {@code ReadStream}, it sets the buffer in {@code fetch} mode and clears the actual demand.
@@ -68,7 +63,6 @@ public interface ReadStream<T> extends StreamBase {
    *
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
   ReadStream<T> pause();
 
   /**
@@ -78,7 +72,6 @@ public interface ReadStream<T> extends StreamBase {
    *
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
   ReadStream<T> resume();
 
   /**
@@ -88,7 +81,6 @@ public interface ReadStream<T> extends StreamBase {
    *
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
   ReadStream<T> fetch(long amount);
 
   /**
@@ -96,8 +88,7 @@ public interface ReadStream<T> extends StreamBase {
    *
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  ReadStream<T> endHandler(@Nullable Handler<Void> endHandler);
+  ReadStream<T> endHandler(Handler<Void> endHandler);
 
   /**
    * Pause this stream and return a {@link Pipe} to transfer the elements of this stream to a destination {@link WriteStream}.

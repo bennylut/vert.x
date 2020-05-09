@@ -11,8 +11,8 @@
 
 package io.vertx.core.shareddata;
 
-import io.vertx.codegen.annotations.GenIgnore;
-import io.vertx.codegen.annotations.VertxGen;
+
+
 
 import java.util.Collection;
 import java.util.Map;
@@ -36,7 +36,7 @@ import java.util.function.Function;
  * @author <a href="http://tfox.org">Tim Fox</a>
  * @see Shareable
  */
-@VertxGen
+
 public interface LocalMap<K, V> extends Map<K, V> {
 
   /**
@@ -130,13 +130,13 @@ public interface LocalMap<K, V> extends Map<K, V> {
   /**
    * @return the set of keys in the map
    */
-  @GenIgnore
+
   Set<K> keySet();
 
   /**
    * @return the set of values in the map
    */
-  @GenIgnore
+
   Collection<V> values();
 
   /**
@@ -152,7 +152,7 @@ public interface LocalMap<K, V> extends Map<K, V> {
    * @param remappingFunction the function to compute a value
    * @return the new value associated with the specified key, or null if none
    **/
-  @GenIgnore
+
   @Override
   V compute(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction);
 
@@ -170,7 +170,7 @@ public interface LocalMap<K, V> extends Map<K, V> {
    * @return the current (existing or computed) value associated with
    * the specified key, or null if the computed value is null
    */
-  @GenIgnore
+
   @Override
   V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction);
 
@@ -186,7 +186,7 @@ public interface LocalMap<K, V> extends Map<K, V> {
    * @param remappingFunction the function to compute a value
    * @return the new value associated with the specified key, or null if none
    */
-  @GenIgnore
+
   @Override
   V computeIfPresent(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction);
 
@@ -220,7 +220,7 @@ public interface LocalMap<K, V> extends Map<K, V> {
    *
    * @return a set view of the mappings contained in this map
    */
-  @GenIgnore
+
   @Override
   Set<Entry<K, V>> entrySet();
 
@@ -232,7 +232,7 @@ public interface LocalMap<K, V> extends Map<K, V> {
    *
    * @param action The action to be performed for each entry
    */
-  @GenIgnore
+
   @Override
   void forEach(BiConsumer<? super K, ? super V> action);
 
@@ -263,7 +263,7 @@ public interface LocalMap<K, V> extends Map<K, V> {
    * @return the new value associated with the specified key, or null if no
    * value is associated with the key
    */
-  @GenIgnore
+
   @Override
   V merge(K key, V value, BiFunction<? super V, ? super V, ? extends V> remappingFunction);
 
@@ -275,7 +275,7 @@ public interface LocalMap<K, V> extends Map<K, V> {
    *
    * @param m mappings to be stored in this map
    */
-  @GenIgnore
+
   @Override
   void putAll(Map<? extends K, ? extends V> m);
 
@@ -288,7 +288,7 @@ public interface LocalMap<K, V> extends Map<K, V> {
    * @return {@code true} if the value was removed
    */
   @Override
-  @GenIgnore
+
   boolean remove(Object key, Object value);
 
   /**
@@ -301,7 +301,7 @@ public interface LocalMap<K, V> extends Map<K, V> {
    * @return {@code true} if the value was replaced
    */
   @Override
-  @GenIgnore
+
   boolean replace(K key, V oldValue, V newValue);
 
   /**
@@ -312,7 +312,7 @@ public interface LocalMap<K, V> extends Map<K, V> {
    *
    * @param function the function to apply to each entry
    */
-  @GenIgnore
+
   @Override
   void replaceAll(BiFunction<? super K, ? super V, ? extends V> function);
 }

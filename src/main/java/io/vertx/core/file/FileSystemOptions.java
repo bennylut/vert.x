@@ -12,7 +12,7 @@
 
 package io.vertx.core.file;
 
-import io.vertx.codegen.annotations.DataObject;
+
 
 import java.io.File;
 
@@ -22,7 +22,7 @@ import static io.vertx.core.file.impl.FileResolver.*;
  * Vert.x file system base configuration, this class can be extended by provider implementations to configure
  * those specific implementations.
  */
-@DataObject(generateConverter = true, publicConverter = false)
+
 public class FileSystemOptions {
 
   /**

@@ -23,7 +23,7 @@ import io.netty.handler.codec.http2.Http2FrameListener;
 import io.netty.handler.codec.http2.Http2Headers;
 import io.netty.handler.codec.http2.Http2Settings;
 import io.netty.handler.codec.http2.Http2Stream;
-import io.vertx.codegen.annotations.Nullable;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -438,7 +438,7 @@ abstract class Http2ConnectionBase extends ConnectionBase implements Http2FrameL
   }
 
   @Override
-  public HttpConnection updateSettings(io.vertx.core.http.Http2Settings settings, @Nullable Handler<AsyncResult<Void>> completionHandler) {
+  public HttpConnection updateSettings(io.vertx.core.http.Http2Settings settings,  Handler<AsyncResult<Void>> completionHandler) {
     updateSettings(settings).onComplete(completionHandler);
     return this;
   }

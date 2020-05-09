@@ -28,7 +28,7 @@ import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.stream.ChunkedFile;
-import io.vertx.codegen.annotations.Nullable;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -179,12 +179,12 @@ abstract class Http1xConnectionBase<S extends WebSocketImplBase<S>> extends Conn
   }
 
   @Override
-  public HttpConnection goAwayHandler(@Nullable Handler<GoAway> handler) {
+  public HttpConnection goAwayHandler( Handler<GoAway> handler) {
     throw new UnsupportedOperationException("HTTP/1.x connections don't support GOAWAY");
   }
 
   @Override
-  public HttpConnection shutdownHandler(@Nullable Handler<Void> handler) {
+  public HttpConnection shutdownHandler( Handler<Void> handler) {
     throw new UnsupportedOperationException("HTTP/1.x connections don't support GOAWAY");
   }
 
@@ -229,7 +229,7 @@ abstract class Http1xConnectionBase<S extends WebSocketImplBase<S>> extends Conn
   }
 
   @Override
-  public HttpConnection pingHandler(@Nullable Handler<Buffer> handler) {
+  public HttpConnection pingHandler( Handler<Buffer> handler) {
     throw new UnsupportedOperationException("HTTP/1.x connections don't support PING");
   }
 

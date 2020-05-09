@@ -14,7 +14,7 @@ package io.vertx.core.http.impl;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.util.CharsetUtil;
-import io.vertx.codegen.annotations.Nullable;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
@@ -322,7 +322,7 @@ class VertxHttp2NetSocket<C extends Http2ConnectionBase> extends VertxHttp2Strea
   }
 
   @Override
-  public NetSocket closeHandler(@Nullable Handler<Void> handler) {
+  public NetSocket closeHandler( Handler<Void> handler) {
     synchronized (conn) {
       closeHandler = handler;
     }

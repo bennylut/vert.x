@@ -11,7 +11,7 @@
 
 package io.vertx.core.net;
 
-import io.vertx.codegen.annotations.VertxGen;
+
 import io.vertx.core.net.impl.SelfSignedCertificateImpl;
 
 /**
@@ -21,7 +21,7 @@ import io.vertx.core.net.impl.SelfSignedCertificateImpl;
  *
  * @author <a href="https://julien.ponge.org/">Julien Ponge</a>
  */
-@VertxGen
+
 public interface SelfSignedCertificate {
 
   /**

@@ -11,9 +11,9 @@
 
 package io.vertx.core.http;
 
-import io.vertx.codegen.annotations.Fluent;
-import io.vertx.codegen.annotations.Nullable;
-import io.vertx.codegen.annotations.VertxGen;
+
+
+
 import io.vertx.core.http.impl.CookieImpl;
 
 /**
@@ -21,7 +21,7 @@ import io.vertx.core.http.impl.CookieImpl;
  * <p>
  * All cookies must have a name and a value and can optionally have other fields set such as path, domain, etc.
  */
-@VertxGen
+
 public interface Cookie {
 
   /**
@@ -50,7 +50,7 @@ public interface Cookie {
    * @param value The value to set
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   Cookie setValue(String value);
 
   /**
@@ -59,13 +59,13 @@ public interface Cookie {
    * @param domain The domain to use
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  Cookie setDomain(@Nullable String domain);
+
+  Cookie setDomain( String domain);
 
   /**
    * @return  the domain for the cookie
    */
-  @Nullable
+
   String getDomain();
 
   /**
@@ -74,14 +74,14 @@ public interface Cookie {
    * @param path The path to use for this cookie
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  Cookie setPath(@Nullable String path);
+
+  Cookie setPath( String path);
 
   /**
    *
    * @return the path for this cookie
    */
-  @Nullable
+
   String getPath();
 
   /**
@@ -94,7 +94,7 @@ public interface Cookie {
    *
    * @param maxAge The maximum age of this cookie in seconds
    */
-  @Fluent
+
   Cookie setMaxAge(long maxAge);
 
   /**
@@ -103,7 +103,7 @@ public interface Cookie {
    * @param secure True if this cookie is to be secure, otherwise false
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   Cookie setSecure(boolean secure);
 
   /**
@@ -115,7 +115,7 @@ public interface Cookie {
    *
    * @param httpOnly True if the cookie is HTTP only, otherwise false.
    */
-  @Fluent
+
   Cookie setHttpOnly(boolean httpOnly);
 
   /**
@@ -124,7 +124,7 @@ public interface Cookie {
    * @param policy The policy should be one of {@link CookieSameSite}.
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   Cookie setSameSite(CookieSameSite policy);
 
   /**

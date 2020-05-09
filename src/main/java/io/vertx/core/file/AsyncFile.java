@@ -11,8 +11,8 @@
 
 package io.vertx.core.file;
 
-import io.vertx.codegen.annotations.Fluent;
-import io.vertx.codegen.annotations.VertxGen;
+
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -30,7 +30,7 @@ import io.vertx.core.streams.WriteStream;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen
+
 public interface AsyncFile extends ReadStream<Buffer>, WriteStream<Buffer> {
 
   @Override
@@ -111,7 +111,7 @@ public interface AsyncFile extends ReadStream<Buffer>, WriteStream<Buffer> {
    * @param handler  the handler to call when the write is complete
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   AsyncFile read(Buffer buffer, int offset, long position, int length, Handler<AsyncResult<Buffer>> handler);
 
   /**
@@ -133,7 +133,7 @@ public interface AsyncFile extends ReadStream<Buffer>, WriteStream<Buffer> {
   /**
    * Same as {@link #flush} but the handler will be called when the flush is complete or if an error occurs
    */
-  @Fluent
+
   AsyncFile flush(Handler<AsyncResult<Void>> handler);
 
   /**
@@ -142,7 +142,7 @@ public interface AsyncFile extends ReadStream<Buffer>, WriteStream<Buffer> {
    * @param readPos  the position in the file
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   AsyncFile setReadPos(long readPos);
 
   /**
@@ -151,7 +151,7 @@ public interface AsyncFile extends ReadStream<Buffer>, WriteStream<Buffer> {
    * @param readLength the bytes that will be read from the file
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   AsyncFile setReadLength(long readLength);
 
   /**
@@ -165,7 +165,7 @@ public interface AsyncFile extends ReadStream<Buffer>, WriteStream<Buffer> {
    * @param writePos  the position in the file
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   AsyncFile setWritePos(long writePos);
 
   /**
@@ -179,6 +179,6 @@ public interface AsyncFile extends ReadStream<Buffer>, WriteStream<Buffer> {
    * @param readBufferSize the buffer size
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   AsyncFile setReadBufferSize(int readBufferSize);
 }

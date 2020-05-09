@@ -11,7 +11,6 @@
 
 package io.vertx.core.http;
 
-import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
@@ -21,7 +20,6 @@ import io.vertx.core.buffer.Buffer;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen
 public interface WebSocket extends WebSocketBase {
 
   @Override

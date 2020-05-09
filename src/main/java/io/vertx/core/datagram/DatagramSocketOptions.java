@@ -11,7 +11,7 @@
 
 package io.vertx.core.datagram;
 
-import io.vertx.codegen.annotations.DataObject;
+
 import io.vertx.core.impl.Arguments;
 import io.vertx.core.net.NetworkOptions;
 
@@ -20,7 +20,7 @@ import io.vertx.core.net.NetworkOptions;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@DataObject(generateConverter = true, publicConverter = false)
+
 public class DatagramSocketOptions extends NetworkOptions {
 
   /**

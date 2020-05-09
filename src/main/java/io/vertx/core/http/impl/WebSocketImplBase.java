@@ -12,7 +12,7 @@
 package io.vertx.core.http.impl;
 
 import io.netty.buffer.ByteBuf;
-import io.vertx.codegen.annotations.Nullable;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Promise;
 import io.vertx.core.Future;
@@ -145,7 +145,7 @@ public abstract class WebSocketImplBase<S extends WebSocketBase> implements WebS
   }
 
   @Override
-  public void close(short statusCode, @Nullable String reason, Handler<AsyncResult<Void>> handler) {
+  public void close(short statusCode,  String reason, Handler<AsyncResult<Void>> handler) {
     close(statusCode, reason).onComplete(handler);
   }
 
@@ -262,7 +262,7 @@ public abstract class WebSocketImplBase<S extends WebSocketBase> implements WebS
   }
 
   @Override
-  public S writeTextMessage(String text, @Nullable Handler<AsyncResult<Void>> handler) {
+  public S writeTextMessage(String text,  Handler<AsyncResult<Void>> handler) {
     synchronized (conn) {
       checkClosed();
       Buffer data = Buffer.buffer(text);

@@ -11,7 +11,6 @@
 
 package io.vertx.core.http;
 
-import io.vertx.codegen.annotations.*;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -34,7 +33,6 @@ import javax.security.cert.X509Certificate;
  *
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */
-@VertxGen
 public interface HttpConnection {
 
   /**
@@ -54,7 +52,6 @@ public interface HttpConnection {
    * @param windowSize the new window size
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
   default HttpConnection setWindowSize(int windowSize) {
     return this;
   }
@@ -62,7 +59,6 @@ public interface HttpConnection {
   /**
    * Like {@link #goAway(long, int)} with a last stream id {@code -1} which means to disallow any new stream creation.
    */
-  @Fluent
   default HttpConnection goAway(long errorCode) {
     return goAway(errorCode, -1);
   }
@@ -70,7 +66,6 @@ public interface HttpConnection {
   /**
    * Like {@link #goAway(long, int, Buffer)} with no buffer.
    */
-  @Fluent
   default HttpConnection goAway(long errorCode, int lastStreamId) {
     return goAway(errorCode, lastStreamId, null);
   }
@@ -91,7 +86,6 @@ public interface HttpConnection {
    * @param debugData additional debug data sent to the remote endpoint
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
   HttpConnection goAway(long errorCode, int lastStreamId, Buffer debugData);
 
   /**
@@ -102,8 +96,7 @@ public interface HttpConnection {
    * @param handler the handler
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  HttpConnection goAwayHandler(@Nullable Handler<GoAway> handler);
+  HttpConnection goAwayHandler(Handler<GoAway> handler);
 
   /**
    * Set an handler called when a {@literal GOAWAY} frame has been sent or received and all connections are closed.
@@ -113,8 +106,7 @@ public interface HttpConnection {
    * @param handler the handler
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  HttpConnection shutdownHandler(@Nullable  Handler<Void> handler);
+  HttpConnection shutdownHandler(Handler<Void> handler);
 
   /**
    * Initiate a graceful connection shutdown, the connection is taken out of service and closed when all current requests
@@ -156,7 +148,6 @@ public interface HttpConnection {
    * @param handler the handler to be notified
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
   HttpConnection closeHandler(Handler<Void> handler);
 
   /**
@@ -194,7 +185,6 @@ public interface HttpConnection {
    * @param completionHandler the handler notified when the settings have been acknowledged by the remote endpoint
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
   HttpConnection updateSettings(Http2Settings settings, Handler<AsyncResult<Void>> completionHandler);
 
   /**
@@ -210,7 +200,6 @@ public interface HttpConnection {
    * @param handler the handler for remote endpoint settings
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
   HttpConnection remoteSettingsHandler(Handler<Http2Settings> handler);
 
   /**
@@ -222,7 +211,6 @@ public interface HttpConnection {
    * @param pongHandler an async result handler notified with pong reply or the failure
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
   HttpConnection ping(Buffer data, Handler<AsyncResult<Buffer>> pongHandler);
 
   /**
@@ -238,8 +226,7 @@ public interface HttpConnection {
    * @param handler the handler to be called when a {@literal PING} is received
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  HttpConnection pingHandler(@Nullable Handler<Buffer> handler);
+  HttpConnection pingHandler(Handler<Buffer> handler);
 
   /**
    * Set an handler called when a connection error happens
@@ -247,21 +234,18 @@ public interface HttpConnection {
    * @param handler the handler
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
   HttpConnection exceptionHandler(Handler<Throwable> handler);
 
   /**
    * @return the remote address for this connection, possibly {@code null} (e.g a server bound on a domain socket).
    * If {@code useProxyProtocol} is set to {@code true}, the address returned will be of the actual connecting client.
    */
-  @CacheReturn
   SocketAddress remoteAddress();
 
   /**
    * @return the local address for this connection, possibly {@code null} (e.g a server bound on a domain socket)
    * If {@code useProxyProtocol} is set to {@code true}, the address returned will be of the proxy.
    */
-  @CacheReturn
   SocketAddress localAddress();
 
   /**
@@ -274,7 +258,6 @@ public interface HttpConnection {
    *         not SSL.
    * @see javax.net.ssl.SSLSession
    */
-  @GenIgnore(GenIgnore.PERMITTED_TYPE)
   SSLSession sslSession();
 
   /**
@@ -288,7 +271,6 @@ public interface HttpConnection {
    * @see javax.net.ssl.SSLSession#getPeerCertificateChain()
    * @see #sslSession()
    */
-  @GenIgnore
   X509Certificate[] peerCertificateChain() throws SSLPeerUnverifiedException;
 
   /**

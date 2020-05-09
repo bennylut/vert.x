@@ -11,14 +11,12 @@
 
 package io.vertx.core.net;
 
-import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.impl.Arguments;
 
 
 /**
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@DataObject(generateConverter = true, publicConverter = false)
 public abstract class NetworkOptions {
 
   /**

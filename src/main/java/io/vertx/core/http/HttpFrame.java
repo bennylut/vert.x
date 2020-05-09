@@ -11,8 +11,8 @@
 
 package io.vertx.core.http;
 
-import io.vertx.codegen.annotations.CacheReturn;
-import io.vertx.codegen.annotations.VertxGen;
+
+
 import io.vertx.core.buffer.Buffer;
 
 /**
@@ -20,25 +20,25 @@ import io.vertx.core.buffer.Buffer;
  *
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */
-@VertxGen
+
 public interface HttpFrame {
 
   /**
    * @return the 8-bit type of the frame
    */
-  @CacheReturn
+
   int type();
 
   /**
    * @return the 8-bit flags specific to the frame
    */
-  @CacheReturn
+
   int flags();
 
   /**
    * @return the frame payload
    */
-  @CacheReturn
+
   Buffer payload();
 
 }

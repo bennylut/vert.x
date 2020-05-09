@@ -11,7 +11,7 @@
 
 package io.vertx.core.shareddata;
 
-import io.vertx.codegen.annotations.VertxGen;
+
 
 /**
  * An asynchronous exclusive lock which can be obtained from any node in the cluster.
@@ -21,7 +21,7 @@ import io.vertx.codegen.annotations.VertxGen;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen
+
 public interface Lock {
 
   /**

@@ -19,7 +19,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.TooLongFrameException;
 import io.netty.handler.codec.http.*;
 import io.netty.util.concurrent.EventExecutor;
-import io.vertx.codegen.annotations.Nullable;
+
 import io.vertx.core.*;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.*;
@@ -375,7 +375,7 @@ public class Http2UpgradedClientConnection implements HttpClientConnection {
   }
 
   @Override
-  public HttpConnection pingHandler(@Nullable Handler<Buffer> handler) {
+  public HttpConnection pingHandler( Handler<Buffer> handler) {
     if (current instanceof Http1xClientConnection) {
       pingHandler = handler;
     } else {
@@ -385,7 +385,7 @@ public class Http2UpgradedClientConnection implements HttpClientConnection {
   }
 
   @Override
-  public HttpConnection goAwayHandler(@Nullable Handler<GoAway> handler) {
+  public HttpConnection goAwayHandler( Handler<GoAway> handler) {
     if (current instanceof Http1xClientConnection) {
       goAwayHandler = handler;
     } else {
@@ -395,7 +395,7 @@ public class Http2UpgradedClientConnection implements HttpClientConnection {
   }
 
   @Override
-  public HttpConnection shutdownHandler(@Nullable Handler<Void> handler) {
+  public HttpConnection shutdownHandler( Handler<Void> handler) {
     if (current instanceof Http1xClientConnection) {
       shutdownHandler = handler;
     } else {

@@ -10,14 +10,14 @@
  */
 package io.vertx.core.http;
 
-import io.vertx.codegen.annotations.VertxGen;
+
 
 /**
  * Represents the Cookie SameSite policy to be used. For more info <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#SameSite_cookies">https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#SameSite_cookies</a>.
  *
  * @author <a href="mailto:plopes@redhat.com">Paulo Lopes</a>
  */
-@VertxGen
+
 public enum CookieSameSite {
 
   /**

@@ -11,8 +11,8 @@
 
 package io.vertx.core.eventbus;
 
-import io.vertx.codegen.annotations.Fluent;
-import io.vertx.codegen.annotations.VertxGen;
+
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -25,7 +25,7 @@ import io.vertx.core.streams.WriteStream;
  *
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */
-@VertxGen
+
 public interface MessageProducer<T> {
 
   /**
@@ -34,7 +34,7 @@ public interface MessageProducer<T> {
    * @param options the new options
    * @return this producer object
    */
-  @Fluent
+
   MessageProducer<T> deliveryOptions(DeliveryOptions options);
 
   /**

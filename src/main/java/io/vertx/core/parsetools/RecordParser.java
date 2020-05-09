@@ -11,8 +11,8 @@
 
 package io.vertx.core.parsetools;
 
-import io.vertx.codegen.annotations.Fluent;
-import io.vertx.codegen.annotations.VertxGen;
+
+
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.parsetools.impl.RecordParserImpl;
@@ -52,7 +52,7 @@ import io.vertx.core.streams.ReadStream;
  * @author <a href="http://tfox.org">Tim Fox</a>
  * @author <a href="mailto:larsdtimm@gmail.com">Lars Timm</a>
  */
-@VertxGen
+
 public interface RecordParser extends Handler<Buffer>, ReadStream<Buffer> {
 
   void setOutput(Handler<Buffer> output);
@@ -202,7 +202,7 @@ public interface RecordParser extends Handler<Buffer>, ReadStream<Buffer> {
    * @param size the maximum record size
    * @return  a reference to this, so the API can be used fluently
    */
-  @Fluent
+
   RecordParser maxRecordSize(int size);
 
   /**

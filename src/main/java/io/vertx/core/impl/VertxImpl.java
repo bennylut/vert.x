@@ -16,7 +16,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.resolver.AddressResolverGroup;
 import io.netty.util.ResourceLeakDetector;
 import io.netty.util.concurrent.GenericFutureListener;
-import io.vertx.codegen.annotations.Nullable;
+
 import io.vertx.core.Future;
 import io.vertx.core.*;
 import io.vertx.core.datagram.DatagramSocket;
@@ -606,7 +606,7 @@ public class VertxImpl implements VertxInternal, MetricsProvider {
   }
 
   @Override
-  public <T> Future<@Nullable T> executeBlocking(Handler<Promise<T>> blockingCodeHandler, boolean ordered) {
+  public <T> Future< T> executeBlocking(Handler<Promise<T>> blockingCodeHandler, boolean ordered) {
     ContextInternal context = getOrCreateContext();
     return context.executeBlocking(blockingCodeHandler, ordered);
   }

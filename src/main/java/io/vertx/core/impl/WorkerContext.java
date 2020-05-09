@@ -11,7 +11,7 @@
 
 package io.vertx.core.impl;
 
-import io.vertx.codegen.annotations.Nullable;
+
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -147,7 +147,7 @@ public class WorkerContext extends ContextImpl {
     }
 
     @Override
-    public <T> Future<@Nullable T> executeBlocking(Handler<Promise<T>> blockingCodeHandler, boolean ordered) {
+    public <T> Future< T> executeBlocking(Handler<Promise<T>> blockingCodeHandler, boolean ordered) {
       return ContextImpl.executeBlocking(this, blockingCodeHandler, delegate.workerPool, ordered ? orderedTasks : null);
     }
 

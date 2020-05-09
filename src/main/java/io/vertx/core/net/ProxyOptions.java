@@ -13,14 +13,14 @@ package io.vertx.core.net;
 
 import java.util.Objects;
 
-import io.vertx.codegen.annotations.DataObject;
+
 
 /**
  * Proxy options for a net client or a net client.
  *
  * @author <a href="http://oss.lehmann.cx/">Alexander Lehmann</a>
  */
-@DataObject(generateConverter = true, publicConverter = false)
+
 public class ProxyOptions {
 
   /**

@@ -11,8 +11,8 @@
 
 package io.vertx.core.net;
 
-import io.vertx.codegen.annotations.DataObject;
-import io.vertx.codegen.annotations.GenIgnore;
+
+
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.impl.Arguments;
 
@@ -86,7 +86,7 @@ import java.util.List;
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@DataObject(generateConverter = true, publicConverter = false)
+
 public class PemKeyCertOptions implements KeyCertOptions {
 
   private List<String> keyPaths;
@@ -128,7 +128,7 @@ public class PemKeyCertOptions implements KeyCertOptions {
    *
    * @return the path to the key file
    */
-  @GenIgnore
+
   public String getKeyPath() {
     return keyPaths.isEmpty() ? null : keyPaths.get(0);
   }
@@ -174,7 +174,7 @@ public class PemKeyCertOptions implements KeyCertOptions {
    * @param keyPath  the path to the key file
    * @return a reference to this, so the API can be used fluently
    */
-  @GenIgnore
+
   public PemKeyCertOptions addKeyPath(String keyPath) {
     Arguments.require(keyPath != null, "Null keyPath");
     keyPaths.add(keyPath);
@@ -186,7 +186,7 @@ public class PemKeyCertOptions implements KeyCertOptions {
    *
    * @return  the first key as a buffer
    */
-  @GenIgnore
+
   public Buffer getKeyValue() {
     return keyValues.isEmpty() ? null : keyValues.get(0);
   }
@@ -232,7 +232,7 @@ public class PemKeyCertOptions implements KeyCertOptions {
    * @param keyValue the key to add
    * @return a reference to this, so the API can be used fluently
    */
-  @GenIgnore
+
   public PemKeyCertOptions addKeyValue(Buffer keyValue) {
     Arguments.require(keyValue != null, "Null keyValue");
     keyValues.add(keyValue);
@@ -244,7 +244,7 @@ public class PemKeyCertOptions implements KeyCertOptions {
    *
    * @return  the path to the certificate file
    */
-  @GenIgnore
+
   public String getCertPath() {
     return certPaths.isEmpty() ? null : certPaths.get(0);
   }
@@ -290,7 +290,7 @@ public class PemKeyCertOptions implements KeyCertOptions {
    * @param certPath  the path to the certificate file
    * @return a reference to this, so the API can be used fluently
    */
-  @GenIgnore
+
   public PemKeyCertOptions addCertPath(String certPath) {
     Arguments.require(certPath != null, "Null certPath");
     certPaths.add(certPath);
@@ -302,7 +302,7 @@ public class PemKeyCertOptions implements KeyCertOptions {
    *
    * @return  the first certificate as a buffer
    */
-  @GenIgnore
+
   public Buffer getCertValue() {
     return certValues.isEmpty() ? null : certValues.get(0);
   }
@@ -348,7 +348,7 @@ public class PemKeyCertOptions implements KeyCertOptions {
    * @param certValue the certificate to add
    * @return a reference to this, so the API can be used fluently
    */
-  @GenIgnore
+
   public PemKeyCertOptions addCertValue(Buffer certValue) {
     Arguments.require(certValue != null, "Null certValue");
     certValues.add(certValue);

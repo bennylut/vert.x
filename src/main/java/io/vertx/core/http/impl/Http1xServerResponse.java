@@ -22,7 +22,7 @@ import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.LastHttpContent;
-import io.vertx.codegen.annotations.Nullable;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -294,7 +294,7 @@ public class Http1xServerResponse implements HttpServerResponse {
   }
 
   @Override
-  public HttpServerResponse endHandler(@Nullable Handler<Void> handler) {
+  public HttpServerResponse endHandler( Handler<Void> handler) {
     synchronized (conn) {
       if (handler != null) {
         checkValid();
@@ -766,7 +766,7 @@ public class Http1xServerResponse implements HttpServerResponse {
   }
 
   @Override
-  public @Nullable Cookie removeCookie(String name, boolean invalidate) {
+  public  Cookie removeCookie(String name, boolean invalidate) {
     return CookieImpl.removeCookie(cookies(), name, invalidate);
   }
 }

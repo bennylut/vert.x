@@ -11,9 +11,6 @@
 
 package io.vertx.core.streams;
 
-import io.vertx.codegen.annotations.Fluent;
-import io.vertx.codegen.annotations.Nullable;
-import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.Handler;
 
 /**
@@ -21,7 +18,6 @@ import io.vertx.core.Handler;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-@VertxGen(concrete = false)
 public interface StreamBase {
 
   /**
@@ -30,6 +26,5 @@ public interface StreamBase {
    * @param handler the handler
    * @return a reference to this, so the API can be used fluently
    */
-  @Fluent
-  StreamBase exceptionHandler(@Nullable Handler<Throwable> handler);
+  StreamBase exceptionHandler(Handler<Throwable> handler);
 }
