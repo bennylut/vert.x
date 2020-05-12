@@ -372,23 +372,21 @@ public class HttpClientRequestImpl extends HttpClientRequestBase implements Http
     int statusCode = resp.statusCode();
     if (followRedirects > 0 && statusCode >= 300 && statusCode < 400) {
       ContextInternal prev = context.emitBegin();
-      Future<HttpClientRequest> next;
+      HttpClientRequest next;
       try {
-        next = client.redirectHandler().apply(resp);
-      } finally {
+        next = client.redirectHandler().next(resp);
+        if (next != null) {
+          handleNextRequest(next, promise, timeoutMs);
+          return;
+        }
+      } catch (Throwable err){
+        fail(err);
+        return;
+      }finally {
         context.emitEnd(prev);
       }
-      if (next != null) {
-        next.onComplete(ar -> {
-          if (ar.succeeded()) {
-            handleNextRequest(ar.result(), promise, timeoutMs);
-          } else {
-            fail(ar.cause());
-          }
-        });
-        return;
-      }
     }
+
     promise.complete(resp);
   }
 

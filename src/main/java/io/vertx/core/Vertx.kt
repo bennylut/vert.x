@@ -22,7 +22,6 @@ import io.vertx.core.http.HttpServer
 import io.vertx.core.http.HttpServerOptions
 import io.vertx.core.impl.ContextInternal
 import io.vertx.core.impl.VertxFactory
-import io.vertx.core.metrics.Measured
 import io.vertx.core.net.NetClient
 import io.vertx.core.net.NetClientOptions
 import io.vertx.core.net.NetServer
@@ -60,7 +59,7 @@ import java.util.function.Supplier
  *
  * @author [Tim Fox](http://tfox.org)
  */
-interface Vertx : Measured {
+interface Vertx {
   /**
    * Gets the current context, or creates one if there isn't one
    *

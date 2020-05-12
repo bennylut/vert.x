@@ -18,10 +18,6 @@ import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.file.impl.FileResolver;
 import io.vertx.core.net.impl.transport.Transport;
-import io.vertx.core.spi.VertxMetricsFactory;
-import io.vertx.core.spi.VertxTracerFactory;
-import io.vertx.core.spi.metrics.VertxMetrics;
-import io.vertx.core.spi.tracing.VertxTracer;
 
 import java.util.Objects;
 
@@ -34,8 +30,6 @@ public class VertxFactory {
 
   private VertxOptions options;
   private Transport transport;
-  private VertxTracer tracer;
-  private VertxMetrics metrics;
   private FileResolver fileResolver;
 
   public VertxFactory(VertxOptions options) {
@@ -51,19 +45,9 @@ public class VertxFactory {
     return this;
   }
 
-  public VertxFactory tracer(VertxTracer tracer) {
-    this.tracer = tracer;
-    return this;
-  }
-
-  public VertxFactory metrics(VertxMetrics metrics) {
-    this.metrics = metrics;
-    return this;
-  }
 
   public Vertx vertx() {
-    VertxImpl vertx = new VertxImpl(options, createMetrics(), createTracer(), createTransport(), createFileResolver());
-    vertx.init();
+    VertxImpl vertx = new VertxImpl(options, createTransport(), createFileResolver());
     return vertx;
   }
 
@@ -73,44 +57,6 @@ public class VertxFactory {
       transport = Transport.transport(options.getPreferNativeTransport());
     }
     return transport;
-  }
-
-  private VertxMetrics createMetrics() {
-    if (metrics == null) {
-      if (options.getMetricsOptions() != null && options.getMetricsOptions().isEnabled()) {
-        VertxMetricsFactory factory = options.getMetricsOptions().getFactory();
-        if (factory == null) {
-          factory = ServiceHelper.loadFactoryOrNull(VertxMetricsFactory.class);
-          if (factory == null) {
-            // log.warn("Metrics has been set to enabled but no VertxMetricsFactory found on classpath");
-          }
-        }
-        if (factory != null) {
-          metrics = factory.metrics(options);
-          Objects.requireNonNull(metrics, "The metric instance created from " + factory + " cannot be null");
-        }
-      }
-    }
-    return metrics;
-  }
-
-  private VertxTracer createTracer() {
-    if (tracer == null) {
-      if (options.getTracingOptions() != null && options.getTracingOptions().isEnabled()) {
-        VertxTracerFactory factory = options.getTracingOptions().getFactory();
-        if (factory == null) {
-          factory = ServiceHelper.loadFactoryOrNull(VertxTracerFactory.class);
-          if (factory == null) {
-            // log.warn("Metrics has been set to enabled but no TracerFactory found on classpath");
-          }
-        }
-        if (factory != null) {
-          tracer = factory.tracer(options.getTracingOptions());
-          Objects.requireNonNull(tracer, "The tracer instance created from " + factory + " cannot be null");
-        }
-      }
-    }
-    return tracer;
   }
 
   private FileResolver createFileResolver() {

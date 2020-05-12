@@ -32,8 +32,6 @@ public interface HttpClientStream {
    */
   int id();
 
-  Object metric();
-
   /**
    * @return the stream version or null if it's not yet determined
    */

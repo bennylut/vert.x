@@ -32,7 +32,6 @@ import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetSocket;
 import io.vertx.core.net.SocketAddress;
-import io.vertx.core.spi.metrics.TCPMetrics;
 import io.vertx.core.streams.impl.InboundBuffer;
 
 import java.io.File;
@@ -65,7 +64,6 @@ public class NetSocketImpl extends ConnectionBase implements NetSocketInternal {
   private final String writeHandlerID;
   private final SSLHelper helper;
   private final SocketAddress remoteAddress;
-  private final TCPMetrics metrics;
   private final InboundBuffer<Object> pending;
   private Handler<Void> endHandler;
   private Handler<Void> drainHandler;
@@ -73,17 +71,16 @@ public class NetSocketImpl extends ConnectionBase implements NetSocketInternal {
   private Handler<Object> messageHandler;
 
   public NetSocketImpl(VertxInternal vertx, ChannelHandlerContext channel, ContextInternal context,
-                       SSLHelper helper, TCPMetrics metrics) {
-    this(vertx, channel, null, context, helper, metrics);
+                       SSLHelper helper) {
+    this(vertx, channel, null, context, helper);
   }
 
   public NetSocketImpl(VertxInternal vertx, ChannelHandlerContext channel, SocketAddress remoteAddress, ContextInternal context,
-                       SSLHelper helper, TCPMetrics metrics) {
+                       SSLHelper helper) {
     super(vertx, channel, context);
     this.helper = helper;
     this.writeHandlerID = "__vertx.net." + UUID.randomUUID().toString();
     this.remoteAddress = remoteAddress;
-    this.metrics = metrics;
     this.messageHandler = NULL_MSG_HANDLER;
     pending = new InboundBuffer<>(context);
     pending.drainHandler(v -> doResume());
@@ -108,10 +105,6 @@ public class NetSocketImpl extends ConnectionBase implements NetSocketInternal {
 //    registration = vertx.eventBus().<Buffer>localConsumer(writeHandlerID).handler(writeHandler);
 //  }
 
-  @Override
-  public TCPMetrics metrics() {
-    return metrics;
-  }
 
   @Override
   public String writeHandlerID() {

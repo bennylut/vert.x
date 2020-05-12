@@ -38,6 +38,4 @@ public interface HttpClientConnection extends HttpConnection {
 
   boolean isValid();
 
-  Object metric();
-
 }

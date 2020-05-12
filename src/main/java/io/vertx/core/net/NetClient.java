@@ -16,7 +16,6 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
 
-import io.vertx.core.metrics.Measured;
 
 /**
  * A TCP client.
@@ -29,7 +28,7 @@ import io.vertx.core.metrics.Measured;
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
 
-public interface NetClient extends Measured {
+public interface NetClient {
 
   /**
    * Open a connection to a server at the specific {@code port} and {@code host}.

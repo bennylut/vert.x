@@ -31,8 +31,6 @@ import io.vertx.core.impl.VertxInternal;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetSocket;
-import io.vertx.core.spi.tracing.TagExtractor;
-import io.vertx.core.spi.tracing.VertxTracer;
 import io.vertx.core.streams.impl.InboundBuffer;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
@@ -40,7 +38,6 @@ import javax.security.cert.X509Certificate;
 import java.net.URISyntaxException;
 import java.util.Map;
 
-import static io.vertx.core.spi.metrics.Metrics.METRICS_ENABLED;
 
 /**
  * This class is optimised for performance when used on the same event loop that is was passed to the handler with.
@@ -69,8 +66,6 @@ public class Http1xServerRequest implements HttpServerRequest {
 
   // Accessed on event loop
   Http1xServerRequest next;
-  Object metric;
-  Object trace;
 
   private Http1xServerResponse response;
 
@@ -146,7 +141,7 @@ public class Http1xServerRequest implements HttpServerRequest {
   }
 
   void handleBegin() {
-    response = new Http1xServerResponse((VertxInternal) conn.vertx(), context, conn, request, metric);
+    response = new Http1xServerResponse((VertxInternal) conn.vertx(), context, conn, request);
     if (conn.handle100ContinueAutomatically) {
       check100();
     }
@@ -176,14 +171,6 @@ public class Http1xServerRequest implements HttpServerRequest {
     if (HttpUtil.is100ContinueExpected(request)) {
       conn.write100Continue();
     }
-  }
-
-  Object metric() {
-    return metric;
-  }
-
-  Object trace() {
-    return trace;
   }
 
   @Override
@@ -534,9 +521,6 @@ public class Http1xServerRequest implements HttpServerRequest {
         }
       }
       if (!response.ended()) {
-        if (METRICS_ENABLED) {
-          reportRequestReset(t);
-        }
         resp = response;
       }
       bodyPromise = this.bodyPromise;
@@ -557,15 +541,6 @@ public class Http1xServerRequest implements HttpServerRequest {
     }
   }
 
-  private void reportRequestReset(Throwable err) {
-    if (conn.metrics != null) {
-      conn.metrics.requestReset(metric);
-    }
-    VertxTracer tracer = context.tracer();
-    if (tracer != null) {
-      tracer.sendResponse(context, null, trace, err, TagExtractor.empty());
-    }
-  }
 
   private void sendNotImplementedAndClose() {
     response().setStatusCode(501).end();

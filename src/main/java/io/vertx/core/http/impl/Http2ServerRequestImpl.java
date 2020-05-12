@@ -42,7 +42,6 @@ import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetSocket;
 import io.vertx.core.net.impl.ConnectionBase;
-import io.vertx.core.spi.tracing.VertxTracer;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.security.cert.X509Certificate;
@@ -104,13 +103,6 @@ public class Http2ServerRequestImpl extends Http2ServerStream implements HttpSer
   }
 
   void dispatch(Handler<HttpServerRequest> handler) {
-    VertxTracer tracer = context.tracer();
-    if (tracer != null) {
-      List<Map.Entry<String, String>> tags = new ArrayList<>();
-      tags.add(new AbstractMap.SimpleEntry<>("http.url", absoluteURI()));
-      tags.add(new AbstractMap.SimpleEntry<>("http.method", method.name()));
-      trace = tracer.receiveRequest(context, this, method().name(), headers(), HttpUtils.SERVER_REQUEST_TAG_EXTRACTOR);
-    }
     context.dispatch(this, handler);
   }
 
@@ -153,23 +145,6 @@ public class Http2ServerRequestImpl extends Http2ServerStream implements HttpSer
     if (bodyPromise != null) {
       bodyPromise.tryFail(failure);
     }
-  }
-
-  @Override
-  void onClose() {
-    VertxTracer tracer = context.tracer();
-    if (tracer != null) {
-      Throwable failure;
-      synchronized (conn) {
-        if (!streamEnded && (!ended || !response.ended())) {
-          failure = ConnectionBase.CLOSED_EXCEPTION;
-        } else {
-          failure = null;
-        }
-      }
-      tracer.sendResponse(context, failure == null ? response : null, trace, failure, HttpUtils.SERVER_RESPONSE_TAG_EXTRACTOR);
-    }
-    super.onClose();
   }
 
   @Override

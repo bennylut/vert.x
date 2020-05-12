@@ -50,7 +50,7 @@ import java.util.Objects;
 /**
  * @author <a href="mailto:nmaurer@redhat.com">Norman Maurer</a>
  */
-public class DatagramSocketImpl implements DatagramSocket, MetricsProvider {
+public class DatagramSocketImpl implements DatagramSocket {
 
   public static DatagramSocketImpl create(VertxInternal vertx, DatagramSocketOptions options) {
     DatagramSocketImpl socket = new DatagramSocketImpl(vertx, options);
@@ -60,7 +60,6 @@ public class DatagramSocketImpl implements DatagramSocket, MetricsProvider {
   }
 
   private final ContextInternal context;
-  private final DatagramSocketMetrics metrics;
   private DatagramChannel channel;
   private Handler<io.vertx.core.datagram.DatagramPacket> packetHandler;
   private Handler<Void> endHandler;
@@ -79,8 +78,6 @@ public class DatagramSocketImpl implements DatagramSocket, MetricsProvider {
     if (options.getLogActivity()) {
       channel.pipeline().addLast("logging", new LoggingHandler());
     }
-    VertxMetrics metrics = vertx.metricsSPI();
-    this.metrics = metrics != null ? metrics.createDatagramSocketMetrics(options) : null;
     this.channel = channel;
     this.context = context;
     this.demand = Long.MAX_VALUE;
@@ -277,13 +274,6 @@ public class DatagramSocketImpl implements DatagramSocket, MetricsProvider {
     f1.addListener((GenericFutureListener<io.netty.util.concurrent.Future<InetSocketAddress>>) res1 -> {
       if (res1.isSuccess()) {
         ChannelFuture f2 = channel.bind(new InetSocketAddress(res1.getNow().getAddress(), local.port()));
-        if (metrics != null) {
-          f2.addListener((GenericFutureListener<io.netty.util.concurrent.Future<Void>>) res2 -> {
-            if (res2.isSuccess()) {
-              metrics.listening(local.host(), localAddress());
-            }
-          });
-        }
         f2.addListener(promise);
       } else {
         promise.fail(res1.cause());
@@ -347,13 +337,6 @@ public class DatagramSocketImpl implements DatagramSocket, MetricsProvider {
     f1.addListener((GenericFutureListener<io.netty.util.concurrent.Future<InetSocketAddress>>) res1 -> {
       if (res1.isSuccess()) {
         ChannelFuture f2 = channel.writeAndFlush(new DatagramPacket(packet.getByteBuf(), new InetSocketAddress(f1.getNow().getAddress(), port)));
-        if (metrics != null) {
-          f2.addListener(fut -> {
-            if (fut.isSuccess()) {
-              metrics.bytesWritten(null, SocketAddress.inetSocketAddress(port, host), packet.length());
-            }
-          });
-        }
         f2.addListener(promise);
       } else {
         promise.fail(res1.cause());
@@ -416,16 +399,6 @@ public class DatagramSocketImpl implements DatagramSocket, MetricsProvider {
   }
 
   @Override
-  public boolean isMetricsEnabled() {
-    return metrics != null;
-  }
-
-  @Override
-  public Metrics getMetrics() {
-    return metrics;
-  }
-
-  @Override
   protected void finalize() throws Throwable {
     // Make sure this gets cleaned up if there are no more references to it
     // so as not to leave connections and resources dangling until the system is shutdown
@@ -442,11 +415,6 @@ public class DatagramSocketImpl implements DatagramSocket, MetricsProvider {
 
     public Connection(VertxInternal vertx, ChannelHandlerContext channel, ContextInternal context) {
       super(vertx, channel, context);
-    }
-
-    @Override
-    public NetworkMetrics metrics() {
-      return metrics;
     }
 
     @Override
@@ -469,14 +437,10 @@ public class DatagramSocketImpl implements DatagramSocket, MetricsProvider {
     protected void handleClosed() {
       super.handleClosed();
       Handler<Void> handler;
-      DatagramSocketMetrics metrics;
       synchronized (DatagramSocketImpl.this) {
         handler = endHandler;
-        metrics = DatagramSocketImpl.this.metrics;
       }
-      if (metrics != null) {
-        metrics.close();
-      }
+
       if (handler != null) {
         context.dispatch(null, handler);
       }
@@ -496,9 +460,6 @@ public class DatagramSocketImpl implements DatagramSocket, MetricsProvider {
     void handlePacket(io.vertx.core.datagram.DatagramPacket packet) {
       Handler<io.vertx.core.datagram.DatagramPacket> handler;
       synchronized (DatagramSocketImpl.this) {
-        if (metrics != null) {
-          metrics.bytesRead(null, packet.sender(), packet.data().length());
-        }
         if (demand > 0L) {
           if (demand != Long.MAX_VALUE) {
             demand--;

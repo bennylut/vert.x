@@ -30,9 +30,6 @@ import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.net.NetSocket;
 import io.vertx.core.net.SocketAddress;
-import io.vertx.core.spi.metrics.MetricsProvider;
-import io.vertx.core.spi.metrics.TCPMetrics;
-import io.vertx.core.spi.metrics.VertxMetrics;
 import io.vertx.core.streams.ReadStream;
 
 /**
@@ -41,7 +38,7 @@ import io.vertx.core.streams.ReadStream;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-public class NetServerImpl extends TCPServerBase implements Closeable, MetricsProvider, NetServer {
+public class NetServerImpl extends TCPServerBase implements Closeable, NetServer {
 
   private static final Logger log = LoggerFactory.getLogger(NetServerImpl.class);
 
@@ -114,16 +111,6 @@ public class NetServerImpl extends TCPServerBase implements Closeable, MetricsPr
     }
     if (options.getIdleTimeout() > 0) {
       pipeline.addLast("idle", new IdleStateHandler(0, 0, options.getIdleTimeout(), options.getIdleTimeoutUnit()));
-    }
-  }
-
-  @Override
-  protected TCPMetrics<?> createMetrics(SocketAddress localAddress) {
-    VertxMetrics vertxMetrics = vertx.metricsSPI();
-    if (vertxMetrics != null) {
-      return vertxMetrics.createNetServerMetrics(options, localAddress);
-    } else {
-      return null;
     }
   }
 
@@ -313,12 +300,9 @@ public class NetServerImpl extends TCPServerBase implements Closeable, MetricsPr
 
     private void connected(Channel ch) {
       NetServerImpl.this.initChannel(ch.pipeline());
-      TCPMetrics<?> metrics = getMetrics();
-      VertxHandler<NetSocketImpl> nh = VertxHandler.create(ctx -> new NetSocketImpl(vertx, ctx, context, sslHelper, metrics));
+      VertxHandler<NetSocketImpl> nh = VertxHandler.create(ctx -> new NetSocketImpl(vertx, ctx, context, sslHelper));
       nh.addHandler(conn -> {
-        if (metrics != null) {
-          conn.metric(metrics.connected(conn.remoteAddress(), conn.remoteName()));
-        }
+
 //        conn.registerEventBusHandler();
         context.dispatch(conn, connectionHandler::handle);
       });

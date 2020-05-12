@@ -25,8 +25,6 @@ import io.vertx.core.impl.VertxInternal;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.SocketAddress;
-import io.vertx.core.spi.metrics.NetworkMetrics;
-import io.vertx.core.spi.metrics.TCPMetrics;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
@@ -35,7 +33,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.InetSocketAddress;
 
-import static io.vertx.core.spi.metrics.Metrics.METRICS_ENABLED;
 
 /**
  * Abstract base class for TCP connections.
@@ -67,7 +64,6 @@ public abstract class ConnectionBase {
   private Handler<Throwable> exceptionHandler;
   private Handler<Void> closeHandler;
   private int writeInProgress;
-  private Object metric;
   private SocketAddress remoteAddress;
   private SocketAddress localAddress;
   private Promise<Void> closePromise;
@@ -136,9 +132,6 @@ public abstract class ConnectionBase {
    * @param promise the promise receiving the completion event
    */
   private void write(Object msg, Boolean flush, ChannelPromise promise) {
-    if (METRICS_ENABLED) {
-      reportsBytesWritten(msg);
-    }
     boolean writeAndFlush;
     if (flush == null) {
       writeAndFlush = !read;
@@ -308,21 +301,8 @@ public abstract class ConnectionBase {
     return context;
   }
 
-  public final synchronized void metric(Object metric) {
-    this.metric = metric;
-  }
-
-  public final synchronized Object metric() {
-    return metric;
-  }
-
-  public abstract NetworkMetrics metrics();
-
   protected void handleException(Throwable t) {
-    NetworkMetrics metrics = metrics();
-    if (metrics != null) {
-      metrics.exceptionOccurred(metric, remoteAddress(), t);
-    }
+
     context.dispatch(t, err -> {
       Handler<Throwable> handler;
       synchronized (ConnectionBase.this) {
@@ -342,10 +322,6 @@ public abstract class ConnectionBase {
 
   protected void handleClosed() {
     closed = true;
-    NetworkMetrics metrics = metrics();
-    if (metrics instanceof TCPMetrics) {
-      ((TCPMetrics) metrics).disconnected(metric(), remoteAddress());
-    }
     closePromise.complete();
   }
 
@@ -377,17 +353,10 @@ public abstract class ConnectionBase {
   }
 
   public void reportBytesRead(long numberOfBytes) {
-    NetworkMetrics metrics = metrics();
-    if (metrics != null) {
-      metrics.bytesRead(metric(), remoteAddress(), numberOfBytes);
-    }
   }
 
   public void reportBytesWritten(long numberOfBytes) {
-    NetworkMetrics metrics = metrics();
-    if (metrics != null && numberOfBytes > 0) {
-      metrics.bytesWritten(metric, remoteAddress(), numberOfBytes);
-    }
+
   }
 
   /**

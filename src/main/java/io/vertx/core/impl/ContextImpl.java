@@ -16,13 +16,10 @@ import io.netty.channel.EventLoopGroup;
 import io.vertx.core.*;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
-import io.vertx.core.spi.metrics.PoolMetrics;
-import io.vertx.core.spi.tracing.VertxTracer;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executor;
-import java.util.concurrent.RejectedExecutionException;
 
 /**
  * @author <a href="http://tfox.org">Tim Fox</a>
@@ -32,6 +29,7 @@ abstract class ContextImpl extends AbstractContext {
   /**
    * Execute the {@code task} disabling the thread-local association for the duration
    * of the execution. {@link Vertx#currentContext()} will return {@code null},
+   *
    * @param task the task to execute
    * @throws IllegalStateException if the current thread is not a Vertx thread
    */
@@ -65,7 +63,6 @@ abstract class ContextImpl extends AbstractContext {
   static final boolean DISABLE_TIMINGS = Boolean.getBoolean(DISABLE_TIMINGS_PROP_NAME);
 
   protected final VertxInternal owner;
-  protected final VertxTracer<?, ?> tracer;
   private final Deployment deployment;
   private final CloseHooks closeHooks;
   private final ClassLoader tccl;
@@ -78,17 +75,16 @@ abstract class ContextImpl extends AbstractContext {
   final WorkerPool workerPool;
   final TaskQueue orderedTasks;
 
-  ContextImpl(VertxInternal vertx, VertxTracer<?, ?> tracer, WorkerPool internalBlockingPool, WorkerPool workerPool, Deployment deployment,
-                        ClassLoader tccl) {
-    this(vertx, tracer, getEventLoop(vertx), internalBlockingPool, workerPool, deployment, tccl);
+  ContextImpl(VertxInternal vertx, WorkerPool internalBlockingPool, WorkerPool workerPool, Deployment deployment,
+              ClassLoader tccl) {
+    this(vertx, getEventLoop(vertx), internalBlockingPool, workerPool, deployment, tccl);
   }
 
-  ContextImpl(VertxInternal vertx, VertxTracer<?, ?> tracer, EventLoop eventLoop, WorkerPool internalBlockingPool, WorkerPool workerPool, Deployment deployment,
-                        ClassLoader tccl) {
+  ContextImpl(VertxInternal vertx, EventLoop eventLoop, WorkerPool internalBlockingPool, WorkerPool workerPool, Deployment deployment,
+              ClassLoader tccl) {
     if (VertxThread.DISABLE_TCCL && tccl != ClassLoader.getSystemClassLoader()) {
       log.warn("You have disabled TCCL checks but you have a custom TCCL to set.");
     }
-    this.tracer = tracer;
     this.deployment = deployment;
     this.eventLoop = eventLoop;
     this.tccl = tccl;
@@ -145,47 +141,28 @@ abstract class ContextImpl extends AbstractContext {
   }
 
   static <T> Future<T> executeBlocking(ContextInternal context, Handler<Promise<T>> blockingCodeHandler,
-      WorkerPool workerPool, TaskQueue queue) {
-    PoolMetrics metrics = workerPool.metrics();
-    Object queueMetric = metrics != null ? metrics.submitted() : null;
+                                       WorkerPool workerPool, TaskQueue queue) {
     Promise<T> promise = context.promise();
     Future<T> fut = promise.future();
-    try {
-      Runnable command = () -> {
-        Object execMetric = null;
-        if (metrics != null) {
-          execMetric = metrics.begin(queueMetric);
-        }
-        context.emit(promise, f -> {
-          try {
-            blockingCodeHandler.handle(promise);
-          } catch (Throwable e) {
-            promise.tryFail(e);
-          }
-        });
-        if (metrics != null) {
-          metrics.end(execMetric, fut.succeeded());
-        }
-      };
-      Executor exec = workerPool.executor();
-      if (queue != null) {
-        queue.execute(command, exec);
-      } else {
-        exec.execute(command);
-      }
-    } catch (RejectedExecutionException e) {
-      // Pool is already shut down
-      if (metrics != null) {
-        metrics.rejected(queueMetric);
-      }
-      throw e;
-    }
-    return fut;
-  }
 
-  @Override
-  public VertxTracer tracer() {
-    return tracer;
+    Runnable command = () -> {
+      context.emit(promise, f -> {
+        try {
+          blockingCodeHandler.handle(promise);
+        } catch (Throwable e) {
+          promise.tryFail(e);
+        }
+      });
+
+    };
+    Executor exec = workerPool.executor();
+    if (queue != null) {
+      queue.execute(command, exec);
+    } else {
+      exec.execute(command);
+    }
+
+    return fut;
   }
 
   @Override
@@ -252,11 +229,6 @@ abstract class ContextImpl extends AbstractContext {
 
     Duplicated(C delegate) {
       this.delegate = delegate;
-    }
-
-    @Override
-    public VertxTracer tracer() {
-      return delegate.tracer();
     }
 
     @Override

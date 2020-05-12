@@ -30,8 +30,6 @@ import io.vertx.core.net.NetSocket;
 import io.vertx.core.net.impl.NetSocketImpl;
 import io.vertx.core.net.impl.SSLHelper;
 import io.vertx.core.net.impl.VertxHandler;
-import io.vertx.core.spi.metrics.HttpServerMetrics;
-import io.vertx.core.spi.tracing.VertxTracer;
 
 import java.util.*;
 
@@ -40,7 +38,6 @@ import static io.netty.handler.codec.http.HttpResponseStatus.CONTINUE;
 import static io.netty.handler.codec.http.HttpResponseStatus.METHOD_NOT_ALLOWED;
 import static io.netty.handler.codec.http.HttpResponseStatus.UPGRADE_REQUIRED;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
-import static io.vertx.core.spi.metrics.Metrics.METRICS_ENABLED;
 
 /**
  *
@@ -78,7 +75,6 @@ public class Http1xServerConnection extends Http1xConnectionBase<ServerWebSocket
   private boolean channelPaused;
   private Handler<HttpServerRequest> requestHandler;
 
-  final HttpServerMetrics metrics;
   final boolean handle100ContinueAutomatically;
   final HttpServerOptions options;
 
@@ -87,13 +83,11 @@ public class Http1xServerConnection extends Http1xConnectionBase<ServerWebSocket
                                 HttpServerOptions options,
                                 ChannelHandlerContext channel,
                                 ContextInternal context,
-                                String serverOrigin,
-                                HttpServerMetrics metrics) {
+                                String serverOrigin) {
     super(vertx, channel, context);
     this.serverOrigin = serverOrigin;
     this.options = options;
     this.sslHelper = sslHelper;
-    this.metrics = metrics;
     this.handle100ContinueAutomatically = options.isHandle100ContinueAutomatically();
   }
 
@@ -102,11 +96,6 @@ public class Http1xServerConnection extends Http1xConnectionBase<ServerWebSocket
     // SHOULD BE FINAL ?????
     requestHandler = handler;
     return this;
-  }
-
-  @Override
-  public HttpServerMetrics metrics() {
-    return metrics;
   }
 
   public void handleMessage(Object msg) {
@@ -125,9 +114,7 @@ public class Http1xServerConnection extends Http1xConnectionBase<ServerWebSocket
         return;
       }
       responseInProgress = requestInProgress;
-      if (METRICS_ENABLED) {
-        reportRequestBegin(req);
-      }
+
       req.context.dispatch(req, r -> {
         req.handleBegin();
         requestHandler.handle(r);
@@ -142,16 +129,6 @@ public class Http1xServerConnection extends Http1xConnectionBase<ServerWebSocket
     }
   }
 
-  private void reportRequestBegin(Http1xServerRequest request) {
-    if (metrics != null) {
-      request.metric = metrics.requestBegin(metric(), request);
-    }
-    VertxTracer tracer = context.tracer();
-    if (tracer != null) {
-      request.trace = tracer.receiveRequest(request.context, request, request.method().name(), request.headers(), HttpUtils.SERVER_REQUEST_TAG_EXTRACTOR);
-    }
-  }
-
   private void onContent(Object msg) {
     HttpContent content = (HttpContent) msg;
     if (content.decoderResult() != DecoderResult.SUCCESS) {
@@ -161,9 +138,6 @@ public class Http1xServerConnection extends Http1xConnectionBase<ServerWebSocket
     Buffer buffer = Buffer.buffer(VertxHandler.safeBuffer(content.content(), chctx.alloc()));
     Http1xServerRequest request;
     synchronized (this) {
-      if (METRICS_ENABLED) {
-        reportBytesRead(buffer);
-      }
       request = requestInProgress;
     }
     request.context.schedule(buffer, request::handleContent);
@@ -176,9 +150,6 @@ public class Http1xServerConnection extends Http1xConnectionBase<ServerWebSocket
   private void onEnd() {
     Http1xServerRequest request;
     synchronized (this) {
-      if (METRICS_ENABLED) {
-        reportRequestComplete();
-      }
       request = requestInProgress;
       requestInProgress = null;
     }
@@ -188,9 +159,6 @@ public class Http1xServerConnection extends Http1xConnectionBase<ServerWebSocket
   void responseComplete() {
     EventLoop eventLoop = context.nettyEventLoop();
     if (eventLoop.inEventLoop()) {
-      if (METRICS_ENABLED) {
-        reportResponseComplete();
-      }
       Http1xServerRequest request = responseInProgress;
       responseInProgress = null;
       Http1xServerRequest next = request.next();
@@ -228,36 +196,6 @@ public class Http1xServerConnection extends Http1xConnectionBase<ServerWebSocket
     }
   }
 
-  private void reportBytesRead(Buffer buffer) {
-    if (metrics != null) {
-      bytesRead += buffer.length();
-    }
-  }
-
-  private void reportRequestComplete() {
-    if (metrics != null) {
-      reportBytesRead(bytesRead);
-      bytesRead = 0;
-    }
-  }
-
-  private void reportResponseComplete() {
-    if (metrics != null) {
-      reportBytesWritten(bytesWritten);
-      bytesWritten = 0L;
-      if (requestFailed) {
-        metrics.requestReset(responseInProgress.metric());
-        requestFailed = false;
-      } else {
-        metrics.responseEnd(responseInProgress.metric(), responseInProgress.response());
-      }
-    }
-    VertxTracer tracer = context.tracer();
-    if (tracer != null) {
-      tracer.sendResponse(responseInProgress.context, responseInProgress.response(), responseInProgress.trace(), null, HttpUtils.SERVER_RESPONSE_TAG_EXTRACTOR);
-    }
-  }
-
   String getServerOrigin() {
     return serverOrigin;
   }
@@ -279,9 +217,6 @@ public class Http1xServerConnection extends Http1xConnectionBase<ServerWebSocket
     }
     webSocket = new ServerWebSocketImpl(vertx.getOrCreateContext(), this, handshaker.version() != WebSocketVersion.V00,
       request, handshaker, options.getMaxWebSocketFrameSize(), options.getMaxWebSocketMessageSize());
-    if (METRICS_ENABLED && metrics != null) {
-      webSocket.setMetric(metrics.connected(metric(), request.metric(), webSocket));
-    }
     return webSocket;
   }
 
@@ -338,12 +273,9 @@ public class Http1xServerConnection extends Http1xConnectionBase<ServerWebSocket
 
     Map<Channel, NetSocketImpl> connectionMap = new HashMap<>(1);
 
-    NetSocketImpl socket = new NetSocketImpl(vertx, chctx, context, sslHelper, metrics) {
+    NetSocketImpl socket = new NetSocketImpl(vertx, chctx, context, sslHelper) {
       @Override
       protected void handleClosed() {
-        if (metrics != null) {
-          metrics.responseEnd(responseInProgress.metric(), responseInProgress.response());
-        }
         connectionMap.remove(chctx.channel());
         super.handleClosed();
       }
@@ -357,7 +289,6 @@ public class Http1xServerConnection extends Http1xConnectionBase<ServerWebSocket
         super.handleMessage(msg);
       }
     };
-    socket.metric(metric());
     connectionMap.put(chctx.channel(), socket);
 
     // Flush out all pending data
@@ -413,10 +344,6 @@ public class Http1xServerConnection extends Http1xConnectionBase<ServerWebSocket
       ws = this.webSocket;
       requestInProgress = this.requestInProgress;
       responseInProgress = this.responseInProgress;
-      if (METRICS_ENABLED && metrics != null && ws != null) {
-        metrics.disconnected(ws.getMetric());
-        ws.setMetric(null);
-      }
     }
     if (requestInProgress != null) {
       requestInProgress.context.schedule(v -> {
@@ -444,9 +371,6 @@ public class Http1xServerConnection extends Http1xConnectionBase<ServerWebSocket
       ws = this.webSocket;
       requestInProgress = this.requestInProgress;
       responseInProgress = this.responseInProgress;
-      if (METRICS_ENABLED && metrics != null) {
-        requestFailed = true;
-      }
     }
     if (requestInProgress != null) {
       requestInProgress.handleException(t);

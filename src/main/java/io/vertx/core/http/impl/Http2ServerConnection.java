@@ -25,7 +25,6 @@ import io.vertx.core.Promise;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.*;
 import io.vertx.core.impl.ContextInternal;
-import io.vertx.core.spi.metrics.HttpServerMetrics;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -38,7 +37,6 @@ public class Http2ServerConnection extends Http2ConnectionBase implements HttpSe
 
   final HttpServerOptions options;
   private final String serverOrigin;
-  private final HttpServerMetrics metrics;
 
   Handler<HttpServerRequest> requestHandler;
   private int concurrentStreams;
@@ -48,23 +46,17 @@ public class Http2ServerConnection extends Http2ConnectionBase implements HttpSe
     ContextInternal context,
       String serverOrigin,
       VertxHttp2ConnectionHandler connHandler,
-      HttpServerOptions options,
-      HttpServerMetrics metrics) {
+      HttpServerOptions options) {
     super(context, connHandler);
 
     this.options = options;
     this.serverOrigin = serverOrigin;
-    this.metrics = metrics;
   }
 
   @Override
   public HttpServerConnection handler(Handler<HttpServerRequest> handler) {
     requestHandler = handler;
     return this;
-  }
-
-  public HttpServerMetrics metrics() {
-    return metrics;
   }
 
   private static boolean isMalformedRequest(Http2Headers headers) {
@@ -239,7 +231,6 @@ public class Http2ServerConnection extends Http2ConnectionBase implements HttpSe
     }
 
     void complete() {
-      registerMetrics();
       promise.complete(response);
     }
   }

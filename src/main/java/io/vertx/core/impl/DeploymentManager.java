@@ -21,7 +21,6 @@ import io.vertx.core.Promise;
 import io.vertx.core.Verticle;
 import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
-import io.vertx.core.spi.metrics.VertxMetrics;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -209,10 +208,6 @@ public class DeploymentManager {
                   return;
                 }
               }
-              VertxMetrics metrics = vertx.metricsSPI();
-              if (metrics != null) {
-                metrics.verticleDeployed(verticle);
-              }
               deployments.put(deploymentID, deployment);
               if (deployCount.incrementAndGet() == verticles.length) {
                 promise.complete(deployment);
@@ -337,10 +332,6 @@ public class DeploymentManager {
             Future<Void> stopFuture = stopPromise.future();
             stopFuture.onComplete(ar -> {
               deployments.remove(deploymentID);
-              VertxMetrics metrics = vertx.metricsSPI();
-              if (metrics != null) {
-                metrics.verticleUndeployed(verticleHolder.verticle);
-              }
               context.runCloseHooks(ar2 -> {
                 if (ar2.failed()) {
                   // Log error but we report success anyway

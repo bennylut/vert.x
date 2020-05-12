@@ -16,8 +16,6 @@ import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
-import io.vertx.core.spi.metrics.PoolMetrics;
-import io.vertx.core.spi.tracing.VertxTracer;
 
 import java.util.Objects;
 
@@ -26,9 +24,9 @@ import java.util.Objects;
  */
 public class WorkerContext extends ContextImpl {
 
-  WorkerContext(VertxInternal vertx, VertxTracer<?, ?> tracer, WorkerPool internalBlockingPool, WorkerPool workerPool, Deployment deployment,
+  WorkerContext(VertxInternal vertx, WorkerPool internalBlockingPool, WorkerPool workerPool, Deployment deployment,
                 ClassLoader tccl) {
-    super(vertx, tracer, internalBlockingPool, workerPool, deployment, tccl);
+    super(vertx, internalBlockingPool, workerPool, deployment, tccl);
   }
 
   @Override
@@ -47,39 +45,15 @@ public class WorkerContext extends ContextImpl {
   }
 
   private <T> void execute(ContextInternal ctx, TaskQueue queue, Runnable task) {
-    PoolMetrics metrics = workerPool.metrics();
-    Object queueMetric = metrics != null ? metrics.submitted() : null;
     queue.execute(() -> {
-      Object execMetric = null;
-      if (metrics != null) {
-        execMetric = metrics.begin(queueMetric);
-      }
-      try {
         ctx.emit(task);
-      } finally {
-        if (metrics != null) {
-          metrics.end(execMetric, true);
-        }
-      }
     }, workerPool.executor());
   }
 
   private <T> void execute(ContextInternal ctx, TaskQueue queue, T value, Handler<T> task) {
     Objects.requireNonNull(task, "Task handler must not be null");
-    PoolMetrics metrics = workerPool.metrics();
-    Object queueMetric = metrics != null ? metrics.submitted() : null;
     queue.execute(() -> {
-      Object execMetric = null;
-      if (metrics != null) {
-        execMetric = metrics.begin(queueMetric);
-      }
-      try {
         ctx.emit(value, task);
-      } finally {
-        if (metrics != null) {
-          metrics.end(execMetric, true);
-        }
-      }
     }, workerPool.executor());
   }
 
@@ -87,20 +61,8 @@ public class WorkerContext extends ContextImpl {
     if (Context.isOnWorkerThread()) {
       task.handle(argument);
     } else {
-      PoolMetrics metrics = workerPool.metrics();
-      Object queueMetric = metrics != null ? metrics.submitted() : null;
       queue.execute(() -> {
-        Object execMetric = null;
-        if (metrics != null) {
-          execMetric = metrics.begin(queueMetric);
-        }
-        try {
-          task.handle(argument);
-        } finally {
-          if (metrics != null) {
-            metrics.end(execMetric, true);
-          }
-        }
+        task.handle(argument);
       }, workerPool.executor());
     }
   }
@@ -147,7 +109,7 @@ public class WorkerContext extends ContextImpl {
     }
 
     @Override
-    public <T> Future< T> executeBlocking(Handler<Promise<T>> blockingCodeHandler, boolean ordered) {
+    public <T> Future<T> executeBlocking(Handler<Promise<T>> blockingCodeHandler, boolean ordered) {
       return ContextImpl.executeBlocking(this, blockingCodeHandler, delegate.workerPool, ordered ? orderedTasks : null);
     }
 

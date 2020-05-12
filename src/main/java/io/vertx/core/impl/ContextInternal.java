@@ -14,7 +14,6 @@ package io.vertx.core.impl;
 import io.netty.channel.EventLoop;
 import io.netty.util.concurrent.FastThreadLocalThread;
 import io.vertx.core.*;
-import io.vertx.core.spi.tracing.VertxTracer;
 
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executor;
@@ -224,11 +223,6 @@ public interface ContextInternal extends Context, Executor {
    * @return the classloader associated with this context
    */
   ClassLoader classLoader();
-
-  /**
-   * @return the tracer for this context
-   */
-  VertxTracer tracer();
 
   /**
    * Returns a context sharing with this context

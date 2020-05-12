@@ -246,6 +246,11 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.6.1</version>
+
+        <configuration>
+          <forceJavacCompilerUse>true</forceJavacCompilerUse>
+        </configuration>
+
         <executions>
           <!-- Replacing default-compile as it is treated specially by maven -->
           <execution>

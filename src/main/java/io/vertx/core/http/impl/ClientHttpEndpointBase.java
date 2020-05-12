@@ -14,44 +14,23 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.impl.ContextInternal;
 import io.vertx.core.net.impl.clientconnection.Endpoint;
-import io.vertx.core.spi.metrics.HttpClientMetrics;
 
 /**
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */
 abstract class ClientHttpEndpointBase extends Endpoint<HttpClientConnection> {
 
-  private final Object metric;
   private final int port;
   private final String host;
-  private final HttpClientMetrics metrics; // Shall be removed later combining the PoolMetrics with HttpClientMetrics
 
-  ClientHttpEndpointBase(HttpClientMetrics metrics, int port, String host, Object metric, Runnable dispose) {
+  ClientHttpEndpointBase(int port, String host, Runnable dispose) {
     super(dispose);
-
     this.port = port;
     this.host = host;
-    this.metric = metric;
-    this.metrics = metrics;
   }
 
   @Override
   public final void requestConnection(ContextInternal ctx, Handler<AsyncResult<HttpClientConnection>> handler) {
-    if (metrics != null) {
-      Object metric;
-      if (metrics != null) {
-        metric = metrics.enqueueRequest(this.metric);
-      } else {
-        metric = null;
-      }
-      Handler<AsyncResult<HttpClientConnection>> next = handler;
-      handler = ar -> {
-        if (metrics != null) {
-          metrics.dequeueRequest(this.metric, metric);
-        }
-        next.handle(ar);
-      };
-    }
     requestConnection2(ctx, handler);
   }
 
@@ -59,9 +38,7 @@ abstract class ClientHttpEndpointBase extends Endpoint<HttpClientConnection> {
 
   @Override
   protected void dispose() {
-    if (metrics != null) {
-      metrics.closeEndpoint(host, port, metric);
-    }
+
   }
 
   @Override

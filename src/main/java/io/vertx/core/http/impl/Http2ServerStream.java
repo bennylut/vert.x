@@ -13,16 +13,11 @@ package io.vertx.core.http.impl;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http2.Http2Headers;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.StreamPriority;
 import io.vertx.core.impl.ContextInternal;
-import io.vertx.core.spi.metrics.HttpServerMetrics;
-import io.vertx.core.spi.metrics.Metrics;
-
-import static io.vertx.core.spi.metrics.Metrics.METRICS_ENABLED;
 
 abstract class Http2ServerStream extends VertxHttp2Stream<Http2ServerConnection> {
 
@@ -31,7 +26,6 @@ abstract class Http2ServerStream extends VertxHttp2Stream<Http2ServerConnection>
   protected final String uri;
   protected final String host;
   protected final Http2ServerResponseImpl response;
-  private Object metric;
 
   Http2ServerStream(Http2ServerConnection conn,
                     ContextInternal context,
@@ -63,25 +57,12 @@ abstract class Http2ServerStream extends VertxHttp2Stream<Http2ServerConnection>
     this.response = new Http2ServerResponseImpl(conn, this, false, contentEncoding, host);
   }
 
-  void registerMetrics() {
-    if (METRICS_ENABLED) {
-      HttpServerMetrics metrics = conn.metrics();
-      if (metrics != null) {
-        if (response.isPush()) {
-          metric = metrics.responsePushed(conn.metric(), method(), uri, response);
-        } else {
-          metric = metrics.requestBegin(conn.metric(), (HttpServerRequest) this);
-        }
-      }
-    }
-  }
 
   @Override
   void onHeaders(Http2Headers headers, StreamPriority streamPriority) {
     if (streamPriority != null) {
       priority(streamPriority);
     }
-    registerMetrics();
     CharSequence value = headers.get(HttpHeaderNames.EXPECT);
     if (conn.options.isHandle100ContinueAutomatically() &&
       ((value != null && HttpHeaderValues.CONTINUE.equals(value)) ||
@@ -94,14 +75,6 @@ abstract class Http2ServerStream extends VertxHttp2Stream<Http2ServerConnection>
   abstract void dispatch(Handler<HttpServerRequest> handler);
 
   @Override
-  void doWriteHeaders(Http2Headers headers, boolean end, Handler<AsyncResult<Void>> handler) {
-    if (Metrics.METRICS_ENABLED && !end && metric != null) {
-      conn.metrics().responseBegin(metric, response);
-    }
-    super.doWriteHeaders(headers, end, handler);
-  }
-
-  @Override
   void handleWritabilityChanged(boolean writable) {
     if (response != null) {
       response.handlerWritabilityChanged(writable);
@@ -112,20 +85,4 @@ abstract class Http2ServerStream extends VertxHttp2Stream<Http2ServerConnection>
     return method;
   }
 
-  @Override
-  void handleClose() {
-    super.handleClose();
-    if (METRICS_ENABLED) {
-      HttpServerMetrics metrics = conn.metrics();
-      if (metrics != null) {
-        // Null in case of push response : handle this case
-        boolean failed = !response.ended();
-        if (failed) {
-          metrics.requestReset(metric);
-        } else {
-          metrics.responseEnd(metric, response);
-        }
-      }
-    }
-  }
 }

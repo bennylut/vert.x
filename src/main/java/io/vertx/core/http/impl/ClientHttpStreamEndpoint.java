@@ -14,7 +14,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.net.impl.clientconnection.Pool;
 import io.vertx.core.impl.ContextInternal;
-import io.vertx.core.spi.metrics.HttpClientMetrics;
 
 /**
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
@@ -23,8 +22,7 @@ class ClientHttpStreamEndpoint extends ClientHttpEndpointBase {
 
   private final Pool<HttpClientConnection> pool;
 
-  public ClientHttpStreamEndpoint(HttpClientMetrics metrics,
-                                  Object metric,
+  public ClientHttpStreamEndpoint(
                                   int queueMaxSize,
                                   long maxSize,
                                   String host,
@@ -32,7 +30,7 @@ class ClientHttpStreamEndpoint extends ClientHttpEndpointBase {
                                   ContextInternal ctx,
                                   HttpChannelConnector connector,
                                   Runnable dispose) {
-    super(metrics, port, host, metric, dispose);
+    super(port, host, dispose);
     this.pool = new Pool<>(
       ctx,
       connector,

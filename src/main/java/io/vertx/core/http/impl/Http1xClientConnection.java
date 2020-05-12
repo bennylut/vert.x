@@ -41,14 +41,10 @@ import io.vertx.core.net.SocketAddress;
 import io.vertx.core.net.impl.ConnectionBase;
 import io.vertx.core.net.impl.NetSocketImpl;
 import io.vertx.core.net.impl.VertxHandler;
-import io.vertx.core.spi.metrics.HttpClientMetrics;
-import io.vertx.core.spi.tracing.TagExtractor;
-import io.vertx.core.spi.tracing.VertxTracer;
 import io.vertx.core.streams.impl.InboundBuffer;
 
 import java.net.URI;
 import java.util.*;
-import java.util.function.BiConsumer;
 
 import static io.vertx.core.http.HttpHeaders.*;
 
@@ -74,8 +70,6 @@ class Http1xClientConnection extends Http1xConnectionBase<WebSocketImpl> impleme
   private final HttpClientOptions options;
   private final boolean ssl;
   private final SocketAddress server;
-  private final Object endpointMetric;
-  private final HttpClientMetrics metrics;
   private final HttpVersion version;
 
   private Deque<Stream> requests = new ArrayDeque<>();
@@ -95,26 +89,18 @@ class Http1xClientConnection extends Http1xConnectionBase<WebSocketImpl> impleme
   Http1xClientConnection(ConnectionListener<HttpClientConnection> listener,
                          HttpVersion version,
                          HttpClientImpl client,
-                         Object endpointMetric,
                          ChannelHandlerContext channel,
                          boolean ssl,
                          SocketAddress server,
-                         ContextInternal context,
-                         HttpClientMetrics metrics) {
+                         ContextInternal context) {
     super(client.getVertx(), channel, context);
     this.listener = listener;
     this.client = client;
     this.options = client.getOptions();
     this.ssl = ssl;
     this.server = server;
-    this.metrics = metrics;
     this.version = version;
-    this.endpointMetric = endpointMetric;
     this.keepAliveTimeout = options.getKeepAliveTimeout();
-  }
-
-  Object endpointMetric() {
-    return endpointMetric;
   }
 
   ConnectionListener<HttpClientConnection> listener() {
@@ -158,17 +144,6 @@ class Http1xClientConnection extends Http1xConnectionBase<WebSocketImpl> impleme
     synchronized (this) {
       responses.add(stream);
       this.netSocketPromise = ((StreamImpl)stream).netSocketPromise;
-      if (this.metrics != null) {
-        stream.metric = this.metrics.requestBegin(this.endpointMetric, this.metric(), this.localAddress(), this.remoteAddress(), stream.request);
-      }
-      VertxTracer tracer = context.tracer();
-      if (tracer != null) {
-        List<Map.Entry<String, String>> tags = new ArrayList<>();
-        tags.add(new AbstractMap.SimpleEntry<>("http.url", stream.request.absoluteURI()));
-        tags.add(new AbstractMap.SimpleEntry<>("http.method", stream.request.method().name()));
-        BiConsumer<String, String> headers = (key, val) -> request.headers().add(key, val);
-        stream.trace = tracer.sendRequest(stream.context, stream.request, stream.request.method.name(), headers, HttpUtils.CLIENT_REQUEST_TAG_EXTRACTOR);
-      }
     }
     writeToChannel(request, handler == null ? null : context.promise(handler));
     if (request instanceof LastHttpContent) {
@@ -183,9 +158,6 @@ class Http1xClientConnection extends Http1xConnectionBase<WebSocketImpl> impleme
       requests.pop();
       next = requests.peek();
       recycle = s.responseEnded;
-      if (metrics != null) {
-        metrics.requestEnd(s.metric);
-      }
     }
     reportBytesWritten(bytesWritten);
     bytesWritten = 0L;
@@ -555,10 +527,6 @@ class Http1xClientConnection extends Http1xConnectionBase<WebSocketImpl> impleme
         response = new HttpClientResponseImpl(request, version, (HttpClientStream) stream, resp.status().code(), resp.status().reasonPhrase(), new HeadersAdaptor(resp.headers()));
         stream.response = response;
 
-        if (metrics != null) {
-          metrics.responseBegin(stream.metric, response);
-        }
-
         //
         if (resp.status().code() != 100 && request.method() != io.vertx.core.http.HttpMethod.CONNECT) {
           // See https://tools.ietf.org/html/rfc7230#section-6.3
@@ -612,16 +580,7 @@ class Http1xClientConnection extends Http1xConnectionBase<WebSocketImpl> impleme
           pipeline.remove("codec");
 
           // replace the old handler with one that handle plain sockets
-          NetSocketImpl socket = new NetSocketImpl(vertx, chctx, context, client.getSslHelper(), metrics) {
-            @Override
-            protected void handleClosed() {
-              if (metrics != null) {
-                metrics.responseEnd(stream.metric, response);
-              }
-              super.handleClosed();
-            }
-          };
-          socket.metric(metric());
+          NetSocketImpl socket = new NetSocketImpl(vertx, chctx, context, client.getSslHelper());
           pipeline.replace("handler", "handler", VertxHandler.create(ctx -> socket));
 
           // Handle back response
@@ -660,23 +619,12 @@ class Http1xClientConnection extends Http1xConnectionBase<WebSocketImpl> impleme
       stream.responseEnded = true;
       check = requests.peek() != stream;
     }
-    VertxTracer tracer = context.tracer();
-    if (tracer != null) {
-      tracer.receiveResponse(stream.context, stream.response, stream.trace, null, HttpUtils.CLIENT_RESPONSE_TAG_EXTRACTOR);
-    }
-    if (metrics != null) {
-      metrics.responseEnd(stream.metric, stream.response);
-    }
     stream.context.schedule(trailer, stream::handleEnd);
     this.doResume();
     reportBytesRead(bytesRead);
     if (check) {
       checkLifecycle();
     }
-  }
-
-  public HttpClientMetrics metrics() {
-    return metrics;
   }
 
   synchronized void toWebSocket(
@@ -743,9 +691,6 @@ class Http1xClientConnection extends Http1xConnectionBase<WebSocketImpl> impleme
 
         }
         log.debug("WebSocket handshake complete");
-        if (metrics != null) {
-          webSocket.setMetric(metrics.connected(endpointMetric, metric(), webSocket));
-        }
         getContext().dispatch(wsRes, res -> {
           if (res.succeeded()) {
             webSocket.headers(ar.result());
@@ -818,11 +763,7 @@ class Http1xClientConnection extends Http1xConnectionBase<WebSocketImpl> impleme
       vertx.cancelTimer(timerID);
     }
     closed = true;
-    if (metrics != null) {
-      metrics.endpointDisconnected(endpointMetric, metric());
-    }
     WebSocketImpl ws;
-    VertxTracer tracer = context.tracer();
     Iterable<Stream> streams;
     synchronized (this) {
       ws = webSocket;
@@ -835,12 +776,6 @@ class Http1xClientConnection extends Http1xConnectionBase<WebSocketImpl> impleme
       ws.handleClosed();
     }
     for (Stream stream : streams) {
-      if (metrics != null) {
-        metrics.requestReset(stream.metric);
-      }
-      if (tracer != null) {
-        tracer.receiveResponse(stream.context, null, stream.trace, ConnectionBase.CLOSED_EXCEPTION, TagExtractor.empty());
-      }
       stream.context.schedule(null, v -> stream.handleClosed());
     }
   }

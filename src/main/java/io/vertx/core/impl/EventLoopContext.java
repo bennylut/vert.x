@@ -16,21 +16,20 @@ import io.netty.channel.EventLoop;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
-import io.vertx.core.spi.tracing.VertxTracer;
 
 /**
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
 public class EventLoopContext extends ContextImpl {
 
-  EventLoopContext(VertxInternal vertx, VertxTracer<?, ?> tracer, WorkerPool internalBlockingPool, WorkerPool workerPool, Deployment deployment,
+  EventLoopContext(VertxInternal vertx, WorkerPool internalBlockingPool, WorkerPool workerPool, Deployment deployment,
                    ClassLoader tccl) {
-    super(vertx, tracer, internalBlockingPool, workerPool, deployment, tccl);
+    super(vertx, internalBlockingPool, workerPool, deployment, tccl);
   }
 
-  EventLoopContext(VertxInternal vertx, VertxTracer<?, ?> tracer, EventLoop eventLoop, WorkerPool internalBlockingPool, WorkerPool workerPool, Deployment deployment,
+  EventLoopContext(VertxInternal vertx, EventLoop eventLoop, WorkerPool internalBlockingPool, WorkerPool workerPool, Deployment deployment,
                           ClassLoader tccl) {
-    super(vertx, tracer, eventLoop, internalBlockingPool, workerPool, deployment, tccl);
+    super(vertx, eventLoop, internalBlockingPool, workerPool, deployment, tccl);
   }
 
   @Override

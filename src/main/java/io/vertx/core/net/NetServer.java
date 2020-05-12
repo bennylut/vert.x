@@ -18,7 +18,6 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
 
-import io.vertx.core.metrics.Measured;
 import io.vertx.core.streams.ReadStream;
 
 /**
@@ -27,7 +26,7 @@ import io.vertx.core.streams.ReadStream;
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
 
-public interface NetServer extends Measured {
+public interface NetServer {
 
   /**
    * Return the connect stream for this server. The server can only have at most one handler at any one time.

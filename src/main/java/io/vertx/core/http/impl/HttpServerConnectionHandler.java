@@ -22,7 +22,6 @@ import io.vertx.core.http.HttpConnection;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.impl.ContextInternal;
-import io.vertx.core.spi.metrics.HttpServerMetrics;
 
 import java.util.ArrayList;
 

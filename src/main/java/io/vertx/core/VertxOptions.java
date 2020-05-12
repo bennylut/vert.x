@@ -15,8 +15,6 @@ package io.vertx.core;
 import io.vertx.core.dns.AddressResolverOptions;
 import io.vertx.core.file.FileSystemOptions;
 import io.vertx.core.impl.cpu.CpuCoreSensor;
-import io.vertx.core.metrics.MetricsOptions;
-import io.vertx.core.tracing.TracingOptions;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -106,8 +104,6 @@ public class VertxOptions {
   private long maxEventLoopExecuteTime = DEFAULT_MAX_EVENT_LOOP_EXECUTE_TIME;
   private long maxWorkerExecuteTime = DEFAULT_MAX_WORKER_EXECUTE_TIME;
   private int quorumSize = DEFAULT_QUORUM_SIZE;
-  private MetricsOptions metricsOptions = new MetricsOptions();
-  private TracingOptions tracingOptions = new TracingOptions();
   private FileSystemOptions fileSystemOptions = new FileSystemOptions();
   private long warningExceptionTime = DEFAULT_WARNING_EXCEPTION_TIME;
   private AddressResolverOptions addressResolverOptions = new AddressResolverOptions();
@@ -136,7 +132,6 @@ public class VertxOptions {
     this.maxWorkerExecuteTime = other.getMaxWorkerExecuteTime();
     this.internalBlockingPoolSize = other.getInternalBlockingPoolSize();
     this.quorumSize = other.getQuorumSize();
-    this.metricsOptions = other.getMetricsOptions() != null ? new MetricsOptions(other.getMetricsOptions()) : null;
     this.fileSystemOptions = other.getFileSystemOptions() != null ? new FileSystemOptions(other.getFileSystemOptions()) : null;
     this.warningExceptionTime = other.warningExceptionTime;
     this.addressResolverOptions = other.addressResolverOptions != null ? new AddressResolverOptions(other.getAddressResolverOptions()) : null;
@@ -144,7 +139,6 @@ public class VertxOptions {
     this.maxWorkerExecuteTimeUnit = other.maxWorkerExecuteTimeUnit;
     this.warningExceptionTimeUnit = other.warningExceptionTimeUnit;
     this.blockedThreadCheckIntervalUnit = other.blockedThreadCheckIntervalUnit;
-    this.tracingOptions = other.tracingOptions != null ? other.tracingOptions.copy() : null;
   }
 
   /**
@@ -338,28 +332,10 @@ public class VertxOptions {
 
 
   /**
-   * @return the metrics options
-   */
-  public MetricsOptions getMetricsOptions() {
-    return metricsOptions;
-  }
-
-  /**
    * @return the file system options
    */
   public FileSystemOptions getFileSystemOptions() {
     return fileSystemOptions;
-  }
-
-  /**
-   * Set the metrics options
-   *
-   * @param metrics the options
-   * @return a reference to this, so the API can be used fluently
-   */
-  public VertxOptions setMetricsOptions(MetricsOptions metrics) {
-    this.metricsOptions = metrics;
-    return this;
   }
 
   /**
@@ -507,15 +483,6 @@ public class VertxOptions {
     return this;
   }
 
-  public TracingOptions getTracingOptions() {
-    return tracingOptions;
-  }
-
-  public VertxOptions setTracingOptions(TracingOptions tracingOptions) {
-    this.tracingOptions = tracingOptions;
-    return this;
-  }
-
   @Override
   public String toString() {
     return "VertxOptions{" +
@@ -530,7 +497,6 @@ public class VertxOptions {
         ", maxWorkerExecuteTime=" + maxWorkerExecuteTime +
         ", preferNativeTransport=" + preferNativeTransport +
         ", quorumSize=" + quorumSize +
-        ", metrics=" + metricsOptions +
         ", fileSystemOptions=" + fileSystemOptions +
         ", addressResolver=" + addressResolverOptions +
         ", warningExceptionTimeUnit=" + warningExceptionTimeUnit +

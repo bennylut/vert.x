@@ -16,7 +16,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.metrics.Measured;
+import io.vertx.core.http.impl.HttpRedirectHandler;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.core.streams.ReadStream;
 
@@ -51,7 +51,7 @@ import java.util.function.Function;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-public interface HttpClient extends Measured {
+public interface HttpClient {
 
   /**
    * Sends an HTTP request to send to the server with the specified options, specifying a response handler to receive
@@ -1362,12 +1362,12 @@ public interface HttpClient extends Measured {
    * @param handler the new redirect handler
    * @return a reference to this, so the API can be used fluently
    */
-  HttpClient redirectHandler(Function<HttpClientResponse, Future<HttpClientRequest>> handler);
+  HttpClient redirectHandler(HttpRedirectHandler handler);
 
   /**
    * @return the current redirect handler.
    */
-  Function<HttpClientResponse, Future<HttpClientRequest>> redirectHandler();
+  HttpRedirectHandler redirectHandler();
 
   /**
    * Close the client. Closing will close down any pooled connections.

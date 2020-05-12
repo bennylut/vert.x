@@ -22,9 +22,6 @@ import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.core.net.impl.*;
-import io.vertx.core.spi.metrics.MetricsProvider;
-import io.vertx.core.spi.metrics.TCPMetrics;
-import io.vertx.core.spi.metrics.VertxMetrics;
 import io.vertx.core.streams.ReadStream;
 
 import java.util.List;
@@ -34,7 +31,7 @@ import java.util.List;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-public class HttpServerImpl extends TCPServerBase implements HttpServer, Closeable, MetricsProvider {
+public class HttpServerImpl extends TCPServerBase implements HttpServer, Closeable{
 
   static final Logger log = LoggerFactory.getLogger(HttpServerImpl.class);
 
@@ -60,15 +57,6 @@ public class HttpServerImpl extends TCPServerBase implements HttpServer, Closeab
     this.options = new HttpServerOptions(options);
   }
 
-  @Override
-  protected TCPMetrics<?> createMetrics(SocketAddress localAddress) {
-    VertxMetrics vertxMetrics = vertx.metricsSPI();
-    if (vertxMetrics != null) {
-      return vertxMetrics.createHttpServerMetrics(options, localAddress);
-    } else {
-      return null;
-    }
-  }
 
   @Override
   public synchronized HttpServer requestHandler(Handler<HttpServerRequest> handler) {

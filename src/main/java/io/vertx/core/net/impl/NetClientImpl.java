@@ -36,10 +36,6 @@ import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.NetSocket;
 import io.vertx.core.net.SocketAddress;
-import io.vertx.core.spi.metrics.Metrics;
-import io.vertx.core.spi.metrics.MetricsProvider;
-import io.vertx.core.spi.metrics.TCPMetrics;
-import io.vertx.core.spi.metrics.VertxMetrics;
 
 import java.io.FileNotFoundException;
 import java.net.ConnectException;
@@ -52,7 +48,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-public class NetClientImpl implements MetricsProvider, NetClient {
+public class NetClientImpl implements NetClient {
 
   private static final Logger log = LoggerFactory.getLogger(NetClientImpl.class);
   protected final int idleTimeout;
@@ -65,7 +61,6 @@ public class NetClientImpl implements MetricsProvider, NetClient {
   private final ChannelGroup channelGroup;
   private final Closeable closeHook;
   private final ContextInternal creatingContext;
-  private final TCPMetrics metrics;
   private volatile boolean closed;
 
   public NetClientImpl(VertxInternal vertx, NetClientOptions options) {
@@ -89,8 +84,6 @@ public class NetClientImpl implements MetricsProvider, NetClient {
     } else {
       creatingContext = null;
     }
-    VertxMetrics metrics = vertx.metricsSPI();
-    this.metrics = metrics != null ? metrics.createNetClientMetrics(options) : null;
     logEnabled = options.getLogActivity();
     idleTimeout = options.getIdleTimeout();
     idleTimeoutUnit = options.getIdleTimeoutUnit();
@@ -165,21 +158,6 @@ public class NetClientImpl implements MetricsProvider, NetClient {
     }
     ChannelGroupFuture fut = channelGroup.close();
     fut.addListener(promise);
-    promise.future().onComplete(ar -> {
-      if (metrics != null) {
-        metrics.close();
-      }
-    });
-  }
-
-  @Override
-  public boolean isMetricsEnabled() {
-    return metrics != null;
-  }
-
-  @Override
-  public Metrics getMetrics() {
-    return metrics;
   }
 
   private void checkClosed() {
@@ -254,11 +232,8 @@ public class NetClientImpl implements MetricsProvider, NetClient {
   private void connected(ContextInternal context, Channel ch, Promise<NetSocket> connectHandler, SocketAddress remoteAddress) {
     channelGroup.add(ch);
     initChannel(ch.pipeline());
-    VertxHandler<NetSocketImpl> handler = VertxHandler.create(ctx -> new NetSocketImpl(vertx, ctx, remoteAddress, context, sslHelper, metrics));
+    VertxHandler<NetSocketImpl> handler = VertxHandler.create(ctx -> new NetSocketImpl(vertx, ctx, remoteAddress, context, sslHelper));
     handler.addHandler(sock -> {
-      if (metrics != null) {
-        sock.metric(metrics.connected(sock.remoteAddress(), sock.remoteName()));
-      }
 //      sock.registerEventBusHandler();
       connectHandler.complete(sock);
     });

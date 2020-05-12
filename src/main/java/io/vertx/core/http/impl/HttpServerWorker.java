@@ -32,7 +32,6 @@ import io.vertx.core.net.impl.SSLHelper;
 import io.vertx.core.net.impl.SslHandshakeCompletionHandler;
 import io.vertx.core.net.impl.VertxHandler;
 import io.vertx.core.net.impl.HAProxyMessageCompletionHandler;
-import io.vertx.core.spi.metrics.HttpServerMetrics;
 
 import java.nio.charset.StandardCharsets;
 
@@ -212,20 +211,16 @@ public class HttpServerWorker implements Handler<Channel> {
   }
 
   VertxHttp2ConnectionHandler<Http2ServerConnection> buildHttp2ConnectionHandler(ContextInternal ctx, Handler<HttpServerConnection> handler_) {
-    HttpServerMetrics metrics = (HttpServerMetrics) server.getMetrics();
     VertxHttp2ConnectionHandler<Http2ServerConnection> handler = new VertxHttp2ConnectionHandlerBuilder<Http2ServerConnection>()
       .server(true)
       .useCompression(options.isCompressionSupported())
       .useDecompression(options.isDecompressionSupported())
       .compressionLevel(options.getCompressionLevel())
       .initialSettings(options.getInitialSettings())
-      .connectionFactory(connHandler -> new Http2ServerConnection(ctx, serverOrigin, connHandler, options, metrics))
+      .connectionFactory(connHandler -> new Http2ServerConnection(ctx, serverOrigin, connHandler, options))
       .logEnabled(logEnabled)
       .build();
     handler.addHandler(conn -> {
-      if (metrics != null) {
-        conn.metric(metrics.connected(conn.remoteAddress(), conn.remoteName()));
-      }
       if (options.getHttp2ConnectionWindowSize() > 0) {
         conn.setWindowSize(options.getHttp2ConnectionWindowSize());
       }
@@ -268,22 +263,17 @@ public class HttpServerWorker implements Handler<Channel> {
       sendServiceUnavailable(pipeline.channel());
       return;
     }
-    HttpServerMetrics metrics = (HttpServerMetrics) server.getMetrics();
     VertxHandler<Http1xServerConnection> handler = VertxHandler.create(chctx -> {
       Http1xServerConnection conn = new Http1xServerConnection(context.owner(),
         sslHelper,
         options,
         chctx,
         context,
-        serverOrigin,
-        metrics);
+        serverOrigin);
       return conn;
     });
     pipeline.addLast("handler", handler);
     Http1xServerConnection conn = handler.getConnection();
-    if (metrics != null) {
-      conn.metric(metrics.connected(conn.remoteAddress(), conn.remoteName()));
-    }
     connectionHandler.handle(conn);
   }
 }

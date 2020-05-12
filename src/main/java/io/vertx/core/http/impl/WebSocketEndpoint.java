@@ -16,7 +16,6 @@ import io.vertx.core.Handler;
 import io.vertx.core.net.impl.clientconnection.ConnectResult;
 import io.vertx.core.net.impl.clientconnection.ConnectionListener;
 import io.vertx.core.impl.ContextInternal;
-import io.vertx.core.spi.metrics.HttpClientMetrics;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -33,8 +32,8 @@ class WebSocketEndpoint extends ClientHttpEndpointBase {
   private final Deque<Waiter> waiters;
   private int inflightConnections;
 
-  WebSocketEndpoint(HttpClientMetrics metrics, int port, String host, Object metric, int maxPoolSize, HttpChannelConnector connector, Runnable dispose) {
-    super(metrics, port, host, metric, dispose);
+  WebSocketEndpoint(int port, String host, int maxPoolSize, HttpChannelConnector connector, Runnable dispose) {
+    super(port, host, dispose);
     this.maxPoolSize = maxPoolSize;
     this.connector = connector;
     this.waiters = new ArrayDeque<>();

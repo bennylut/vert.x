@@ -16,7 +16,6 @@ import io.netty.handler.codec.http.HttpRequest;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.spi.metrics.HttpServerMetrics;
 
 import static io.vertx.core.http.HttpHeaders.UPGRADE;
 import static io.vertx.core.http.HttpHeaders.WEBSOCKET;

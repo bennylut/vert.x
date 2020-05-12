@@ -11,8 +11,6 @@
 
 package io.vertx.core.impl;
 
-import io.vertx.core.spi.metrics.PoolMetrics;
-
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -21,25 +19,16 @@ import java.util.concurrent.ExecutorService;
 public class WorkerPool {
 
   private final ExecutorService pool;
-  private final PoolMetrics metrics;
 
-  public WorkerPool(ExecutorService pool, PoolMetrics metrics) {
+  public WorkerPool(ExecutorService pool) {
     this.pool = pool;
-    this.metrics = metrics;
   }
 
   ExecutorService executor() {
     return pool;
   }
 
-  PoolMetrics metrics() {
-    return metrics;
-  }
-
   void close() {
-    if (metrics != null) {
-      metrics.close();
-    }
     pool.shutdownNow();
   }
 }

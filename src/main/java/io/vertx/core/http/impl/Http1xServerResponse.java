@@ -41,7 +41,6 @@ import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetSocket;
 import io.vertx.core.net.impl.ConnectionBase;
-import io.vertx.core.spi.metrics.Metrics;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -77,7 +76,6 @@ public class Http1xServerResponse implements HttpServerResponse {
   private final HttpVersion version;
   private final boolean keepAlive;
   private final boolean head;
-  private final Object requestMetric;
 
   private boolean headWritten;
   private boolean written;
@@ -97,7 +95,7 @@ public class Http1xServerResponse implements HttpServerResponse {
   private long bytesWritten;
   private NetSocket netSocket;
 
-  Http1xServerResponse(final VertxInternal vertx, ContextInternal context, Http1xServerConnection conn, HttpRequest request, Object requestMetric) {
+  Http1xServerResponse(final VertxInternal vertx, ContextInternal context, Http1xServerConnection conn, HttpRequest request) {
     this.vertx = vertx;
     this.conn = conn;
     this.context = context;
@@ -105,7 +103,6 @@ public class Http1xServerResponse implements HttpServerResponse {
     this.headers = new VertxHttpHeaders();
     this.request = request;
     this.status = HttpResponseStatus.OK;
-    this.requestMetric = requestMetric;
     this.writable = !conn.isNotWritable();
     this.keepAlive = (version == HttpVersion.HTTP_1_1 && !request.headers().contains(io.vertx.core.http.HttpHeaders.CONNECTION, HttpHeaders.CLOSE, true))
       || (version == HttpVersion.HTTP_1_0 && request.headers().contains(io.vertx.core.http.HttpHeaders.CONNECTION, HttpHeaders.KEEP_ALIVE, true));
@@ -672,10 +669,6 @@ public class Http1xServerResponse implements HttpServerResponse {
     if (cookies != null) {
       setCookies();
     }
-    if (Metrics.METRICS_ENABLED) {
-      // TODO : DONE SOMEWHERE ELSE FROM EVENT LOOP
-      reportResponseBegin();
-    }
     headWritten = true;
   }
 
@@ -684,12 +677,6 @@ public class Http1xServerResponse implements HttpServerResponse {
       if (cookie.isChanged()) {
         headers.add(SET_COOKIE, cookie.encode());
       }
-    }
-  }
-
-  private void reportResponseBegin() {
-    if (conn.metrics != null) {
-      conn.metrics.responseBegin(requestMetric, this);
     }
   }
 

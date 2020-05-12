@@ -21,7 +21,6 @@ import io.vertx.core.net.impl.NetServerImpl;
 import io.vertx.core.net.impl.ServerID;
 import io.vertx.core.net.impl.TCPServerBase;
 import io.vertx.core.net.impl.transport.Transport;
-import io.vertx.core.spi.metrics.VertxMetrics;
 
 import java.io.File;
 import java.net.InetAddress;
@@ -68,8 +67,6 @@ public interface VertxInternal extends Vertx {
   Map<ServerID, NetServerImpl> sharedNetServers();
 
   <S extends TCPServerBase> Map<ServerID, S> sharedTCPServers(Class<S> type);
-
-  VertxMetrics metricsSPI();
 
   Transport transport();
 

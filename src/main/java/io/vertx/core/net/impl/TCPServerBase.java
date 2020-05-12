@@ -28,8 +28,6 @@ import io.vertx.core.impl.logging.Logger;
 import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.net.SocketAddress;
-import io.vertx.core.spi.metrics.MetricsProvider;
-import io.vertx.core.spi.metrics.TCPMetrics;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -45,7 +43,7 @@ import java.util.stream.Collectors;
  * @author <a href="http://tfox.org">Tim Fox</a>
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */
-public abstract class TCPServerBase implements Closeable, MetricsProvider {
+public abstract class TCPServerBase implements Closeable {
 
   private static final Logger log = LoggerFactory.getLogger(NetServerImpl.class);
 
@@ -68,7 +66,6 @@ public abstract class TCPServerBase implements Closeable, MetricsProvider {
   private ServerChannelLoadBalancer channelBalancer;
   private io.netty.util.concurrent.Future<Channel> bindFuture;
   private Set<TCPServerBase> servers;
-  private TCPMetrics<?> metrics;
 
   public TCPServerBase(VertxInternal vertx, NetServerOptions options) {
     this.vertx = vertx;
@@ -124,7 +121,6 @@ public abstract class TCPServerBase implements Closeable, MetricsProvider {
                 actualPort = ((InetSocketAddress)ch.localAddress()).getPort();
               }
               id = new ServerID(TCPServerBase.this.actualPort, id.host);
-              metrics = createMetrics(localAddress);
               // We will overwrite the server in most case but not if the port was randomly chosen
               synchronized (sharedNetServers) {
                 sharedNetServers.put(id, TCPServerBase.this);
@@ -150,7 +146,6 @@ public abstract class TCPServerBase implements Closeable, MetricsProvider {
         actualServer.servers.add(this);
         actualServer.channelBalancer.addWorker(eventLoop, worker);
         actualPort = shared.actualPort;
-        metrics = shared.metrics;
       }
     }
 
@@ -161,10 +156,6 @@ public abstract class TCPServerBase implements Closeable, MetricsProvider {
     return listening;
   }
 
-  protected TCPMetrics<?> createMetrics(SocketAddress localAddress) {
-    return null;
-  }
-
   /**
    * Apply the connection option to the server.
    *
@@ -173,17 +164,6 @@ public abstract class TCPServerBase implements Closeable, MetricsProvider {
    */
   private void applyConnectionOptions(boolean domainSocket, ServerBootstrap bootstrap) {
     vertx.transport().configure(options, domainSocket, bootstrap);
-  }
-
-
-  @Override
-  public boolean isMetricsEnabled() {
-    return metrics != null;
-  }
-
-  @Override
-  public synchronized TCPMetrics<?> getMetrics() {
-    return actualServer != null ? actualServer.metrics : null;
   }
 
   @Override
@@ -219,9 +199,6 @@ public abstract class TCPServerBase implements Closeable, MetricsProvider {
       if (fut.isSuccess()) {
         Channel channel = fut.getNow();
         ChannelFuture a = channel.close();
-        if (metrics != null) {
-          a.addListener(cg -> metrics.close());
-        }
         a.addListener((PromiseInternal<Void>)done);
       } else {
         done.complete();

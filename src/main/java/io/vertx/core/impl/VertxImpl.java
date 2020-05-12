@@ -49,11 +49,6 @@ import io.vertx.core.net.impl.ServerID;
 import io.vertx.core.net.impl.TCPServerBase;
 import io.vertx.core.net.impl.transport.Transport;
 import io.vertx.core.spi.VerticleFactory;
-import io.vertx.core.spi.metrics.Metrics;
-import io.vertx.core.spi.metrics.MetricsProvider;
-import io.vertx.core.spi.metrics.PoolMetrics;
-import io.vertx.core.spi.metrics.VertxMetrics;
-import io.vertx.core.spi.tracing.VertxTracer;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,7 +63,7 @@ import java.util.function.Supplier;
 /**
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-public class VertxImpl implements VertxInternal, MetricsProvider {
+public class VertxImpl implements VertxInternal {
 
   private static final Logger log = LoggerFactory.getLogger(VertxImpl.class);
 
@@ -84,7 +79,6 @@ public class VertxImpl implements VertxInternal, MetricsProvider {
   }
 
   private final FileSystem fileSystem = getFileSystem();
-  private final VertxMetrics metrics;
   private final ConcurrentMap<Long, InternalTimerHandler> timeouts = new ConcurrentHashMap<>();
   private final AtomicLong timeoutCounter = new AtomicLong(0);
   private final DeploymentManager deploymentManager;
@@ -110,9 +104,8 @@ public class VertxImpl implements VertxInternal, MetricsProvider {
   private final TimeUnit maxEventLoopExecTimeUnit;
   private final CloseHooks closeHooks;
   private final Transport transport;
-  final VertxTracer tracer;
 
-  VertxImpl(VertxOptions options, VertxMetrics metrics, VertxTracer<?, ?> tracer, Transport transport, FileResolver fileResolver) {
+  VertxImpl(VertxOptions options, Transport transport, FileResolver fileResolver) {
     // Sanity check
     if (Vertx.currentContext() != null) {
       log.warn("You're already on a Vert.x context, are you sure you want to create a new Vertx instance?");
@@ -132,32 +125,21 @@ public class VertxImpl implements VertxInternal, MetricsProvider {
     ExecutorService workerExec = new ThreadPoolExecutor(workerPoolSize, workerPoolSize,
       0L, TimeUnit.MILLISECONDS, new LinkedTransferQueue<>(),
       new VertxThreadFactory("vert.x-worker-thread-", checker, true, options.getMaxWorkerExecuteTime(), options.getMaxWorkerExecuteTimeUnit()));
-    PoolMetrics workerPoolMetrics = metrics != null ? metrics.createPoolMetrics("worker", "vert.x-worker-thread", options.getWorkerPoolSize()) : null;
     ExecutorService internalBlockingExec = Executors.newFixedThreadPool(options.getInternalBlockingPoolSize(),
       new VertxThreadFactory("vert.x-internal-blocking-", checker, true, options.getMaxWorkerExecuteTime(), options.getMaxWorkerExecuteTimeUnit()));
-    PoolMetrics internalBlockingPoolMetrics = metrics != null ? metrics.createPoolMetrics("worker", "vert.x-internal-blocking", options.getInternalBlockingPoolSize()) : null;
-    internalBlockingPool = new WorkerPool(internalBlockingExec, internalBlockingPoolMetrics);
+    internalBlockingPool = new WorkerPool(internalBlockingExec);
     namedWorkerPools = new HashMap<>();
-    workerPool = new WorkerPool(workerExec, workerPoolMetrics);
+    workerPool = new WorkerPool(workerExec);
     defaultWorkerPoolSize = options.getWorkerPoolSize();
     maxWorkerExecTime = options.getMaxWorkerExecuteTime();
     maxWorkerExecTimeUnit = options.getMaxWorkerExecuteTimeUnit();
 
-    this.metrics = metrics;
     this.transport = transport;
     this.fileResolver = fileResolver;
     this.addressResolverOptions = options.getAddressResolverOptions();
     this.addressResolver = new AddressResolver(this, options.getAddressResolverOptions());
-    this.tracer = tracer;
     this.deploymentManager = new DeploymentManager(this);
     this.verticleManager = new VerticleManager(this, deploymentManager);
-  }
-
-  void init() {
-
-    if (metrics != null) {
-      metrics.vertxCreated(this);
-    }
   }
 
   /**
@@ -322,16 +304,6 @@ public class VertxImpl implements VertxInternal, MetricsProvider {
     }
   }
 
-  @Override
-  public boolean isMetricsEnabled() {
-    return metrics != null;
-  }
-
-  @Override
-  public Metrics getMetrics() {
-    return metrics;
-  }
-
   public boolean cancelTimer(long id) {
     InternalTimerHandler handler = timeouts.remove(id);
     if (handler != null) {
@@ -344,12 +316,12 @@ public class VertxImpl implements VertxInternal, MetricsProvider {
 
   @Override
   public EventLoopContext createEventLoopContext(Deployment deployment, WorkerPool workerPool, ClassLoader tccl) {
-    return new EventLoopContext(this, tracer, internalBlockingPool, workerPool != null ? workerPool : this.workerPool, deployment, tccl);
+    return new EventLoopContext(this, internalBlockingPool, workerPool != null ? workerPool : this.workerPool, deployment, tccl);
   }
 
   @Override
   public EventLoopContext createEventLoopContext(EventLoop eventLoop, WorkerPool workerPool, ClassLoader tccl) {
-    return new EventLoopContext(this, tracer, eventLoop, internalBlockingPool, workerPool != null ? workerPool : this.workerPool, null, tccl);
+    return new EventLoopContext(this, eventLoop, internalBlockingPool, workerPool != null ? workerPool : this.workerPool, null, tccl);
   }
 
   @Override
@@ -357,7 +329,7 @@ public class VertxImpl implements VertxInternal, MetricsProvider {
     if (workerPool == null) {
       workerPool = this.workerPool;
     }
-    return new WorkerContext(this, tracer, internalBlockingPool, workerPool, deployment, tccl);
+    return new WorkerContext(this, internalBlockingPool, workerPool, deployment, tccl);
   }
 
   @Override
@@ -641,11 +613,6 @@ public class VertxImpl implements VertxInternal, MetricsProvider {
   }
 
   @Override
-  public VertxMetrics metricsSPI() {
-    return metrics;
-  }
-
-  @Override
   public File resolveFile(String fileName) {
     return fileResolver.resolveFile(fileName);
   }
@@ -697,13 +664,6 @@ public class VertxImpl implements VertxInternal, MetricsProvider {
               if (!future.isSuccess()) {
                 log.warn("Failure in shutting down event loop group", future.cause());
               }
-              if (metrics != null) {
-                metrics.close();
-              }
-              if (tracer != null) {
-                tracer.close();
-              }
-
               checker.close();
 
               if (completionHandler != null) {
@@ -882,8 +842,8 @@ public class VertxImpl implements VertxInternal, MetricsProvider {
     private final String name;
     private int refCount = 1;
 
-    SharedWorkerPool(String name, ExecutorService workerExec, PoolMetrics workerMetrics) {
-      super(workerExec, workerMetrics);
+    SharedWorkerPool(String name, ExecutorService workerExec) {
+      super(workerExec);
       this.name = name;
     }
 
@@ -933,8 +893,7 @@ public class VertxImpl implements VertxInternal, MetricsProvider {
     SharedWorkerPool sharedWorkerPool = namedWorkerPools.get(name);
     if (sharedWorkerPool == null) {
       ExecutorService workerExec = Executors.newFixedThreadPool(poolSize, new VertxThreadFactory(name + "-", checker, true, maxExecuteTime, maxExecuteTimeUnit));
-      PoolMetrics workerMetrics = metrics != null ? metrics.createPoolMetrics("worker", name, poolSize) : null;
-      namedWorkerPools.put(name, sharedWorkerPool = new SharedWorkerPool(name, workerExec, workerMetrics));
+      namedWorkerPools.put(name, sharedWorkerPool = new SharedWorkerPool(name, workerExec));
     } else {
       sharedWorkerPool.refCount++;
     }

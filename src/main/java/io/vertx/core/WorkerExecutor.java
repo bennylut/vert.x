@@ -12,9 +12,6 @@
 package io.vertx.core;
 
 
-
-import io.vertx.core.metrics.Measured;
-
 /**
  * An executor for executing blocking code in Vert.x .<p>
  *
@@ -24,7 +21,7 @@ import io.vertx.core.metrics.Measured;
  * @author <a href="mailto:julien@julienviet.com">Julien Viet</a>
  */
 
-public interface WorkerExecutor extends Measured {
+public interface WorkerExecutor{
 
   /**
    * Safely execute some blocking code.

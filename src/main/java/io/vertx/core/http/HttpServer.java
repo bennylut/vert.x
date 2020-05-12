@@ -18,7 +18,6 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
 
-import io.vertx.core.metrics.Measured;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.core.streams.ReadStream;
 
@@ -34,7 +33,7 @@ import io.vertx.core.streams.ReadStream;
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
 
-public interface HttpServer extends Measured {
+public interface HttpServer  {
 
   /**
    * Return the request stream for the server. As HTTP requests are received by the server,

@@ -13,8 +13,6 @@ package io.vertx.core.http.impl;
 
 import io.vertx.core.http.WebSocket;
 import io.vertx.core.impl.ContextInternal;
-import io.vertx.core.impl.VertxInternal;
-import io.vertx.core.spi.metrics.HttpClientMetrics;
 
 /**
  * This class is optimised for performance when used on the same event loop. However it can be used safely from other threads.
@@ -33,15 +31,4 @@ public class WebSocketImpl extends WebSocketImplBase<WebSocketImpl> implements W
     super(context, conn, supportsContinuation, maxWebSocketFrameSize, maxWebSocketMessageSize);
   }
 
-  @Override
-  void handleClosed() {
-    // THAT SHOULD BE CALLED ON EVENT LOOP
-    synchronized (conn) {
-      HttpClientMetrics metrics = ((Http1xClientConnection) conn).metrics();
-      if (metrics != null) {
-        metrics.disconnected(getMetric());
-      }
-    }
-    super.handleClosed();
-  }
 }
